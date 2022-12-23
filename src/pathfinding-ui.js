@@ -34,6 +34,9 @@ var PathfindingUi = (function () {
 
       this.pathfinding = new Pathfinding(this.matrix);
 
+
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
       this.render();
 
       return this;
@@ -109,7 +112,7 @@ var PathfindingUi = (function () {
     loop() {}
 
     static init(elements, settings) {
-
+      console.log("init");
       if (elements instanceof Node) {
         elements = [elements];
       }
@@ -123,9 +126,8 @@ var PathfindingUi = (function () {
       }
 
       elements.forEach((element) => {
-        console.log(JSON.parse(element.dataset.from));
-       element.pui =  new PathfindingUi(element, {
-          matrix: JSON.parse(element.dataset.matrix),
+       new PathfindingUi(element, {
+          matrix: JSON.parse(element.dataset.pathfinding),
         }).drawPath(JSON.parse(element.dataset.from), JSON.parse(element.dataset.to));
       });
     }
