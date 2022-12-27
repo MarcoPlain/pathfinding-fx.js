@@ -63,7 +63,7 @@ var PathfindingUi = (function () {
     }
 
     drawPath(fromNode, toNode) {
-      const path = this.pathfinding.fromTo(fromNode, toNode);
+      this.path = this.pathfinding.fromTo(fromNode, toNode);
       const ctx = this.ctx;
       const tileSize = this.tileSize;
 
@@ -84,7 +84,7 @@ var PathfindingUi = (function () {
       }*/
 
       setTimeout(() => {
-        this.drawNode(path);
+        this.drawNode(this.path);
       }, 100);
 
       return this;
