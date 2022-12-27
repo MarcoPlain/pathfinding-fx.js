@@ -7,6 +7,12 @@ var PathfindingUi = (function () {
    * Version 1.0.0
    */
 
+  const defaults = {
+    pathNodeColor: '#a8a8a8',
+    startNodeColor: '#0088bb',
+    endNodeColor: '#00bb88',
+  }
+
   class PathfindingUi {
     constructor(element, settings = {}) {
       if (typeof Pathfinding == "undefined") {
@@ -25,19 +31,25 @@ var PathfindingUi = (function () {
       this.height = element.offsetHeight;
       this.ctx = element.getContext("2d");
 
-      this.matrix = settings.matrix || [];
+      this.map = settings.map || [];
 
       this.tileSize = {
-        h: this.height / this.matrix.length,
-        w: this.width / this.matrix[0].length,
+        h: this.height / this.map.length,
+        w: this.width / this.map[0].length,
       };
 
-      this.pathfinding = new Pathfinding(this.matrix);
+      this.pathfinding = new Pathfinding(this.map);
 
 
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      this.render();
+      //this.render();
+
+      // Settings
+      this.settings = {};
+      this.settings.pathNodeColor = settings.pathNodeColor || defaults.pathNodeColor
+      this.settings.startNodeColor = settings.startNodeColor || defaults.startNodeColor
+      this.settings.endNodeColor = settings.endNodeColor || defaults.endNodeColor
 
       return this;
     }
@@ -46,11 +58,11 @@ var PathfindingUi = (function () {
       const ctx = this.ctx;
       //ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      for (let y = 0; y < this.matrix.length; y++) {
-        for (let x = 0; x < this.matrix[y].length; x++) {
+      for (let y = 0; y < this.map.length; y++) {
+        for (let x = 0; x < this.map[y].length; x++) {
           ctx.font = "10px Arial";
           ctx.fillStyle = "#000000";
-          if (!this.matrix[y][x])
+          if (!this.map[y][x])
             ctx.fillRect(
               x * this.tileSize.w,
               y * this.tileSize.h,
@@ -62,8 +74,9 @@ var PathfindingUi = (function () {
       return this;
     }
 
-    drawPath(fromNode, toNode) {
+    findPath(fromNode, toNode) {
       this.path = this.pathfinding.fromTo(fromNode, toNode);
+      return this.path;
       const ctx = this.ctx;
       const tileSize = this.tileSize;
 
@@ -89,24 +102,58 @@ var PathfindingUi = (function () {
 
       return this;
     }
+    drawMap(config = {}){
 
-    drawNode(path) {
-      const ctx = this.ctx;
-      const tileSize = this.tileSize;
-      ctx.fillStyle = "#a8a8a8";
-      const node = path.shift();
-      if (!path.length) ctx.fillStyle = "#00bb88";
-      ctx.fillRect(
-        node.x * tileSize.w,
-        node.y * tileSize.h,
-        tileSize.w,
-        tileSize.h
-      );
-      if (path.length) {
-        setTimeout(() => {
-          this.drawNode(path);
-        }, 100);
+      for (let y = 0; y < this.map.length; y++) {
+        for (let x = 0; x < this.map[y].length; x++) {
+          this.ctx.font = "10px Arial";
+          this.ctx.fillStyle = "#000000";
+          if (!this.map[y][x])
+            this.ctx.fillRect(
+              x * this.tileSize.w,
+              y * this.tileSize.h,
+              this.tileSize.w,
+              this.tileSize.h
+            );
+        }
       }
+      return this;
+    }
+
+    drawPath(path, config = {}){
+
+      this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
+
+      for(let i=0; i < path.length; i++){
+        if(config && config.distance && i==config.distance)
+          break;
+        let node = path[i];
+        this.ctx.fillRect(
+          node.x * this.tileSize.w,
+          node.y * this.tileSize.h,
+          this.tileSize.w,
+          this.tileSize.h
+        );
+      }
+    }
+
+    drawNode(node, config = {}) {
+      this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
+      
+      this.ctx.fillRect(
+        node.x * this.tileSize.w,
+        node.y * this.tileSize.h,
+        this.tileSize.w,
+        this.tileSize.h
+      );
+    }
+
+    drawStartNode(node, config = {}) {
+      this.drawNode(node, {color:config.color || this.settings.startNodeColor})
+    }
+
+    drawEndNode(node, config = {}) {
+      this.drawNode(node, {color:config.color || this.settings.endNodeColor})
     }
 
     loop() {}
@@ -126,8 +173,8 @@ var PathfindingUi = (function () {
 
       elements.forEach((element) => {
        new PathfindingUi(element, {
-          matrix: JSON.parse(element.dataset.pathfinding),
-        }).drawPath(JSON.parse(element.dataset.from), JSON.parse(element.dataset.to));
+          map: JSON.parse(element.dataset.pathfinding),
+        }).findPath(JSON.parse(element.dataset.from), JSON.parse(element.dataset.to));
       });
     }
   }
