@@ -112,7 +112,6 @@ var PathfindingUi = (function () {
     loop() {}
 
     static init(elements, settings) {
-      console.log("init");
       if (elements instanceof Node) {
         elements = [elements];
       }
