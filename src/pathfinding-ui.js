@@ -9,6 +9,7 @@ var PathfindingUi = (function () {
 
   const defaults = {
     pathNodeColor: '#a8a8a8',
+    floodNodeColor: '#585858',
     startNodeColor: '#0088bb',
     endNodeColor: '#00bb88',
   }
@@ -48,6 +49,7 @@ var PathfindingUi = (function () {
       // Settings
       this.settings = {};
       this.settings.pathNodeColor = settings.pathNodeColor || defaults.pathNodeColor
+      this.settings.floodNodeColor = settings.floodNodeColor || defaults.floodNodeColor
       this.settings.startNodeColor = settings.startNodeColor || defaults.startNodeColor
       this.settings.endNodeColor = settings.endNodeColor || defaults.endNodeColor
 
@@ -75,7 +77,7 @@ var PathfindingUi = (function () {
     }
 
     findPath(fromNode, toNode) {
-      this.path = this.pathfinding.fromTo(fromNode, toNode);
+      this.path = this.pathfinding.findPath(fromNode, toNode);
       return this.path;
       const ctx = this.ctx;
       const tileSize = this.tileSize;
@@ -102,6 +104,12 @@ var PathfindingUi = (function () {
 
       return this;
     }
+    findFlood(fromNode, toNode, settings={}) {
+      return this.pathfinding.findFlood(fromNode, toNode, settings);
+    }
+    findSequence(fromNode, toNode, settings={}) {
+      return this.pathfinding.findSequence(fromNode, toNode, settings);
+    }
     drawMap(config = {}){
 
       for (let y = 0; y < this.map.length; y++) {
@@ -120,20 +128,9 @@ var PathfindingUi = (function () {
       return this;
     }
 
-    drawPath(path, config = {}){
-
-      this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
-
+    drawNodes(path, config = {}){
       for(let i=0; i < path.length; i++){
-        if(config && config.distance && i==config.distance)
-          break;
-        let node = path[i];
-        this.ctx.fillRect(
-          node.x * this.tileSize.w,
-          node.y * this.tileSize.h,
-          this.tileSize.w,
-          this.tileSize.h
-        );
+        this.drawNode(path[i], config)
       }
     }
 
