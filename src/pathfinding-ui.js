@@ -76,40 +76,14 @@ var PathfindingUi = (function () {
       return this;
     }
 
-    findPath(fromNode, toNode) {
-      this.path = this.pathfinding.findPath(fromNode, toNode);
-      return this.path;
-      const ctx = this.ctx;
-      const tileSize = this.tileSize;
-
-      ctx.fillStyle = "#0088bb";
-      ctx.fillRect(
-        fromNode.x * tileSize.w,
-        fromNode.y * tileSize.h,
-        tileSize.w,
-        tileSize.h
-      );
-
-      ctx.font = "10px Arial";
-      ctx.fillStyle = "#a8a8a8";
-      /*for (let i = 0; i < path.length; i++) {
-        let node = path[i];
-        if (i == path.length - 1) ctx.fillStyle = "#00bb88";
-        ctx.fillRect(node.x * tileSize.w, node.y * tileSize.h, tileSize.w, tileSize.h);
-      }*/
-
-      setTimeout(() => {
-        this.drawNode(this.path);
-      }, 100);
-
-      return this;
+    findPath(fromNode, toNode, settings={}) {
+      return this.pathfinding.findPath(fromNode, toNode, settings);
     }
+
     findFlood(fromNode, toNode, settings={}) {
       return this.pathfinding.findFlood(fromNode, toNode, settings);
     }
-    findSequence(fromNode, toNode, settings={}) {
-      return this.pathfinding.findSequence(fromNode, toNode, settings);
-    }
+    
     drawMap(config = {}){
 
       for (let y = 0; y < this.map.length; y++) {
