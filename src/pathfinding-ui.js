@@ -8,11 +8,11 @@ var PathfindingUi = (function () {
    */
 
   const defaults = {
-    pathNodeColor: '#a8a8a8',
-    floodNodeColor: '#585858',
-    startNodeColor: '#0088bb',
-    endNodeColor: '#00bb88',
-  }
+    pathNodeColor: "#a8a8a8",
+    floodNodeColor: "#585858",
+    startNodeColor: "#0088bb",
+    endNodeColor: "#00bb88",
+  };
 
   class PathfindingUi {
     constructor(element, settings = {}) {
@@ -32,6 +32,12 @@ var PathfindingUi = (function () {
       this.height = element.offsetHeight;
       this.ctx = element.getContext("2d");
 
+      this.mouseIsDown = false;
+      element.addEventListener("mousedown", (evt) => this.mouseDown(evt));
+      element.addEventListener("mouseup", (evt) => this.mouseUp(evt));
+      element.addEventListener("mouseleave", (evt) => this.mouseUp(evt));
+      element.addEventListener("mousemove", (evt) => this.mouseMove(evt));
+
       this.map = settings.map || [];
 
       this.tileSize = {
@@ -41,51 +47,81 @@ var PathfindingUi = (function () {
 
       this.pathfinding = new Pathfinding(this.map);
 
-
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
       //this.render();
 
       // Settings
       this.settings = {};
-      this.settings.pathNodeColor = settings.pathNodeColor || defaults.pathNodeColor
-      this.settings.floodNodeColor = settings.floodNodeColor || defaults.floodNodeColor
-      this.settings.startNodeColor = settings.startNodeColor || defaults.startNodeColor
-      this.settings.endNodeColor = settings.endNodeColor || defaults.endNodeColor
+      this.settings.pathNodeColor =
+        settings.pathNodeColor || defaults.pathNodeColor;
+      this.settings.floodNodeColor =
+        settings.floodNodeColor || defaults.floodNodeColor;
+      this.settings.startNodeColor =
+        settings.startNodeColor || defaults.startNodeColor;
+      this.settings.endNodeColor =
+        settings.endNodeColor || defaults.endNodeColor;
 
       return this;
     }
 
-    render() {
-      const ctx = this.ctx;
-      //ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    normalizePointFromEvent(event) {
+      return {
+        x: event.clientX - this.canvas.offsetLeft + window.scrollX,
+        y: event.clientY - this.canvas.offsetTop + window.scrollY,
+      };
+    }
 
-      for (let y = 0; y < this.map.length; y++) {
-        for (let x = 0; x < this.map[y].length; x++) {
-          ctx.font = "10px Arial";
-          ctx.fillStyle = "#000000";
-          if (!this.map[y][x])
-            ctx.fillRect(
-              x * this.tileSize.w,
-              y * this.tileSize.h,
-              this.tileSize.w,
-              this.tileSize.h
-            );
-        }
+    getNodeFromPoint(point){
+      const x = Math.round((point.x-this.tileSize.w/2) / this.tileSize.w);
+      const y = Math.round((point.y-this.tileSize.h/2) / this.tileSize.h);
+
+      const node = this.map[y][x];
+
+      return {x:x, y:y};
+    }
+
+    mouseDown(event) {
+      this.mouseIsDown = true;
+
+      let node = this.getNodeFromPoint(this.normalizePointFromEvent(event));
+      //node = !node;
+      this.map[node.y][node.x] = this.map[node.y][node.x] ? 0 : 1;
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.drawMap();
+
+      this.targetNode = node
+
+    }
+
+    mouseUp(event) {
+      if (!this.mouseIsDown) return;
+      this.mouseIsDown = false;
+      console.log(this.mouseIsDown);
+    }
+
+    mouseMove(event){
+      if (!this.mouseIsDown) return;
+
+      let node = this.getNodeFromPoint(this.normalizePointFromEvent(event));
+      if(node.x != this.targetNode.x || node.y != this.targetNode.y){
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.map[node.y][node.x] = this.map[node.y][node.x] ? 0 : 1;
+        this.drawMap();
+
+        this.targetNode = node
       }
-      return this;
     }
 
-    findPath(fromNode, toNode, settings={}) {
+    findPath(fromNode, toNode, settings = {}) {
       return this.pathfinding.findPath(fromNode, toNode, settings);
     }
 
-    findFlood(fromNode, toNode, settings={}) {
+    findFlood(fromNode, toNode, settings = {}) {
       return this.pathfinding.findFlood(fromNode, toNode, settings);
     }
-    
-    drawMap(config = {}){
 
+    drawMap(config = {}) {
       for (let y = 0; y < this.map.length; y++) {
         for (let x = 0; x < this.map[y].length; x++) {
           this.ctx.font = "10px Arial";
@@ -102,15 +138,15 @@ var PathfindingUi = (function () {
       return this;
     }
 
-    drawNodes(path, config = {}){
-      for(let i=0; i < path.length; i++){
-        this.drawNode(path[i], config)
+    drawNodes(path, config = {}) {
+      for (let i = 0; i < path.length; i++) {
+        this.drawNode(path[i], config);
       }
     }
 
     drawNode(node, config = {}) {
       this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
-      
+
       this.ctx.fillRect(
         node.x * this.tileSize.w,
         node.y * this.tileSize.h,
@@ -120,11 +156,15 @@ var PathfindingUi = (function () {
     }
 
     drawStartNode(node, config = {}) {
-      this.drawNode(node, {color:config.color || this.settings.startNodeColor})
+      this.drawNode(node, {
+        color: config.color || this.settings.startNodeColor,
+      });
     }
 
     drawEndNode(node, config = {}) {
-      this.drawNode(node, {color:config.color || this.settings.endNodeColor})
+      this.drawNode(node, {
+        color: config.color || this.settings.endNodeColor,
+      });
     }
 
     loop() {}
@@ -143,9 +183,12 @@ var PathfindingUi = (function () {
       }
 
       elements.forEach((element) => {
-       new PathfindingUi(element, {
+        new PathfindingUi(element, {
           map: JSON.parse(element.dataset.pathfinding),
-        }).findPath(JSON.parse(element.dataset.from), JSON.parse(element.dataset.to));
+        }).findPath(
+          JSON.parse(element.dataset.from),
+          JSON.parse(element.dataset.to)
+        );
       });
     }
   }
