@@ -55,8 +55,8 @@ var PathfindingUi = (function () {
       this.map = settings.map || [];
 
       this.tileSize = {
-        h: Math.floor(this.height / this.map.length) + 0.5,
-        w: Math.floor(this.width / this.map[0].length) + 0.5,
+        h: Math.floor(this.height / this.map.length),
+        w: Math.floor(this.width / this.map[0].length),
       };
 
       this.canvas.style.width = rect.width + "px";
@@ -87,11 +87,11 @@ var PathfindingUi = (function () {
       return this;
     }
 
-    render(){
+    render(settings={}){
       this.clearCanvas();
       this.drawMap();
-      this.pathsList.forEach((nodes) => {
-        this.drawNodes(nodes);
+      this.pathsList.forEach((path) => {
+        this.drawNodes(new Pathfinding(this.map).findPath(path.from, path.to, settings));
       });
       this.drawNodes(this.nodesList);
     }
@@ -218,7 +218,7 @@ var PathfindingUi = (function () {
     addPath(fromNode, toNode, settings = {}) {
       const pathfinding = new Pathfinding(this.map)
       const path = pathfinding.findPath(fromNode, toNode, settings);
-      this.pathsList.push(path);
+      //this.pathsList.push(path);
       return path;
     }
 
@@ -255,6 +255,20 @@ var PathfindingUi = (function () {
       }
     }
 
+    fromNode(node, config = {}) {
+      this.currentNode = this.addStartNode(node, config);
+      return this;
+    }
+    toNode(node, config = {}) {
+
+      node = this.addEndNode(node, config);
+      if(this.currentNode){
+        this.pathsList.push({from: this.currentNode, to: node})
+      }
+      
+      return this;
+    }
+
     addNode(node, config = {}) {
       this.nodesList.push({ ...node, ...{ config: config } });
       this.drawNode(node, config);
@@ -282,6 +296,8 @@ var PathfindingUi = (function () {
       this.drawNode(node, {
         config,
       });
+
+      return this.nodesList[this.nodesList.length-1];
     }
 
     addEndNode(node, config = {}) {
@@ -295,6 +311,7 @@ var PathfindingUi = (function () {
       this.drawNode(node, {
         config,
       });
+      return this.nodesList[this.nodesList.length-1];
     }
 
     drawContext(node, config = {}) {
