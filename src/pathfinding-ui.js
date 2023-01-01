@@ -66,6 +66,7 @@ var PathfindingUi = (function () {
       this.pathsList = [];
       this.interactionMode = null;
       this.targetNodeIndex = null;
+      this.currentContext = null;
 
       // Settings
       this.settings = {};
@@ -84,6 +85,63 @@ var PathfindingUi = (function () {
 
       this.clearCanvas();
 
+      // Animation Stuff
+      this.animationFrameId = null;
+      this.lastFrameTimeMs = 0,
+      this.maxFPS = 60,
+      this.delta = 0,
+      this.timestep = 1000 / 24;
+
+      // Walkers Stuff
+      this.walkers = [];
+
+      return this;
+    }
+
+    update(delta){
+
+    }
+
+    animationLoop(pui, timestamp) {
+      // Throttle the frame rate.    
+      if (timestamp < pui.lastFrameTimeMs + (1000 / pui.maxFPS)) {
+          requestAnimationFrame(pui.animationLoop.bind(0, pui));
+          return;
+      }
+      pui.delta += timestamp - pui.lastFrameTimeMs;
+      pui.lastFrameTimeMs = timestamp;
+  
+      var numUpdateSteps = 0;
+      while (pui.delta >= pui.timestep) {
+          pui.update(pui.timestep);
+          pui.delta -= pui.timestep;
+          if (++numUpdateSteps >= 240) {
+              pui.delta = 0;
+              break;
+          }
+      }
+      pui.render();
+      requestAnimationFrame(pui.animationLoop.bind(0, pui));
+    }
+
+    animate() {
+      this.animationFrameId = requestAnimationFrame(this.animationLoop.bind(0, this));
+      this.interval = setInterval(() => {
+        this.walkers.forEach((walker) => {
+          walker.x = walker.path[walker.steps].x;
+          walker.y = walker.path[walker.steps].y;
+          walker.steps++;
+          if(walker.steps == walker.path.length){
+            walker.steps = 0;
+          }
+        });
+      }, 1000 / 8);
+    }
+
+    addWalker(from, to, settings){
+      var walker = {x:from.x, y:from.y, steps:0, from: from, to: to, settings: settings};
+      walker.path = this.addPath(from, to);
+      this.walkers.push(walker);
       return this;
     }
 
@@ -94,11 +152,23 @@ var PathfindingUi = (function () {
         this.drawNodes(new Pathfinding(this.map).findPath(path.from, path.to, settings));
       });
       this.drawNodes(this.nodesList);
+      this.walkers.forEach((node) => { 
+        this.drawNode(node, node.settings);
+      });
+      if(this.currentContext){
+        this.drawContext(this.currentContext);
+      }
+      return this;
     }
 
     updateMap(map){
       if(typeof this.onMapUpdate != "undefined") this.onMapUpdate(map);
       this.map = map;
+      
+      this.walkers.forEach((walker) => {
+
+        walker.path = this.addPath(walker.from, walker.to);
+      });
     }
 
     normalizePointFromEvent(event) {
@@ -138,7 +208,9 @@ var PathfindingUi = (function () {
         this.updateMap(newMap);
       }
 
-      this.render()
+      if(this.animationFrameId === null){
+        this.render()
+      }
 
       this.targetAxis = node;
     }
@@ -151,6 +223,7 @@ var PathfindingUi = (function () {
       this.mouseIsDown = false;
       this.interactionMode = null;
       this.targetNodeIndex = null;
+      this.currentContext = null;
     }
 
     detectContext(node) {
@@ -209,9 +282,11 @@ var PathfindingUi = (function () {
           }
         }
 
-        let context = this.detectContext(axis);
-        this.render();
-        this.drawContext(context);
+        this.currentContext = this.detectContext(axis);
+        if(this.animationFrameId === null){
+          this.render();
+          this.drawContext(this.currentContext);
+        }
       }
     }
 
@@ -332,7 +407,6 @@ var PathfindingUi = (function () {
       this.ctx.restore();
     }
 
-    loop() {}
 
     static init(elements, settings) {
       if (elements instanceof Node) {
