@@ -1,2 +1,3 @@
-# pathfinding-ui.js
-User interface tools for the pathfinding.js library
+# pathfinding-fx.js
+
+A smooth pathfinding visualizer for websites
