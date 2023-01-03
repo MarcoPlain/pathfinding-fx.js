@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pathfinding</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"
+    ></script>
+    <script src="../src/pathfinding-fx.js"></script>
+  </head>
+  <body class="bg-gray-900 text-gray-50 overflow-x-hidden">
+
+    <div class="h-[100vh] bg-black">
+      <canvas id="pathfinding-canvas" width="100%" height="100%" class="mx-auto"></canvas>
+    </div>
+
+    <div class="container mx-auto">
+      <div class="p-8">
+        <h1 class="text-primary text-center text-4xl">
+          UX Experiment pathfinding.js
+        </h1>
+        <p>pathfinding-ui visualizes the beautry of pathfinding itself.</p>
+      </div>
+      
+      </div>
+
+      <!-- autoload-usage -->
+      <!--<div class="bg-gray-500 my-8 flex gap-4 p-8">
+        <div>
+          <div class="bg-blue-200 mb-2">
+            <canvas
+              width="200"
+              height="200"
+              data-pathfinding="[
+                [0,0,0,0,0,0,0,0,0],
+                [0,1,1,1,1,1,1,1,0],
+                [0,1,1,1,1,1,1,1,0],
+                [0,1,1,1,0,1,1,1,0],
+                [0,1,1,1,0,1,1,1,0],
+                [0,1,1,1,0,1,1,1,0],
+                [0,1,1,1,1,1,1,1,0],
+                [0,1,1,1,1,1,1,1,0],
+                [0,0,0,0,0,0,0,0,0]
+            ]"
+              data-from='{"x":"2", "y":"4"}'
+              data-to='{"x":"6", "y":"4"}'
+            ></canvas>
+          </div>
+          <button
+            class="bg-primary text-black rounded p-1.5"
+            onclick='PathfindingFX.init(document.querySelectorAll("[data-pathfinding]"))'
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
+          </button>
+        </div>
+        <div>
+          <h1 class="text-xl text-primary uppercase">Autoloading</h1>
+          <p>
+            Use <code>data-pathfinding</code> for inline path drawing
+            autoloading
+          </p>
+          <pre><code class="text-code">&lt;canvas width="225" height="225" 
+    <span class="text-code-important">data-pathfinding="[
+        [0,0,0,0,0,0,0,0,0],
+        [0,1,1,1,1,1,1,1,0],
+        [0,1,1,1,1,1,1,1,0],
+        [0,1,1,1,0,1,1,1,0],
+        [0,1,1,1,0,1,1,1,0],
+        [0,1,1,1,0,1,1,1,0],
+        [0,1,1,1,1,1,1,1,0],
+        [0,1,1,1,1,1,1,1,0],
+        [0,0,0,0,0,0,0,0,0]
+    ]"
+    data-from='{"x":"2", "y":"4"}'
+    data-to='{"x":"6", "y":"4"}'</span>
+&gt;&lt;/canvas&gt;</code></pre>
+        </div>
+      </div>-->
+
+      <!-- PUI :: drawMap() -->
+      <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawMap()">
+        <div>
+          <div class="bg-blue-200">
+            <canvas id="drawMap" width="225" height="225"></canvas>
+            <script>
+              const drawMap = () => ({
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                run() {
+                  const PUI = new PathfindingFX(
+                    document.getElementById("drawMap"),
+                    { map: this.map }
+                  );
+
+                  PUI.drawMap();
+                  PUI.onMapUpdate = (map) => {
+                    this.map = map;
+                  };
+                },
+                init() {
+                  this.run();
+                },
+              });
+            </script>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-xl text-primary">PUI :: drawMap()</h1>
+          <pre>
+            <code>
+const PUI = new PathfindingFX(
+    document.getElementById("drawMap"),
+    { 
+        map: [
+          <span x-html='map.join("\n          ")'></span>
+        ], 
+    }
+);
+
+PUI.drawMap();
+
+          </code>
+        </pre>
+        </div>
+      </div>
+
+      <!-- PUI :: drawNode() -->
+      <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNode()">
+        <div>
+          <div class="bg-blue-200">
+            <canvas id="drawNode" width="225" height="225"></canvas>
+            <script>
+              const drawNode = () => ({
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                nodeA: { x: 2, y: 5, config: { color: "red" } },
+                nodeB: { x: 6, y: 2, config: { color: "green" } },
+                run() {
+                  const PUI = new PathfindingFX(
+                    document.getElementById("drawNode"),
+                    { map: this.map }
+                  );
+
+                  PUI.drawMap();
+
+                  PUI.addNode(this.nodeA, { color: "red" });
+                  PUI.addNode(this.nodeB, { color: "green" });
+
+                  PUI.onNodesListUpdate = (nodesList) => {
+                    nodesList.forEach((node) => {
+                      if (node.config.color == "red") {
+                        this.nodeA.x = node.x;
+                        this.nodeA.y = node.y;
+                      }
+                      if (node.config.color == "green") {
+                        this.nodeB.x = node.x;
+                        this.nodeB.y = node.y;
+                      }
+                    });
+                  };
+                },
+                init() {
+                  this.run();
+                },
+              });
+            </script>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-xl text-primary">PUI :: drawNode()</h1>
+          <pre>
+            <code>
+const nodeA = <span x-html="JSON.stringify(nodeA, ['x','y'])"></span>;
+const nodeB = <span x-html="JSON.stringify(nodeB, ['x','y'])"></span>;
+
+PUI.drawNode(nodeA, {color:'red'});
+PUI.drawNode(nodeB, {color:'green'});
+
+          </code>
+        </pre>
+        </div>
+      </div>
+
+      <!-- PUI :: drawNodes() -->
+      <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNodes()">
+        <div>
+          <div class="bg-blue-200">
+            <canvas id="drawNodes" width="225" height="225"></canvas>
+            <script>
+              const drawNodes = () => ({
+                PUIObj: null,
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                fromNode: { x: 2, y: 2 },
+                toNode: { x: 6, y: 3 },
+                run() {
+                  const PUI = new PathfindingFX(
+                    document.getElementById("drawNodes"),
+                    { map: this.map }
+                  );
+                  this.PUIObj = PUI;
+
+                  PUI.drawMap();
+
+                  const path = PUI.addPath(this.fromNode, this.toNode);
+
+                  this.sliderValueMax = path.length;
+
+                  PUI.drawNodes(path);
+
+                  PUI.addNode(this.fromNode, { color: "red" });
+                  PUI.addNode(this.toNode, { color: "green" });
+
+                  PUI.onNodesListUpdate = (nodesList) => {
+                    nodesList.forEach((node) => {
+                      if (node.config.color == "red") {
+                        this.fromNode.x = node.x;
+                        this.fromNode.y = node.y;
+                      }
+                      if (node.config.color == "green") {
+                        this.toNode.x = node.x;
+                        this.toNode.y = node.y;
+                      }
+                    });
+
+                    const PUI = this.PUIObj;
+                      PUI.clearAllPaths();
+                      const path = PUI.addPath(this.fromNode, this.toNode);
+                      PUI.drawNodes(path);
+                  };
+                },
+                init() {
+                  this.run();
+                },
+              });
+            </script>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-xl text-primary">PUI :: drawNodes()</h1>
+        
+          <pre>
+            <code>
+const fromNode = { x: 2, y: 3 };
+const toNode = { x: 6, y: 3 };
+
+PUI.addStartNode(fromNode);
+PUI.addEndNode(toNode);
+
+const path = PUI.findPath(fromNode, toNode);
+
+PUI.drawNodes(path);
+          </code>
+        </pre>
+        </div>
+      </div>
+
+      <!-- PUI :: drawNodes with max() -->
+      <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNodesWithSteps()">
+        <div>
+          <div class="bg-blue-200">
+            <canvas id="drawNodesWithSteps" width="225" height="225"></canvas>
+            <script>
+              const drawNodesWithSteps = () => ({
+                PUIObj: null,
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                fromNode: { x: 2, y: 3 },
+                toNode: { x: 6, y: 3 },
+                step: null,
+                sliderValueMax: null,
+                run() {
+                  const PUI = new PathfindingFX(
+                    document.getElementById("drawNodesWithSteps"),
+                    { map: this.map }
+                  );
+                  this.PUIObj = PUI;
+
+                  PUI.drawMap();
+
+                  const path = PUI.addPath(this.fromNode, this.toNode);
+                  this.sliderValueMax = path.length;
+                  if (this.step === null) {
+                    this.step = Math.round(this.sliderValueMax / 2);
+                  }
+
+                  PUI.drawNodes(path.filter((p) => p.g <= this.step));
+
+                  PUI.addNode(this.fromNode, { color: "red" });
+                  PUI.addNode(this.toNode, { color: "green" });
+
+                  PUI.onNodesListUpdate = (nodesList) => {
+                    nodesList.forEach((node) => {
+                      if (node.config.color == "red") {
+                        this.fromNode.x = node.x;
+                        this.fromNode.y = node.y;
+                      }
+                      if (node.config.color == "green") {
+                        this.toNode.x = node.x;
+                        this.toNode.y = node.y;
+                      }
+                      const PUI = this.PUIObj;
+                      PUI.clearAllPaths();
+
+                      const path = PUI.addPath(this.fromNode, this.toNode);
+                      this.sliderValueMax = path.length;
+                      this.step = Math.round(this.sliderValueMax / 2);
+
+                      PUI.drawNodes(path.filter((p) => p.g <= this.step));
+                    });
+                  };
+                },
+                init() {
+                  this.run();
+                  this.$watch("step", (value) => this.run());
+                },
+              });
+            </script>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-xl text-primary">PUI :: drawNodes with steps()</h1>
+          <input
+            id="default-range"
+            type="range"
+            x-model="step"
+            min="0"
+            :max="sliderValueMax"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+          />
+          <pre>
+            <code>
+const fromNode = { x: 2, y: 3 };
+const toNode = { x: 6, y: 3 };
+
+PUI.addStartNode(fromNode);
+PUI.addEndNode(toNode);
+
+const path = PUI.findPath(fromNode, toNode);
+
+PUI.drawNodes(path);
+          </code>
+        </pre>
+        </div>
+      </div>
+
+      <!-- PUI :: drawFlood() -->
+      <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="flood()">
+        <div>
+          <div class="bg-blue-200">
+            <canvas id="flood" width="225" height="225"></canvas>
+            <script>
+              const flood = () => ({
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                step: null,
+                sliderValueMax: null,
+                greedy: true,
+                run() {
+                  const PUI = new PathfindingFX(
+                    document.getElementById("flood"),
+                    { map: this.map }
+                  );
+
+                  PUI.drawMap();
+
+                  const fromNode = { x: 2, y: 3 };
+                  const toNode = { x: 6, y: 3 };
+
+                  PUI.addEndNode(toNode);
+
+                  const flood = PUI.findFlood(fromNode, toNode, {
+                    greedy: this.greedy,
+                  });
+                  this.sliderValueMax = Math.max(...flood.map((o) => o.g));
+                  if (this.step === null)
+                    this.step = Math.round(this.sliderValueMax / 2);
+
+                  PUI.drawNodes(flood.filter((p) => p.g <= this.step));
+                  PUI.addStartNode(fromNode);
+                },
+                init() {
+                  this.run();
+                  this.$watch("step", (value) => this.run());
+                  this.$watch("greedy", (value) => this.run());
+                },
+              });
+            </script>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-xl text-primary">Flooding</h1>
+          <input
+            id="default-range"
+            type="range"
+            x-model="step"
+            min="0"
+            :max="sliderValueMax"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+          />
+          <input type="checkbox" x-model="greedy" />
+          <pre>
+            <code>
+              
+          </code>
+        </pre>
+        </div>
+      </div>
+      
+      <!-- PUI :: sequence() -->
+      <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="sequence()">
+        <div>
+          <div class="bg-blue-200">
+            <canvas id="sequence" width="225" height="225"></canvas>
+            <script>
+              const sequence = () => ({
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                step: null,
+                sliderValueMax: null,
+                greedy: true,
+                run() {
+                  const PUI = new PathfindingFX(
+                    document.getElementById("sequence"),
+                    { map: this.map }
+                  );
+
+                  PUI.drawMap();
+
+                  const fromNode = { x: 2, y: 3 };
+                  const toNode = { x: 6, y: 3 };
+
+                  PUI.addEndNode(toNode);
+
+                  const flood = PUI.findFlood(fromNode, toNode, {
+                    greedy: this.greedy,
+                  });
+                  this.sliderValueMax = flood.length;
+                  if (this.step === null)
+                    this.step = Math.round(this.sliderValueMax / 2);
+
+                  PUI.drawNodes(flood.slice(0, this.step));
+                  PUI.addStartNode(fromNode);
+                },
+                init() {
+                  this.run();
+                  this.$watch("step", (value) => this.run());
+                  this.$watch("greedy", (value) => this.run());
+                },
+              });
+            </script>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-xl text-primary">Sequencing</h1>
+          <input
+            id="default-range"
+            type="range"
+            x-model="step"
+            min="0"
+            :max="sliderValueMax"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+          />
+          <input type="checkbox" x-model="greedy" />
+          <pre>
+            <code>
+              
+          </code>
+        </pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-5 bg-secondary">
+      <div class="container mx-auto p-8">
+        Made with
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6 inline motion-safe:animate-bounce"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+          />
+        </svg>
+        by
+        <a href="https://marcoplain.com" target="_blank" class="text-primary">
+          Marco Plain
+        </a>
+        <p class="text-sm text-gray-300">
+          Designed with
+          <a
+            href="https://tailwindcss.com/"
+            target="_blank"
+            class="text-primary"
+            >TailwindCSS</a
+          >
+          <br />
+          Interactions realized by
+          <a href="https://alpinejs.dev/" target="_blank" class="text-primary"
+            >Alpine</a
+          >
+        </p>
+      </div>
+    </div>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
