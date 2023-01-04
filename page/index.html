@@ -250,10 +250,12 @@ PUI.drawNode(nodeB, {color:'green'});
 
                   this.sliderValueMax = path.length;
 
-                  PUI.drawNodes(path);
+                  //PUI.drawNodes(path);
 
                   PUI.addNode(this.fromNode, { color: "red" });
                   PUI.addNode(this.toNode, { color: "green" });
+
+                  PUI.render();
 
                   PUI.onNodesListUpdate = (nodesList) => {
                     nodesList.forEach((node) => {
@@ -300,7 +302,7 @@ PUI.drawNodes(path);
       </div>
 
       <!-- PUI :: drawNodes with max() -->
-      <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNodesWithSteps()">
+     <!-- <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNodesWithSteps()">
         <div>
           <div class="bg-blue-200">
             <canvas id="drawNodesWithSteps" width="225" height="225"></canvas>
@@ -395,7 +397,7 @@ PUI.drawNodes(path);
           </code>
         </pre>
         </div>
-      </div>
+      </div>-->
 
       <!-- PUI :: drawFlood() -->
       <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="flood()">
