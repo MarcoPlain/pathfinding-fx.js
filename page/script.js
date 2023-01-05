@@ -6,6 +6,17 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function findRandomNode(map){
+  while (true) {
+    let checkY = getRandomInt(0, map.length - 1);
+    let checkX = getRandomInt(0, map[checkY].length - 1);
+    if (map[checkY][checkX]) {
+      return { pos: {x: checkX, y: checkY} };
+      break;
+    }
+  }
+}
+
 function loadPathfinding() {
   const canvas= document.getElementById("pathfinding-canvas");
   canvas.style.height = "100vh";
@@ -21,22 +32,8 @@ function loadPathfinding() {
     }
   }
 
-  while (true) {
-    let checkY = getRandomInt(0, map.length - 1);
-    let checkX = getRandomInt(0, map[checkY].length - 1);
-    if (map[checkY][checkX]) {
-      from = { x: checkX, y: checkY };
-      break;
-    }
-  }
-  while (true) {
-    let checkY = getRandomInt(0, map.length - 1);
-    let checkX = getRandomInt(0, map[checkY].length - 1);
-    if (map[checkY][checkX]) {
-      to = { x: checkX, y: checkY };
-      break;
-    }
-  }
+from = findRandomNode(map);
+   to = findRandomNode(map);
 
   const PFX = new PathfindingFX(
       document.getElementById("pathfinding-canvas"),
@@ -47,40 +44,25 @@ function loadPathfinding() {
   .render();
 
 
-  while (true) {
-    let checkY = getRandomInt(0, map.length - 1);
-    let checkX = getRandomInt(0, map[checkY].length - 1);
-    if (map[checkY][checkX]) {
-      from = { x: checkX, y: checkY };
-      break;
+  PFX.addWalker(findRandomNode(map), findRandomNode(map), {color:"blue", loop: false, onPosChange: (node, pos) => {
+    if(node.pos.x == node.to.pos.x && node.pos.y == node.to.pos.y){
+
+      to = findRandomNode(map);
+      node.to.pos = to.pos
     }
-  }
+  }}).addWalker(findRandomNode(map), findRandomNode(map), {color:"purple", loop: false, onPosChange: (node, pos) => {
+    if(node.pos.x == node.to.pos.x && node.pos.y == node.to.pos.y){
 
-  while (true) {
-    let checkY = getRandomInt(0, map.length - 1);
-    let checkX = getRandomInt(0, map[checkY].length - 1);
-    if (map[checkY][checkX]) {
-      to = { x: checkX, y: checkY };
-      break;
+      to = findRandomNode(map);
+      node.to.pos = to.pos
     }
-  }
+  }}).addWalker(findRandomNode(map), findRandomNode(map), {color:"orange", loop: false, onPosChange: (node, pos) => {
+    if(node.pos.x == node.to.pos.x && node.pos.y == node.to.pos.y){
 
-
-  PFX.addWalker(from, to, {color:"blue", loop: false, onPosChange: (node, pos) => {
-    if(node.x == node.to.x && node.y == node.to.y){
-
-      while (true) {
-        let checkY = getRandomInt(0, map.length - 1);
-        let checkX = getRandomInt(0, map[checkY].length - 1);
-        if (map[checkY][checkX] && PFX.findPath({x:node.x, y:node.y}, node.to)) {
-          to = { x: checkX, y: checkY };
-          break;
-        }
-      }
-      node.to.x = to.x;
-      node.to.y = to.y;
+      to = findRandomNode(map);
+      node.to.pos = to.pos
     }
-  }}).render();
+  }});
 
   PFX.animate()
 }

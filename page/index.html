@@ -185,8 +185,8 @@ PUI.drawMap();
                 [0, 1, 1, 1, 1, 1, 1, 1, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
               ],
-              nodeA: { x: 2, y: 5, config: { color: "red" } },
-              nodeB: { x: 6, y: 2, config: { color: "green" } },
+              nodeA: { pos: {x: 2, y: 5}, config: { color: "red" } },
+              nodeB: { pos: {x: 6, y: 2}, config: { color: "green" } },
               run() {
                 const PUI = new PathfindingFX(
                   document.getElementById("drawNode"),
@@ -201,12 +201,12 @@ PUI.drawMap();
                 PUI.onNodesListUpdate = (nodesList) => {
                   nodesList.forEach((node) => {
                     if (node.config.color == "red") {
-                      this.nodeA.x = node.x;
-                      this.nodeA.y = node.y;
+                      this.nodeA.pos.x = node.pos.x;
+                      this.nodeA.pos.y = node.pos.y;
                     }
                     if (node.config.color == "green") {
-                      this.nodeB.x = node.x;
-                      this.nodeB.y = node.y;
+                      this.nodeB.pos.x = node.pos.x;
+                      this.nodeB.pos.y = node.pos.y;
                     }
                   });
                 };
@@ -222,8 +222,8 @@ PUI.drawMap();
         <h1 class="text-xl text-primary">PUI :: drawNode()</h1>
         <pre>
             <code>
-const nodeA = <span x-html="JSON.stringify(nodeA, ['x','y'])"></span>;
-const nodeB = <span x-html="JSON.stringify(nodeB, ['x','y'])"></span>;
+const nodeA = <span x-html="JSON.stringify(nodeA, ['pos', 'x', 'y'])"></span>;
+const nodeB = <span x-html="JSON.stringify(nodeB, ['pos', 'x', 'y'])"></span>;
 
 PUI.drawNode(nodeA, {color:'red'});
 PUI.drawNode(nodeB, {color:'green'});
@@ -252,8 +252,8 @@ PUI.drawNode(nodeB, {color:'green'});
                 [0, 1, 1, 1, 1, 1, 1, 1, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
               ],
-              fromNode: { x: 2, y: 2 },
-              toNode: { x: 6, y: 3 },
+              fromNode: { pos: {x: 2, y: 2} },
+              toNode: { pos: {x: 6, y: 3} },
               run() {
                 const PFX = new PathfindingFX(
                   document.getElementById("drawNodes"),
@@ -263,22 +263,21 @@ PUI.drawNode(nodeB, {color:'green'});
 
                 PFX.drawMap();
 
-                const path = PFX.addPath(this.fromNode, this.toNode);
+                const path = PFX.addPath(this.fromNode, this.toNode); 
 
                 //PFX.drawNodes(path);
 
                 PFX.addNode(this.fromNode, {
                   color: "red",
                   onPosChange: (node, pos) => {
-                    this.fromNode.x = pos.x;
-                    this.fromNode.y = pos.y;
+                    this.fromNode.pos.x = pos.pos.x;
+                    this.fromNode.pos.y = pos.pos.y;
                   },
                 });
                 PFX.addNode(this.toNode, {
                   color: "green",
                   onPosChange: (node, pos) => {
-                    this.toNode.x = pos.x;
-                    this.toNode.y = pos.y;
+                    this.toNode.pos = pos
                   },
                 });
 
@@ -296,8 +295,8 @@ PUI.drawNode(nodeB, {color:'green'});
 
         <pre>
             <code>
-const fromNode = <span x-html="JSON.stringify(fromNode, ['x','y'])"></span>;
-const toNode = <span x-html="JSON.stringify(toNode, ['x','y'])"></span>;
+const fromNode = <span x-html="JSON.stringify(fromNode, ['pos', 'x', 'y'])"></span>;
+const toNode = <span x-html="JSON.stringify(toNode, ['pos', 'x', 'y'])"></span>;
 
 PUI.addStartNode(fromNode);
 PUI.addEndNode(toNode);
@@ -356,12 +355,12 @@ PUI.drawNodes(path);
                   PUI.onNodesListUpdate = (nodesList) => {
                     nodesList.forEach((node) => {
                       if (node.config.color == "red") {
-                        this.fromNode.x = node.x;
-                        this.fromNode.y = node.y;
+                        this.fromNode.pos.x = node.pos.x;
+                        this.fromNode.pos.y = node.pos.y;
                       }
                       if (node.config.color == "green") {
-                        this.toNode.x = node.x;
-                        this.toNode.y = node.y;
+                        this.toNode.pos.x = node.pos.x;
+                        this.toNode.pos.y = node.pos.y;
                       }
                       const PUI = this.PUIObj;
                       PUI.clearAllPaths();
@@ -437,12 +436,12 @@ PUI.drawNodes(path);
 
                 PUI.drawMap();
 
-                const fromNode = { x: 2, y: 3 };
-                const toNode = { x: 6, y: 3 };
+                const fromNode = { pos: {x: 2, y: 3} };
+                const toNode = { pos: {x: 6, y: 3} };
 
                 PUI.addEndNode(toNode);
 
-                const flood = PUI.findFlood(fromNode, toNode, {
+                const flood = PUI.findFlood(fromNode.pos, toNode.pos, {
                   greedy: this.greedy,
                 });
                 this.sliderValueMax = Math.max(...flood.map((o) => o.g));
@@ -509,12 +508,12 @@ PUI.drawNodes(path);
 
                 PUI.drawMap();
 
-                const fromNode = { x: 2, y: 3 };
-                const toNode = { x: 6, y: 3 };
+                const fromNode = { pos: {x: 2, y: 3} };
+                const toNode = { pos: {x: 6, y: 3} };
 
                 PUI.addEndNode(toNode);
 
-                const flood = PUI.findFlood(fromNode, toNode, {
+                const flood = PUI.findFlood(fromNode.pos, toNode.pos, {
                   greedy: this.greedy,
                 });
                 this.sliderValueMax = flood.length;
@@ -552,7 +551,6 @@ PUI.drawNodes(path);
       </div>
     </div>
 
-
     <!-- PUI :: Walker() -->
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="walker()">
       <div>
@@ -572,8 +570,8 @@ PUI.drawNodes(path);
                 [0, 1, 1, 1, 1, 1, 1, 1, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
               ],
-              fromNode: { x: 2, y: 2 },
-              toNode: { x: 6, y: 5 },
+              fromNode: { pos: {x: 2, y: 2} },
+              toNode: { pos: {x: 6, y: 5} },
               run() {
                 const PFX = new PathfindingFX(
                   document.getElementById("walker"),
