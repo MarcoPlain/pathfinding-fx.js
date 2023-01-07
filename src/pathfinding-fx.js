@@ -24,7 +24,7 @@ var PathfindingFX = (function () {
 
       // START PATHFINDING
 
-      this.heuristics = "euclidean";
+      this.heuristics = "manhattan";
 
       this.initMatrix();
 
@@ -170,13 +170,19 @@ var PathfindingFX = (function () {
           let neighbor = neighbors[n];
           let invalid = false;
           for (let c = 0; c < closed.length; c++) {
-            if (closed[c].pos.x == neighbor.pos.x && closed[c].pos.y == neighbor.pos.y)
+            if (
+              closed[c].pos.x == neighbor.pos.x &&
+              closed[c].pos.y == neighbor.pos.y
+            )
               invalid = true;
           }
           if (invalid) continue;
           let g = currentNode.g;
           // Diagonal g
-          if (neighbor.pos.x != currentNode.pos.x && neighbor.pos.y != currentNode.pos.y) {
+          if (
+            neighbor.pos.x != currentNode.pos.x &&
+            neighbor.pos.y != currentNode.pos.y
+          ) {
             g += this.sqrt2;
           } else {
             g += 1;
@@ -184,7 +190,10 @@ var PathfindingFX = (function () {
           let gBest = false;
           let found = false;
           for (let o = 0; o < open.length; o++)
-            if (open[o].pos.x == neighbor.pos.x && open[o].pos.y == neighbor.pos.y)
+            if (
+              open[o].pos.x == neighbor.pos.x &&
+              open[o].pos.y == neighbor.pos.y
+            )
               found = true;
 
           if (!found) {
@@ -235,7 +244,11 @@ var PathfindingFX = (function () {
 
         // End case -- result has been found, return the traced path
 
-        if (greedy && currentNode.pos.x == to.pos.x && currentNode.pos.y == to.pos.y) {
+        if (
+          greedy &&
+          currentNode.pos.x == to.pos.x &&
+          currentNode.pos.y == to.pos.y
+        ) {
           return flood;
         }
 
@@ -248,14 +261,20 @@ var PathfindingFX = (function () {
           let neighbor = neighbors[n];
           let invalid = false;
           for (let c = 0; c < closed.length; c++) {
-            if (closed[c].pos.x == neighbor.pos.x && closed[c].pos.y == neighbor.pos.y)
+            if (
+              closed[c].pos.x == neighbor.pos.x &&
+              closed[c].pos.y == neighbor.pos.y
+            )
               invalid = true;
           }
           if (invalid) continue;
 
           let g = currentNode.g;
           // Diagonal g
-          if (neighbor.pos.x != currentNode.pos.x && neighbor.pos.y != currentNode.pos.y) {
+          if (
+            neighbor.pos.x != currentNode.pos.x &&
+            neighbor.pos.y != currentNode.pos.y
+          ) {
             g += this.sqrt2;
           } else {
             g += 1;
@@ -264,7 +283,10 @@ var PathfindingFX = (function () {
           let gBest = false;
           let found = false;
           for (let o = 0; o < open.length; o++)
-            if (open[o].pos.x == neighbor.pos.x && open[o].pos.y == neighbor.pos.y)
+            if (
+              open[o].pos.x == neighbor.pos.x &&
+              open[o].pos.y == neighbor.pos.y
+            )
               found = true;
 
           if (!found) {
@@ -372,32 +394,50 @@ var PathfindingFX = (function () {
 
     update(delta) {
       this.walkers.forEach((walker) => {
+        if (walker.isHovered) return;
 
-        var speed = 10;
+        var speed = walker.config.speed || 10;
         walker.path = this.findPath(walker.pos, walker.to.pos);
 
         if (walker.path.length > 1) {
-          var dX = walker.path[1].pos.x * this.tileSize.w - walker.x 
-          var dY = walker.path[1].pos.y * this.tileSize.h - walker.y
-          
-          walker.x += dX * speed / delta;
-          walker.y += dY * speed / delta;
+          var dX = walker.path[1].pos.x * this.tileSize.w - walker.x;
+          var dY = walker.path[1].pos.y * this.tileSize.h - walker.y;
+          var sX = 0;
+          var sY = 0;
+          if (dX > 0) sX = speed / delta;
+          if (dX < 0) sX = -speed / delta;
+          if (dY > 0) sY = speed / delta;
+          if (dY < 0) sY = -speed / delta;
 
-          var distanceX = Math.abs(walker.path[1].pos.x * this.tileSize.w - walker.x);
-          var distanceY = Math.abs(walker.path[1].pos.y * this.tileSize.h - walker.y);
+          if (sY != 0 && sX != 0) {
+            sX /= this.sqrt2;
+            sY /= this.sqrt2;
+          }
 
-          if(distanceX+distanceY < 5){
-            walker.pos = walker.path[1].pos
+          walker.x += sX;
+          walker.y += sY;
 
+          var distanceX = Math.abs(
+            walker.path[1].pos.x * this.tileSize.w - walker.x
+          );
+          var distanceY = Math.abs(
+            walker.path[1].pos.y * this.tileSize.h - walker.y
+          );
+
+          if (distanceX + distanceY < speed / delta) {
             walker.pos = walker.path[1].pos;
+            walker.x = walker.pos.x * this.tileSize.w;
+            walker.y = walker.pos.y * this.tileSize.h;
             if (typeof walker.config.onPosChange != "undefined")
               walker.config.onPosChange(walker, walker.pos);
+
+            // When mouse is inside canvas we need to check, if by this change the mouse is now hovering over the walker
+            if (this.mousePos)
+              this.walkerIsHovered(walker, this.getXYFromPoint(this.mousePos));
 
             //walker.x = walker.pos.x * this.tileSize.w;
             //walker.y = walker.pos.y * this.tileSize.h;
           }
-
-
         }
       });
     }
@@ -433,6 +473,10 @@ var PathfindingFX = (function () {
     addWalker(from, to, config) {
       var walker = {
         pos: from.pos,
+        size: {
+          w: this.tileSize.w / 1.5,
+          h: this.tileSize.h / 1.5,
+        },
         x: from.pos.x * this.tileSize.w,
         y: from.pos.y * this.tileSize.h,
         from: from,
@@ -440,14 +484,16 @@ var PathfindingFX = (function () {
         config: config,
       };
 
+      to.size = walker.size; // TODO this should be configurable
+
       walker.to = this.addCircle(to, {
-        onPosChange: (node, pos) => {
-          walker.to.pos = pos;
-          walker.path = this.findPath(
-            walker.pos,
-            walker.to.pos
-          );
-          walker.steps = 0;
+        ...config,
+        ...{
+          size: 5,
+          onPosChange: (node, pos) => {
+            walker.to.pos = pos;
+            walker.path = this.findPath(walker.pos, walker.to.pos);
+          },
         },
       });
 
@@ -467,7 +513,12 @@ var PathfindingFX = (function () {
       });
       this.drawNodes(this.nodesList);
       this.walkers.forEach((node) => {
-        this.drawPath(node.path);
+        let path = node.path;
+        if (path.length) {
+          path.shift();
+          path.unshift({ x: node.x, y: node.y });
+          this.drawPath(path, node.config);
+        }
         this.drawNode(node, node.config);
       });
       if (this.currentContext) {
@@ -480,9 +531,10 @@ var PathfindingFX = (function () {
       if (typeof this.onMapUpdate != "undefined") this.onMapUpdate(map);
       this.map = map;
       this.initMatrix();
-      this.walkers.forEach((walker) => {
-      //  walker.path = this.findPath(walker.pos, walker.to.pos);
-      });
+      if(this.animationFrameId === null)
+        this.walkers.forEach((walker) => {
+              walker.path = this.findPath(walker.pos, walker.to.pos);
+        });
       this.pathsList.forEach((path) => {
         path.path = this.findPath(path.from.pos, path.to.pos);
       });
@@ -511,10 +563,11 @@ var PathfindingFX = (function () {
 
     mouseDown(event) {
       this.mouseIsDown = true;
+      this.mousePos = this.normalizePointFromEvent(event);
 
       let c = this.getXYFromPoint(this.normalizePointFromEvent(event));
 
-      this.interactionMode = this.detectContext(c);
+      this.interactionMode = this.detectContext(c, event);
 
       if (
         this.interactionMode.type == "wall" ||
@@ -534,6 +587,7 @@ var PathfindingFX = (function () {
 
     mouseLeave(event) {
       this.currentContext = null;
+      this.mousePos = null;
       this.mouseUp(event);
     }
 
@@ -561,8 +615,41 @@ var PathfindingFX = (function () {
       this.render();
     }
 
-    detectContext(c) {
+    walkerIsHovered(node, c, pos) {
+      node.isHovered = node.pos.x == c.x && node.pos.y == c.y;
+      return node.isHovered;
+
+      /*
+      TODO Is this pixel perfect hover collusion detection still needed?
+      const minX =
+          node.x +
+          (typeof node.size != "undefined"
+            ? (this.tileSize.w - node.size.w) / 2
+            : 0),
+        maxX = minX + node.size.w,
+        minY =
+          node.y +
+          (typeof node.size != "undefined"
+            ? (this.tileSize.h - node.size.h) / 2
+            : 0),
+        maxY = minY + node.size.h;
+      node.isHovered =
+        pos.x >= minX && pos.x <= maxX && pos.y >= minY && pos.y <= maxY;
+      return node.isHovered;
+      */
+    }
+
+    detectContext(c, event) {
       if (!c) return;
+
+      const walkerIndex = this.walkers.findIndex((n) =>
+        this.walkerIsHovered(n, c, this.normalizePointFromEvent(event))
+      );
+
+      if (walkerIndex >= 0) {
+        this.targetWalkerIndex = walkerIndex;
+        return { ...this.walkers[walkerIndex], ...{ type: "walker" } };
+      }
 
       const nodeIndex = this.nodesList.findIndex(
         (n) => n.pos.x == c.x && n.pos.y == c.y
@@ -571,15 +658,6 @@ var PathfindingFX = (function () {
       if (nodeIndex >= 0) {
         this.targetNodeIndex = nodeIndex;
         return { ...this.nodesList[nodeIndex], ...{ type: "node" } };
-      }
-
-      const walkerIndex = this.walkers.findIndex(
-        (n) => n.pos.x == c.x && n.pos.y == c.y
-      );
-
-      if (walkerIndex >= 0) {
-        this.targetWalkerIndex = walkerIndex;
-        return { ...this.walkers[walkerIndex], ...{ type: "walker" } };
       }
 
       if (
@@ -593,19 +671,22 @@ var PathfindingFX = (function () {
       if (this.map[c.y][c.x] === 0) {
         return {
           type: "wall",
-          pos: {x: c.x, y: c.y},
+          pos: { x: c.x, y: c.y },
         };
       }
       if (this.map[c.y][c.x] === 1) {
         return {
           type: "free",
-          pos: {x: c.x, y: c.y},
+          pos: { x: c.x, y: c.y },
         };
       }
     }
 
     mouseMove(event) {
-      let c = this.getXYFromPoint(this.normalizePointFromEvent(event));
+      this.mousePos = this.normalizePointFromEvent(event);
+
+      let c = this.getXYFromPoint(this.mousePos);
+
       if (c) {
         if (this.mouseIsDown) {
           if (c.x != this.targetAxis.x || c.y != this.targetAxis.y) {
@@ -631,6 +712,11 @@ var PathfindingFX = (function () {
               }
               if (this.interactionMode.type == "walker") {
                 this.walkers[this.targetWalkerIndex].pos = c;
+
+                // Also setting the pixel position of the walker
+                this.walkers[this.targetWalkerIndex].x = c.x * this.tileSize.w;
+                this.walkers[this.targetWalkerIndex].y = c.y * this.tileSize.h;
+
                 this.walkers[this.targetWalkerIndex].path = this.findPath(
                   {
                     x: this.walkers[this.targetWalkerIndex].pos.x,
@@ -652,7 +738,8 @@ var PathfindingFX = (function () {
           }
         }
 
-        this.currentContext = this.detectContext(c);
+        this.currentContext = this.detectContext(c, event);
+
         if (this.animationFrameId === null) {
           this.render();
           // this.drawContext(this.currentContext);
@@ -727,50 +814,50 @@ var PathfindingFX = (function () {
 
       const draw = config.draw || node.draw || { mode: "fill", type: "rect" };
 
-      var drawX =  node.x || node.pos.x * this.tileSize.w
-      var drawY =  node.y || node.pos.y * this.tileSize.h
+      var drawX =
+        (node.x || node.pos.x * this.tileSize.w) +
+        (typeof node.size != "undefined"
+          ? (this.tileSize.w - node.size.w) / 2
+          : 0);
+      var drawY =
+        (node.y || node.pos.y * this.tileSize.h) +
+        (typeof node.size != "undefined"
+          ? (this.tileSize.h - node.size.h) / 2
+          : 0);
+
+      var sizeX =
+        typeof node.size != "undefined" ? node.size.w : this.tileSize.w;
+      var sizeY =
+        typeof node.size != "undefined" ? node.size.h : this.tileSize.h;
 
       switch (draw.mode) {
         case "fill":
           this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
-          this.ctx.fillRect(
-            drawX,
-            drawY,
-            this.tileSize.w,
-            this.tileSize.h
-          );
+          this.ctx.fillRect(drawX, drawY, sizeX, sizeY);
           break;
         case "stroke":
+          this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
           this.ctx.strokeStyle = config.color || this.settings.pathNodeColor;
+
           switch (draw.type) {
             case "rect":
-              this.ctx.strokeRect(
-                drawX - 2,
-                drawY - 2,
-                this.tileSize.w + 4,
-                this.tileSize.h + 4
-              );
+              this.ctx.strokeRect(drawX - 2, drawY - 2, sizeX + 4, sizeY + 4);
               break;
             case "roundRect":
               this.ctx.beginPath();
-              this.ctx.roundRect(
-                drawX - 2,
-                drawY - 2,
-                this.tileSize.w + 4,
-                this.tileSize.h + 4,
-                5
-              );
+              this.ctx.roundRect(drawX - 2, drawY - 2, sizeX + 4, sizeY + 4, 5);
               this.ctx.stroke();
               break;
             case "circle":
-              this.ctx.beginPath(); // Start a new path
+              this.ctx.beginPath();
               this.ctx.arc(
-                drawX + this.tileSize.w / 2,
-                drawY + this.tileSize.h / 2,
-                (this.tileSize.w + this.tileSize.h) / 4,
+                drawX + (this.tileSize.w - node.size.w),
+                drawY + (this.tileSize.h - node.size.h),
+                (node.size.w + node.size.h) / 2 / 2, // First normalize w and h and the divide by 2
                 0,
                 2 * Math.PI
               );
+              this.ctx.fill();
               this.ctx.stroke();
               break;
           }
@@ -794,11 +881,16 @@ var PathfindingFX = (function () {
         let next = nodes[key + 1];
         if (!next) return;
 
+        var drawX =
+          typeof node.x != "undefined" ? node.x : node.pos.x * this.tileSize.w;
+        var drawY =
+          typeof node.y != "undefined" ? node.y : node.pos.y * this.tileSize.h;
+
         this.ctx.strokeStyle = config.color || this.settings.pathNodeColor;
         this.ctx.beginPath(); // Start a new path
         this.ctx.moveTo(
-          node.pos.x * this.tileSize.w + this.tileSize.w / 2,
-          node.pos.y * this.tileSize.h + this.tileSize.h / 2
+          drawX + this.tileSize.w / 2,
+          drawY + this.tileSize.h / 2
         ); // Move the pen to (30, 50)
         this.ctx.lineTo(
           next.pos.x * this.tileSize.w + this.tileSize.w / 2,
@@ -843,6 +935,7 @@ var PathfindingFX = (function () {
 
       config.color = this.settings.wallNodeColor;
       config.draw = { mode: "stroke", type: "roundRect" };
+      // config.size = node.size;
 
       /*if (node.type == "empty" || !config.color) {
         config.color = this.settings.wallNodeColor;
