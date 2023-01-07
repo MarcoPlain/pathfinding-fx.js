@@ -19,8 +19,8 @@ function findRandomNode(map) {
 
 function loadPathfinding() {
   const canvas = document.getElementById("pathfinding-canvas");
-  canvas.style.height = "100vh";
-  canvas.style.width = "100vw";
+  canvas.style.height = "500px";
+  canvas.style.width = "500px";
   let map = [];
   var from,
     to = {};
@@ -38,9 +38,9 @@ function loadPathfinding() {
   const PFX = new PathfindingFX(document.getElementById("pathfinding-canvas"), {
     map: map,
   })
-    .fromNode(from, { color: "red" })
+    /*.fromNode(from, { color: "red" })
     .toNode(to, { color: "green" })
-    .render();
+    .render();*/
 
   PFX.addWalker(findRandomNode(map), findRandomNode(map), {
     color: "blue",

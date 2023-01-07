@@ -8,7 +8,7 @@ var PathfindingFX = (function () {
    */
 
   const defaults = {
-    wallNodeColor: "#000000",
+    wallNodeColor: "#dbdbdb",
     emptyNodeColor: "#f8f8f8",
     pathNodeColor: "#a8a8a8",
     floodNodeColor: "#585858",
@@ -484,12 +484,11 @@ var PathfindingFX = (function () {
         config: config,
       };
 
-      to.size = walker.size; // TODO this should be configurable
+      to.size = { w: walker.size.w / 2, h: walker.size.h / 2 }; // TODO this should be configurable
 
       walker.to = this.addCircle(to, {
         ...config,
         ...{
-          size: 5,
           onPosChange: (node, pos) => {
             walker.to.pos = pos;
             walker.path = this.findPath(walker.pos, walker.to.pos);
@@ -531,9 +530,9 @@ var PathfindingFX = (function () {
       if (typeof this.onMapUpdate != "undefined") this.onMapUpdate(map);
       this.map = map;
       this.initMatrix();
-      if(this.animationFrameId === null)
+      if (this.animationFrameId === null)
         this.walkers.forEach((walker) => {
-              walker.path = this.findPath(walker.pos, walker.to.pos);
+          walker.path = this.findPath(walker.pos, walker.to.pos);
         });
       this.pathsList.forEach((path) => {
         path.path = this.findPath(path.from.pos, path.to.pos);
@@ -774,7 +773,54 @@ var PathfindingFX = (function () {
             this.map[y][x] === 1
               ? this.settings.emptyNodeColor
               : this.settings.wallNodeColor;
-          this.drawNode({ pos: { x: x, y: y } }, { color: color });
+
+          this.drawNode(
+            {
+              pos: { x: x, y: y },
+            },
+            {
+              color: color,
+              highlightEdges: {
+                top: (y==0 && this.map[y][x] != 0) || (this.map[y][x] == 0 && this.map[y-1] && this.map[y-1][x] != 0) ? { color: "#a8a8a8" } : null,
+                right: (x==this.map[y].length-1 && this.map[y][x] != 0) || (this.map[y][x] == 0 && typeof(this.map[y][x+1]) != 'undefined' && this.map[y][x+1] != 0) ? { color: "#a8a8a8" } : null,
+                bottom: (y==this.map.length-1 && this.map[y][x] != 0) || (this.map[y][x] == 0 && this.map[y+1]  && this.map[y+1][x] != 0) ? { color: "#a8a8a8" } : null,
+                left:  (x==0 && this.map[y][x] != 0) || (this.map[y][x] == 0 && typeof(this.map[y][x-1]) != 'undefined' && this.map[y][x-1] != 0) ? { color: "#a8a8a8" } : null,
+                // also corners
+                topLeft:
+                  this.map[y][x] == 0 &&
+                  this.map[y - 1] &&
+                  this.map[y - 1][x] == 0 &&
+                  this.map[y][x - 1] == 0 &&
+                  this.map[y - 1][x - 1] != 0
+                    ? { color: "#a8a8a8" }
+                    : null,
+                topRight:
+                  this.map[y][x] == 0 &&
+                  this.map[y - 1] &&
+                  this.map[y - 1][x] == 0 &&
+                  this.map[y][x + 1] == 0 &&
+                  this.map[y - 1][x + 1] != 0
+                    ? { color: "#a8a8a8" }
+                    : null,
+                bottomRight:
+                  this.map[y][x] == 0 &&
+                  this.map[y + 1] &&
+                  this.map[y + 1][x] == 0 &&
+                  this.map[y][x + 1] == 0 &&
+                  this.map[y + 1][x + 1] != 0
+                    ? { color: "#a8a8a8" }
+                    : null,
+                bottomLeft:
+                  this.map[y][x] == 0 &&
+                  this.map[y + 1] &&
+                  this.map[y + 1][x] == 0 &&
+                  this.map[y][x - 1] == 0 &&
+                  this.map[y + 1][x - 1] != 0
+                    ? { color: "#a8a8a8" }
+                    : null,
+              },
+            }
+          );
         }
       }
       return this;
@@ -834,6 +880,42 @@ var PathfindingFX = (function () {
         case "fill":
           this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
           this.ctx.fillRect(drawX, drawY, sizeX, sizeY);
+
+          if (config.highlightEdges) {
+            if (config.highlightEdges.top) {
+              this.ctx.fillStyle = config.highlightEdges.top.color;
+              this.ctx.fillRect(drawX, drawY, sizeX, 2);
+            }
+            if (config.highlightEdges.right) {
+              this.ctx.fillStyle = config.highlightEdges.right.color;
+              this.ctx.fillRect(drawX + sizeX - 2, drawY, 2, sizeY);
+            }
+            if (config.highlightEdges.bottom) {
+              this.ctx.fillStyle = config.highlightEdges.bottom.color;
+              this.ctx.fillRect(drawX, drawY + sizeY - 2, sizeX, 2);
+            }
+            if (config.highlightEdges.left) {
+              this.ctx.fillStyle = config.highlightEdges.left.color;
+              this.ctx.fillRect(drawX, drawY, 2, sizeY);
+            }
+            if (config.highlightEdges.topLeft) {
+              this.ctx.fillStyle = config.highlightEdges.topLeft.color;
+              this.ctx.fillRect(drawX, drawY, 2, 2);
+            }
+            if (config.highlightEdges.topRight) {
+              this.ctx.fillStyle = config.highlightEdges.topRight.color;
+              this.ctx.fillRect(drawX + sizeX - 2, drawY, 2, 2);
+            }
+            if (config.highlightEdges.bottomRight) {
+              this.ctx.fillStyle = config.highlightEdges.bottomRight.color;
+              this.ctx.fillRect(drawX + sizeX - 2, drawY + sizeY - 2, 2, 2);
+            }
+            if (config.highlightEdges.bottomLeft) {
+              this.ctx.fillStyle = config.highlightEdges.bottomLeft.color;
+              this.ctx.fillRect(drawX, drawY + sizeY - 2, 2, 2);
+            }
+          }
+
           break;
         case "stroke":
           this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
@@ -851,9 +933,9 @@ var PathfindingFX = (function () {
             case "circle":
               this.ctx.beginPath();
               this.ctx.arc(
-                drawX + (this.tileSize.w - node.size.w),
-                drawY + (this.tileSize.h - node.size.h),
-                (node.size.w + node.size.h) / 2 / 2, // First normalize w and h and the divide by 2
+                drawX + sizeX / 2,
+                drawY + sizeY / 2,
+                (sizeX + sizeY) / 2 / 2, // First normalize w and h and the divide by 2
                 0,
                 2 * Math.PI
               );
