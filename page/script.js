@@ -11,7 +11,7 @@ function findRandomNode(map) {
     let checkY = getRandomInt(0, map.length - 1);
     let checkX = getRandomInt(0, map[checkY].length - 1);
     if (map[checkY][checkX]) {
-      return { pos: { x: checkX, y: checkY } };
+      return { pos: { x: checkX, y: checkY }, color: 'pink' };
       break;
     }
   }
@@ -22,8 +22,6 @@ function loadPathfinding() {
   canvas.style.height = "500px";
   canvas.style.width = "500px";
   let map = [];
-  var from,
-    to = {};
 
   for (let y = 0; y < Math.floor(canvas.offsetHeight / SIZE); y++) {
     map[y] = [];
@@ -32,43 +30,42 @@ function loadPathfinding() {
     }
   }
 
-  from = findRandomNode(map);
-  to = findRandomNode(map);
-
-  const PFX = new PathfindingFX(document.getElementById("pathfinding-canvas"), {
+  const PFX = new PathfindingFX(canvas, {
     map: map,
-  })
-    /*.fromNode(from, { color: "red" })
-    .toNode(to, { color: "green" })
-    .render();*/
-
-  PFX.addWalker(findRandomNode(map), findRandomNode(map), {
+  }).addPath({
+    from: findRandomNode(map),
+    to: findRandomNode(map),
+    color: "red",
+  }).addMovingNode({
+    from: findRandomNode(map),
+    to: findRandomNode(map),
     color: "blue",
     speed: 100,
     onPosChange: (node, pos) => {
       if (node.pos.x == node.to.pos.x && node.pos.y == node.to.pos.y) {
-        to = findRandomNode(map);
-        node.to.pos = to.pos;
+        node.to.pos = findRandomNode(map).pos;
       }
     },
   })
-    .addWalker(findRandomNode(map), findRandomNode(map), {
+    .addMovingNode({
+      from: findRandomNode(map),
+      to: findRandomNode(map),
       color: "purple",
       speed: 50,
       onPosChange: (node, pos) => {
         if (node.pos.x == node.to.pos.x && node.pos.y == node.to.pos.y) {
-          to = findRandomNode(map);
-          node.to.pos = to.pos;
+          node.to.pos = findRandomNode(map).pos;
         }
       },
     })
-    .addWalker(findRandomNode(map), findRandomNode(map), {
+    .addMovingNode({
+      from: findRandomNode(map),
+      to: findRandomNode(map),
       color: "orange",
       speed: 200,
       onPosChange: (node, pos) => {
         if (node.pos.x == node.to.pos.x && node.pos.y == node.to.pos.y) {
-          to = findRandomNode(map);
-          node.to.pos = to.pos;
+          node.to.pos = findRandomNode(map).pos;
         }
       },
     });

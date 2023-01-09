@@ -139,7 +139,7 @@
                 );
 
                 PUI.drawMap();
-                PUI.onMapUpdate = (map) => {
+                PUI.onUpdateMap = (map) => {
                   this.map = map;
                 };
               },
@@ -266,7 +266,7 @@ PUI.drawNode(nodeB, {color:'green'});
 
                 PFX.drawMap();
 
-                const path = PFX.addPath(this.fromNode, this.toNode); 
+                //const path = PFX.addPath({from:this.fromNode, to:this.toNode}); 
 
                 //PFX.drawNodes(path);
 
@@ -582,7 +582,7 @@ PUI.drawNodes(path);
                 );
 
                 // PFX.drawMap();
-                PFX.addWalker(this.fromNode, this.toNode)
+                PFX.addMovingNode({from: this.fromNode, to: this.toNode})
                 PFX.render();
               },
               init() {

@@ -66,6 +66,7 @@ var PathfindingFX = (function () {
       this.ctx.scale(devicePixelRatio, devicePixelRatio);
 
       this.mouseIsDown = false;
+
       element.addEventListener("mousedown", (evt) => this.mouseDown(evt));
       element.addEventListener("mouseup", (evt) => this.mouseUp(evt));
       element.addEventListener("mouseleave", (evt) => this.mouseLeave(evt));
@@ -470,24 +471,60 @@ var PathfindingFX = (function () {
       );
     }
 
-    addWalker(from, to, config) {
+    // START : ADDING DATA TO PFX
+
+    addNode(node, config = {}) {
+      this.nodesList.push({ ...node, ...{ config: config } });
+      this.drawNode(node, config);
+    }
+
+    addPath(settings = {}) {
+      if (
+        typeof settings.from == "undefined" ||
+        typeof settings.from.pos == "undefined" ||
+        typeof settings.from.pos.x == "undefined" ||
+        typeof settings.from.pos.y == "undefined"
+      ) {
+        throw 'pathfinding-fx.js : addPath() requires a valid "from" setting.';
+      }
+      if (
+        typeof settings.to == "undefined" ||
+        typeof settings.to.pos == "undefined" ||
+        typeof settings.to.pos.x == "undefined" ||
+        typeof settings.to.pos.y == "undefined"
+      ) {
+        throw 'pathfinding-fx.js : addPath() requires a valid "to" setting.';
+      }
+
+      const path = {
+        from: settings.from,
+        to: settings.to,
+        path: this.findPath(settings.from.pos, settings.to.pos, settings),
+        color: settings.color,
+      };
+      this.pathsList.push(path);
+      return this.render();
+    }
+
+    addMovingNode(settings = {}) {
       var walker = {
-        pos: from.pos,
+        pos: settings.from.pos,
         size: {
           w: this.tileSize.w / 1.5,
           h: this.tileSize.h / 1.5,
         },
-        x: from.pos.x * this.tileSize.w,
-        y: from.pos.y * this.tileSize.h,
-        from: from,
-        to: to,
-        config: config,
+        x: settings.from.pos.x * this.tileSize.w,
+        y: settings.from.pos.y * this.tileSize.h,
+        from: settings.from,
+        to: settings.to,
+        config: settings,
+        color: settings.color, // !We need to take this color, also for path and circle?
       };
 
-      to.size = { w: walker.size.w / 2, h: walker.size.h / 2 }; // TODO this should be configurable
+      settings.to.size = { w: walker.size.w / 2, h: walker.size.h / 2 }; // TODO this should be configurable
 
-      walker.to = this.addCircle(to, {
-        ...config,
+      walker.to = this.addCircle(settings.to, {
+        ...settings,
         ...{
           onPosChange: (node, pos) => {
             walker.to.pos = pos;
@@ -496,27 +533,69 @@ var PathfindingFX = (function () {
         },
       });
 
-      walker.path = this.findPath(from.pos, to.pos);
+      walker.path = this.findPath(settings.from.pos, settings.to.pos);
 
       this.walkers.push(walker);
 
       return this;
     }
 
+    addStartNode(node, config = {}) {
+      config = {
+        ...config,
+        ...{
+          color: config.color || this.settings.startNodeColor,
+        },
+      };
+      this.nodesList.push({ ...node, ...{ config: config } });
+      this.drawNode(node, {
+        config,
+      });
+
+      return this.nodesList[this.nodesList.length - 1];
+    }
+
+    addEndNode(node, config = {}) {
+      config = {
+        ...config,
+        ...{
+          color: config.color || this.settings.endNodeColor,
+        },
+      };
+      this.nodesList.push({ ...node, ...{ config: config } });
+      this.drawNode(node, {
+        config,
+      });
+      return this.nodesList[this.nodesList.length - 1];
+    }
+
+    addCircle(node, config = {}) {
+      node = {
+        ...node,
+        ...{ config: config },
+        ...{ draw: { mode: "stroke", type: "circle" } },
+      };
+      this.nodesList.push(node);
+      return node;
+    }
+
+    // END : ADDING DATA TO PFX
+
+    // START : RENDER AND DRAW FUNCTIONS
+
     render(settings = {}) {
       //console.log('PFX::render()');
       //this.clearCanvas();
       this.drawMap();
       this.pathsList.forEach((path) => {
-        this.drawPath(path.path);
+        this.drawPath(path);
       });
       this.drawNodes(this.nodesList);
       this.walkers.forEach((node) => {
-        let path = node.path;
-        if (path.length) {
-          path.shift();
-          path.unshift({ x: node.x, y: node.y });
-          this.drawPath(path, node.config);
+        if (node.path.length) {
+          node.path.shift();
+          node.path.unshift({ x: node.x, y: node.y });
+          //this.drawPath(node, node.config);
         }
         this.drawNode(node, node.config);
       });
@@ -526,18 +605,248 @@ var PathfindingFX = (function () {
       return this;
     }
 
-    updateMap(map) {
-      if (typeof this.onMapUpdate != "undefined") this.onMapUpdate(map);
-      this.map = map;
-      this.initMatrix();
-      if (this.animationFrameId === null)
-        this.walkers.forEach((walker) => {
-          walker.path = this.findPath(walker.pos, walker.to.pos);
-        });
-      this.pathsList.forEach((path) => {
-        path.path = this.findPath(path.from.pos, path.to.pos);
+    clearCanvas() {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    drawMap(config = {}) {
+      this.clearCanvas();
+      for (let y = 0; y < this.map.length; y++) {
+        for (let x = 0; x < this.map[y].length; x++) {
+          const color =
+            this.map[y][x] === 1
+              ? this.settings.emptyNodeColor
+              : this.settings.wallNodeColor;
+
+          this.drawNode(
+            {
+              pos: { x: x, y: y },
+            },
+            {
+              color: color,
+              highlightEdges: {
+                top:
+                  (y == 0 && this.map[y][x] != 0) ||
+                  (this.map[y][x] == 0 &&
+                    this.map[y - 1] &&
+                    this.map[y - 1][x] != 0)
+                    ? { color: "#a8a8a8" }
+                    : null,
+                right:
+                  (x == this.map[y].length - 1 && this.map[y][x] != 0) ||
+                  (this.map[y][x] == 0 &&
+                    typeof this.map[y][x + 1] != "undefined" &&
+                    this.map[y][x + 1] != 0)
+                    ? { color: "#a8a8a8" }
+                    : null,
+                bottom:
+                  (y == this.map.length - 1 && this.map[y][x] != 0) ||
+                  (this.map[y][x] == 0 &&
+                    this.map[y + 1] &&
+                    this.map[y + 1][x] != 0)
+                    ? { color: "#a8a8a8" }
+                    : null,
+                left:
+                  (x == 0 && this.map[y][x] != 0) ||
+                  (this.map[y][x] == 0 &&
+                    typeof this.map[y][x - 1] != "undefined" &&
+                    this.map[y][x - 1] != 0)
+                    ? { color: "#a8a8a8" }
+                    : null,
+                // also corners
+                topLeft:
+                  this.map[y][x] == 0 &&
+                  this.map[y - 1] &&
+                  this.map[y - 1][x] == 0 &&
+                  this.map[y][x - 1] == 0 &&
+                  this.map[y - 1][x - 1] != 0
+                    ? { color: "#a8a8a8" }
+                    : null,
+                topRight:
+                  this.map[y][x] == 0 &&
+                  this.map[y - 1] &&
+                  this.map[y - 1][x] == 0 &&
+                  this.map[y][x + 1] == 0 &&
+                  this.map[y - 1][x + 1] != 0
+                    ? { color: "#a8a8a8" }
+                    : null,
+                bottomRight:
+                  this.map[y][x] == 0 &&
+                  this.map[y + 1] &&
+                  this.map[y + 1][x] == 0 &&
+                  this.map[y][x + 1] == 0 &&
+                  this.map[y + 1][x + 1] != 0
+                    ? { color: "#a8a8a8" }
+                    : null,
+                bottomLeft:
+                  this.map[y][x] == 0 &&
+                  this.map[y + 1] &&
+                  this.map[y + 1][x] == 0 &&
+                  this.map[y][x - 1] == 0 &&
+                  this.map[y + 1][x - 1] != 0
+                    ? { color: "#a8a8a8" }
+                    : null,
+              },
+            }
+          );
+        }
+      }
+      return this;
+    }
+
+    drawNodes(path, config = {}) {
+      for (let i = 0; i < path.length; i++) {
+        this.drawNode(path[i], { ...config, ...path[i].config });
+      }
+    }
+
+    drawPath(path, config = {}) {
+      path.path.forEach((node, key) => {
+        let next = path.path[key + 1];
+        if (!next) return;
+
+        var drawX =
+          typeof node.x != "undefined" ? node.x : node.pos.x * this.tileSize.w;
+        var drawY =
+          typeof node.y != "undefined" ? node.y : node.pos.y * this.tileSize.h;
+
+        this.ctx.strokeStyle = path.color || this.settings.pathNodeColor;
+        this.ctx.beginPath(); // Start a new path
+        this.ctx.moveTo(
+          drawX + this.tileSize.w / 2,
+          drawY + this.tileSize.h / 2
+        ); // Move the pen to (30, 50)
+        this.ctx.lineTo(
+          next.pos.x * this.tileSize.w + this.tileSize.w / 2,
+          next.pos.y * this.tileSize.h + this.tileSize.h / 2
+        ); // Move the pen to (30, 50)
+        this.ctx.stroke(); // Render the path
       });
     }
+
+    drawContext(node, config = {}) {
+      //this.ctx.save();
+      //this.ctx.globalAlpha = 0.3;
+
+      config.color = this.settings.wallNodeColor;
+      config.draw = { mode: "stroke", type: "roundRect" };
+      // config.size = node.size;
+
+      /*if (node.type == "empty" || !config.color) {
+        config.color = this.settings.wallNodeColor;
+      }
+      if (node.type == "empty" || !config.draw) {
+        config.draw = {mode:"stroke", type:"rect"}
+      }
+
+      if (node.type == "wall" || !config.color) {
+        config.color = this.settings.emptyNodeColor;
+      }
+      if (node.type == "wall" || !config.draw) {
+        config.draw = {mode:"stroke", type:"rect"}
+      }*/
+
+      this.drawNode(node, config);
+
+      //this.ctx.restore();
+    }
+
+    drawNode(node, config = {}) {
+      if (!node) return;
+
+      const draw = config.draw || node.draw || { mode: "fill", type: "rect" };
+
+      var drawX =
+        (node.x || node.pos.x * this.tileSize.w) +
+        (typeof node.size != "undefined"
+          ? (this.tileSize.w - node.size.w) / 2
+          : 0);
+      var drawY =
+        (node.y || node.pos.y * this.tileSize.h) +
+        (typeof node.size != "undefined"
+          ? (this.tileSize.h - node.size.h) / 2
+          : 0);
+
+      var sizeX =
+        typeof node.size != "undefined" ? node.size.w : this.tileSize.w;
+      var sizeY =
+        typeof node.size != "undefined" ? node.size.h : this.tileSize.h;
+
+      switch (draw.mode) {
+        case "fill":
+          this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
+          this.ctx.fillRect(drawX, drawY, sizeX, sizeY);
+
+          if (config.highlightEdges) {
+            if (config.highlightEdges.top) {
+              this.ctx.fillStyle = config.highlightEdges.top.color;
+              this.ctx.fillRect(drawX, drawY, sizeX, 2);
+            }
+            if (config.highlightEdges.right) {
+              this.ctx.fillStyle = config.highlightEdges.right.color;
+              this.ctx.fillRect(drawX + sizeX - 2, drawY, 2, sizeY);
+            }
+            if (config.highlightEdges.bottom) {
+              this.ctx.fillStyle = config.highlightEdges.bottom.color;
+              this.ctx.fillRect(drawX, drawY + sizeY - 2, sizeX, 2);
+            }
+            if (config.highlightEdges.left) {
+              this.ctx.fillStyle = config.highlightEdges.left.color;
+              this.ctx.fillRect(drawX, drawY, 2, sizeY);
+            }
+            if (config.highlightEdges.topLeft) {
+              this.ctx.fillStyle = config.highlightEdges.topLeft.color;
+              this.ctx.fillRect(drawX, drawY, 2, 2);
+            }
+            if (config.highlightEdges.topRight) {
+              this.ctx.fillStyle = config.highlightEdges.topRight.color;
+              this.ctx.fillRect(drawX + sizeX - 2, drawY, 2, 2);
+            }
+            if (config.highlightEdges.bottomRight) {
+              this.ctx.fillStyle = config.highlightEdges.bottomRight.color;
+              this.ctx.fillRect(drawX + sizeX - 2, drawY + sizeY - 2, 2, 2);
+            }
+            if (config.highlightEdges.bottomLeft) {
+              this.ctx.fillStyle = config.highlightEdges.bottomLeft.color;
+              this.ctx.fillRect(drawX, drawY + sizeY - 2, 2, 2);
+            }
+          }
+
+          break;
+        case "stroke":
+          this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
+          this.ctx.strokeStyle = config.color || this.settings.pathNodeColor;
+
+          switch (draw.type) {
+            case "rect":
+              this.ctx.strokeRect(drawX - 2, drawY - 2, sizeX + 4, sizeY + 4);
+              break;
+            case "roundRect":
+              this.ctx.beginPath();
+              this.ctx.roundRect(drawX - 2, drawY - 2, sizeX + 4, sizeY + 4, 5);
+              this.ctx.stroke();
+              break;
+            case "circle":
+              this.ctx.beginPath();
+              this.ctx.arc(
+                drawX + sizeX / 2,
+                drawY + sizeY / 2,
+                (sizeX + sizeY) / 2 / 2, // First normalize w and h and the divide by 2
+                0,
+                2 * Math.PI
+              );
+              this.ctx.fill();
+              this.ctx.stroke();
+              break;
+          }
+
+          break;
+      }
+    }
+
+    // END : RENDER AND DRAW FUNCTIONS
+
+    // START : CANVAS INTERACTIONS
 
     normalizePointFromEvent(event) {
       return {
@@ -746,90 +1055,27 @@ var PathfindingFX = (function () {
       }
     }
 
-    addPath(fromNode, toNode, settings = {}) {
-      const path = {
-        from: fromNode,
-        to: toNode,
-        path: this.findPath(fromNode.pos, toNode.pos, settings),
-      };
-      this.pathsList.push(path);
-      this.drawPath(path.path, settings);
-      return path;
+    // END : CANVAS INTERACTIONS
+
+    // START : CALLBACKS
+
+    updateMap(map) {
+      if (typeof this.onUpdateMap != "undefined") this.onUpdateMap(map);
+      this.map = map;
+      this.initMatrix();
+      if (this.animationFrameId === null)
+        this.walkers.forEach((walker) => {
+          walker.path = this.findPath(walker.pos, walker.to.pos);
+        });
+      this.pathsList.forEach((path) => {
+        path.path = this.findPath(path.from.pos, path.to.pos);
+      });
     }
+
+    // END : CALLBACKS
 
     clearAllPaths() {
       this.pathsList.length = 0;
-    }
-
-    clearCanvas() {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-
-    drawMap(config = {}) {
-      this.clearCanvas();
-      for (let y = 0; y < this.map.length; y++) {
-        for (let x = 0; x < this.map[y].length; x++) {
-          const color =
-            this.map[y][x] === 1
-              ? this.settings.emptyNodeColor
-              : this.settings.wallNodeColor;
-
-          this.drawNode(
-            {
-              pos: { x: x, y: y },
-            },
-            {
-              color: color,
-              highlightEdges: {
-                top: (y==0 && this.map[y][x] != 0) || (this.map[y][x] == 0 && this.map[y-1] && this.map[y-1][x] != 0) ? { color: "#a8a8a8" } : null,
-                right: (x==this.map[y].length-1 && this.map[y][x] != 0) || (this.map[y][x] == 0 && typeof(this.map[y][x+1]) != 'undefined' && this.map[y][x+1] != 0) ? { color: "#a8a8a8" } : null,
-                bottom: (y==this.map.length-1 && this.map[y][x] != 0) || (this.map[y][x] == 0 && this.map[y+1]  && this.map[y+1][x] != 0) ? { color: "#a8a8a8" } : null,
-                left:  (x==0 && this.map[y][x] != 0) || (this.map[y][x] == 0 && typeof(this.map[y][x-1]) != 'undefined' && this.map[y][x-1] != 0) ? { color: "#a8a8a8" } : null,
-                // also corners
-                topLeft:
-                  this.map[y][x] == 0 &&
-                  this.map[y - 1] &&
-                  this.map[y - 1][x] == 0 &&
-                  this.map[y][x - 1] == 0 &&
-                  this.map[y - 1][x - 1] != 0
-                    ? { color: "#a8a8a8" }
-                    : null,
-                topRight:
-                  this.map[y][x] == 0 &&
-                  this.map[y - 1] &&
-                  this.map[y - 1][x] == 0 &&
-                  this.map[y][x + 1] == 0 &&
-                  this.map[y - 1][x + 1] != 0
-                    ? { color: "#a8a8a8" }
-                    : null,
-                bottomRight:
-                  this.map[y][x] == 0 &&
-                  this.map[y + 1] &&
-                  this.map[y + 1][x] == 0 &&
-                  this.map[y][x + 1] == 0 &&
-                  this.map[y + 1][x + 1] != 0
-                    ? { color: "#a8a8a8" }
-                    : null,
-                bottomLeft:
-                  this.map[y][x] == 0 &&
-                  this.map[y + 1] &&
-                  this.map[y + 1][x] == 0 &&
-                  this.map[y][x - 1] == 0 &&
-                  this.map[y + 1][x - 1] != 0
-                    ? { color: "#a8a8a8" }
-                    : null,
-              },
-            }
-          );
-        }
-      }
-      return this;
-    }
-
-    drawNodes(path, config = {}) {
-      for (let i = 0; i < path.length; i++) {
-        this.drawNode(path[i], { ...config, ...path[i].config });
-      }
     }
 
     fromNode(node, config = {}) {
@@ -848,194 +1094,6 @@ var PathfindingFX = (function () {
       }
 
       return this;
-    }
-
-    addNode(node, config = {}) {
-      this.nodesList.push({ ...node, ...{ config: config } });
-      this.drawNode(node, config);
-    }
-
-    drawNode(node, config = {}) {
-      if (!node) return;
-
-      const draw = config.draw || node.draw || { mode: "fill", type: "rect" };
-
-      var drawX =
-        (node.x || node.pos.x * this.tileSize.w) +
-        (typeof node.size != "undefined"
-          ? (this.tileSize.w - node.size.w) / 2
-          : 0);
-      var drawY =
-        (node.y || node.pos.y * this.tileSize.h) +
-        (typeof node.size != "undefined"
-          ? (this.tileSize.h - node.size.h) / 2
-          : 0);
-
-      var sizeX =
-        typeof node.size != "undefined" ? node.size.w : this.tileSize.w;
-      var sizeY =
-        typeof node.size != "undefined" ? node.size.h : this.tileSize.h;
-
-      switch (draw.mode) {
-        case "fill":
-          this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
-          this.ctx.fillRect(drawX, drawY, sizeX, sizeY);
-
-          if (config.highlightEdges) {
-            if (config.highlightEdges.top) {
-              this.ctx.fillStyle = config.highlightEdges.top.color;
-              this.ctx.fillRect(drawX, drawY, sizeX, 2);
-            }
-            if (config.highlightEdges.right) {
-              this.ctx.fillStyle = config.highlightEdges.right.color;
-              this.ctx.fillRect(drawX + sizeX - 2, drawY, 2, sizeY);
-            }
-            if (config.highlightEdges.bottom) {
-              this.ctx.fillStyle = config.highlightEdges.bottom.color;
-              this.ctx.fillRect(drawX, drawY + sizeY - 2, sizeX, 2);
-            }
-            if (config.highlightEdges.left) {
-              this.ctx.fillStyle = config.highlightEdges.left.color;
-              this.ctx.fillRect(drawX, drawY, 2, sizeY);
-            }
-            if (config.highlightEdges.topLeft) {
-              this.ctx.fillStyle = config.highlightEdges.topLeft.color;
-              this.ctx.fillRect(drawX, drawY, 2, 2);
-            }
-            if (config.highlightEdges.topRight) {
-              this.ctx.fillStyle = config.highlightEdges.topRight.color;
-              this.ctx.fillRect(drawX + sizeX - 2, drawY, 2, 2);
-            }
-            if (config.highlightEdges.bottomRight) {
-              this.ctx.fillStyle = config.highlightEdges.bottomRight.color;
-              this.ctx.fillRect(drawX + sizeX - 2, drawY + sizeY - 2, 2, 2);
-            }
-            if (config.highlightEdges.bottomLeft) {
-              this.ctx.fillStyle = config.highlightEdges.bottomLeft.color;
-              this.ctx.fillRect(drawX, drawY + sizeY - 2, 2, 2);
-            }
-          }
-
-          break;
-        case "stroke":
-          this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
-          this.ctx.strokeStyle = config.color || this.settings.pathNodeColor;
-
-          switch (draw.type) {
-            case "rect":
-              this.ctx.strokeRect(drawX - 2, drawY - 2, sizeX + 4, sizeY + 4);
-              break;
-            case "roundRect":
-              this.ctx.beginPath();
-              this.ctx.roundRect(drawX - 2, drawY - 2, sizeX + 4, sizeY + 4, 5);
-              this.ctx.stroke();
-              break;
-            case "circle":
-              this.ctx.beginPath();
-              this.ctx.arc(
-                drawX + sizeX / 2,
-                drawY + sizeY / 2,
-                (sizeX + sizeY) / 2 / 2, // First normalize w and h and the divide by 2
-                0,
-                2 * Math.PI
-              );
-              this.ctx.fill();
-              this.ctx.stroke();
-              break;
-          }
-
-          break;
-      }
-    }
-
-    addCircle(node, config = {}) {
-      node = {
-        ...node,
-        ...{ config: config },
-        ...{ draw: { mode: "stroke", type: "circle" } },
-      };
-      this.nodesList.push(node);
-      return node;
-    }
-
-    drawPath(nodes, config = {}) {
-      nodes.forEach((node, key) => {
-        let next = nodes[key + 1];
-        if (!next) return;
-
-        var drawX =
-          typeof node.x != "undefined" ? node.x : node.pos.x * this.tileSize.w;
-        var drawY =
-          typeof node.y != "undefined" ? node.y : node.pos.y * this.tileSize.h;
-
-        this.ctx.strokeStyle = config.color || this.settings.pathNodeColor;
-        this.ctx.beginPath(); // Start a new path
-        this.ctx.moveTo(
-          drawX + this.tileSize.w / 2,
-          drawY + this.tileSize.h / 2
-        ); // Move the pen to (30, 50)
-        this.ctx.lineTo(
-          next.pos.x * this.tileSize.w + this.tileSize.w / 2,
-          next.pos.y * this.tileSize.h + this.tileSize.h / 2
-        ); // Move the pen to (30, 50)
-        this.ctx.stroke(); // Render the path
-      });
-    }
-
-    addStartNode(node, config = {}) {
-      config = {
-        ...config,
-        ...{
-          color: config.color || this.settings.startNodeColor,
-        },
-      };
-      this.nodesList.push({ ...node, ...{ config: config } });
-      this.drawNode(node, {
-        config,
-      });
-
-      return this.nodesList[this.nodesList.length - 1];
-    }
-
-    addEndNode(node, config = {}) {
-      config = {
-        ...config,
-        ...{
-          color: config.color || this.settings.endNodeColor,
-        },
-      };
-      this.nodesList.push({ ...node, ...{ config: config } });
-      this.drawNode(node, {
-        config,
-      });
-      return this.nodesList[this.nodesList.length - 1];
-    }
-
-    drawContext(node, config = {}) {
-      //this.ctx.save();
-      //this.ctx.globalAlpha = 0.3;
-
-      config.color = this.settings.wallNodeColor;
-      config.draw = { mode: "stroke", type: "roundRect" };
-      // config.size = node.size;
-
-      /*if (node.type == "empty" || !config.color) {
-        config.color = this.settings.wallNodeColor;
-      }
-      if (node.type == "empty" || !config.draw) {
-        config.draw = {mode:"stroke", type:"rect"}
-      }
-
-      if (node.type == "wall" || !config.color) {
-        config.color = this.settings.emptyNodeColor;
-      }
-      if (node.type == "wall" || !config.draw) {
-        config.draw = {mode:"stroke", type:"rect"}
-      }*/
-
-      this.drawNode(node, config);
-
-      //this.ctx.restore();
     }
 
     static init(elements, settings) {
