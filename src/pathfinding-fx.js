@@ -216,6 +216,16 @@ var PathfindingFX = (function () {
       return [];
     };
 
+    findPathForWalker(node) {
+      if (typeof node.path == "undefined") node.path = [];
+      node.path = this.findPath(node.pos, node.to.pos);
+      if (node.path.length <= 1) {
+        if (typeof node.config.onNoPath == "function") {
+          node.config.onNoPath(node);
+        }
+      }
+    }
+
     findFlood = (from, to, options = {}) => {
       this.initMatrix();
       const greedy = options.greedy || this.greedy;
@@ -398,7 +408,6 @@ var PathfindingFX = (function () {
         if (walker.isHovered) return;
 
         var speed = walker.config.speed || 10;
-        walker.path = this.findPath(walker.pos, walker.to.pos);
 
         if (walker.path.length > 1) {
           var dX = walker.path[1].pos.x * this.tileSize.w - walker.x;
@@ -426,9 +435,11 @@ var PathfindingFX = (function () {
           );
 
           if (distanceX + distanceY < speed / delta) {
+            // Updating internal values becuase walker has reached next path position
             walker.pos = walker.path[1].pos;
             walker.x = walker.pos.x * this.tileSize.w;
             walker.y = walker.pos.y * this.tileSize.h;
+
             if (typeof walker.config.onPosChange != "undefined")
               walker.config.onPosChange(walker, walker.pos);
 
@@ -436,8 +447,10 @@ var PathfindingFX = (function () {
             if (this.mousePos)
               this.walkerIsHovered(walker, this.getXYFromPoint(this.mousePos));
 
-            //walker.x = walker.pos.x * this.tileSize.w;
-            //walker.y = walker.pos.y * this.tileSize.h;
+            this.findPathForWalker(walker);
+            if(walker.path.length == 1 && typeof walker.config.onPathEnd == 'function'){
+              walker.config.onPathEnd(walker);
+            }
           }
         }
       });
@@ -516,26 +529,51 @@ var PathfindingFX = (function () {
         x: settings.from.pos.x * this.tileSize.w,
         y: settings.from.pos.y * this.tileSize.h,
         from: settings.from,
-        to: settings.to,
         config: settings,
         color: settings.color, // !We need to take this color, also for path and circle?
       };
 
       settings.to.size = { w: walker.size.w / 2, h: walker.size.h / 2 }; // TODO this should be configurable
 
-      walker.to = this.addCircle(settings.to, {
+      const self = this;
+
+      walker.to = new Proxy(this.addCircle(settings.to, {
         ...settings,
         ...{
           onPosChange: (node, pos) => {
             walker.to.pos = pos;
-            walker.path = this.findPath(walker.pos, walker.to.pos);
+            this.findPathForWalker(walker);
           },
         },
+      }), {
+        set(obj, prop, value) {
+        // The default behavior to store the value
+        obj[prop] = value;
+
+
+        if(prop === 'pos') {
+          self.findPathForWalker(walker)
+        }
+
+        // Indicate success
+        return true;
+        }
       });
 
-      walker.path = this.findPath(settings.from.pos, settings.to.pos);
+      this.findPathForWalker(walker);
 
-      this.walkers.push(walker);
+      const handler = { 
+        set(obj, prop, value) {
+
+          // The default behavior to store the value
+          obj[prop] = value;
+
+          // Indicate success
+          return true;
+        } 
+      };
+
+      this.walkers.push(new Proxy(walker, handler));
 
       return this;
     }
@@ -595,7 +633,7 @@ var PathfindingFX = (function () {
         if (node.path.length) {
           node.path.shift();
           node.path.unshift({ x: node.x, y: node.y });
-          //this.drawPath(node, node.config);
+          this.drawPath(node, node.config);
         }
         this.drawNode(node, node.config);
       });
@@ -910,13 +948,7 @@ var PathfindingFX = (function () {
       }
 
       if (this.targetWalkerIndex !== null) {
-        this.walkers[this.targetWalkerIndex].path = this.findPath(
-          {
-            x: this.walkers[this.targetWalkerIndex].pos.x,
-            y: this.walkers[this.targetWalkerIndex].pos.y,
-          },
-          this.walkers[this.targetWalkerIndex].to.pos
-        );
+        this.findPathForWalker(this.walkers[this.targetWalkerIndex]);
         this.targetWalkerIndex = null;
       }
 
@@ -1024,14 +1056,7 @@ var PathfindingFX = (function () {
                 // Also setting the pixel position of the walker
                 this.walkers[this.targetWalkerIndex].x = c.x * this.tileSize.w;
                 this.walkers[this.targetWalkerIndex].y = c.y * this.tileSize.h;
-
-                this.walkers[this.targetWalkerIndex].path = this.findPath(
-                  {
-                    x: this.walkers[this.targetWalkerIndex].pos.x,
-                    y: this.walkers[this.targetWalkerIndex].pos.y,
-                  },
-                  this.walkers[this.targetWalkerIndex].to.pos
-                );
+                this.findPathForWalker(this.walkers[this.targetWalkerIndex]);
               }
 
               // Update all paths
@@ -1063,10 +1088,10 @@ var PathfindingFX = (function () {
       if (typeof this.onUpdateMap != "undefined") this.onUpdateMap(map);
       this.map = map;
       this.initMatrix();
-      if (this.animationFrameId === null)
-        this.walkers.forEach((walker) => {
-          walker.path = this.findPath(walker.pos, walker.to.pos);
-        });
+      //if (this.animationFrameId === null)
+      this.walkers.forEach((walker) => {
+        this.findPathForWalker(walker);
+      });
       this.pathsList.forEach((path) => {
         path.path = this.findPath(path.from.pos, path.to.pos);
       });

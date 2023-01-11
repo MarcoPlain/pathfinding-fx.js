@@ -11,7 +11,7 @@ function findRandomNode(map) {
     let checkY = getRandomInt(0, map.length - 1);
     let checkX = getRandomInt(0, map[checkY].length - 1);
     if (map[checkY][checkX]) {
-      return { pos: { x: checkX, y: checkY }, color: 'pink' };
+      return { pos: { x: checkX, y: checkY }, color: "pink" };
       break;
     }
   }
@@ -30,45 +30,41 @@ function loadPathfinding() {
     }
   }
 
+  const cbs = {
+    onPathEnd: (node) => {
+      node.to.pos = findRandomNode(map).pos;
+    },
+    onNoPath: (node) => {
+      node.to.pos = findRandomNode(map).pos;
+    },
+  };
+
   const PFX = new PathfindingFX(canvas, {
     map: map,
-  }).addPath({
-    from: findRandomNode(map),
-    to: findRandomNode(map),
-    color: "red",
-  }).addMovingNode({
-    from: findRandomNode(map),
-    to: findRandomNode(map),
-    color: "blue",
-    speed: 100,
-    onPosChange: (node, pos) => {
-      if (node.pos.x == node.to.pos.x && node.pos.y == node.to.pos.y) {
-        node.to.pos = findRandomNode(map).pos;
-      }
-    },
   })
-    .addMovingNode({
+    .addPath({
+      from: findRandomNode(map),
+      to: findRandomNode(map),
+      color: "gray",
+    })
+    .addMovingNode({...{
+      from: findRandomNode(map),
+      to: findRandomNode(map),
+      color: "blue",
+      speed: 100,
+    }, ...cbs})
+    /*.addMovingNode({...{
       from: findRandomNode(map),
       to: findRandomNode(map),
       color: "purple",
       speed: 50,
-      onPosChange: (node, pos) => {
-        if (node.pos.x == node.to.pos.x && node.pos.y == node.to.pos.y) {
-          node.to.pos = findRandomNode(map).pos;
-        }
-      },
-    })
-    .addMovingNode({
+    }, ...cbs})
+    .addMovingNode({...{
       from: findRandomNode(map),
       to: findRandomNode(map),
       color: "orange",
       speed: 200,
-      onPosChange: (node, pos) => {
-        if (node.pos.x == node.to.pos.x && node.pos.y == node.to.pos.y) {
-          node.to.pos = findRandomNode(map).pos;
-        }
-      },
-    });
+    }, ...cbs})*/
 
   PFX.animate();
 }
