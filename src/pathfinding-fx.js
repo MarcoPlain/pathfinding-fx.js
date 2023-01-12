@@ -221,7 +221,9 @@ var PathfindingFX = (function () {
       node.path = this.findPath(node.pos, node.to.pos);
       if (node.path.length <= 1) {
         if (typeof node.config.onNoPath == "function") {
-          node.config.onNoPath(node);
+          try {
+            node.config.onNoPath(node);
+          } catch (e) {}
         }
       }
     }
@@ -444,11 +446,17 @@ var PathfindingFX = (function () {
               walker.config.onPosChange(walker, walker.pos);
 
             // When mouse is inside canvas we need to check, if by this change the mouse is now hovering over the walker
-            if (this.mousePos)
-              this.walkerIsHovered(walker, this.getXYFromPoint(this.mousePos));
+            if (this.pixelPosition)
+              this.walkerIsHovered(
+                walker,
+                this.getXYFromPoint(this.pixelPosition)
+              );
 
             this.findPathForWalker(walker);
-            if(walker.path.length == 1 && typeof walker.config.onPathEnd == 'function'){
+            if (
+              walker.path.length == 1 &&
+              typeof walker.config.onPathEnd == "function"
+            ) {
               walker.config.onPathEnd(walker);
             }
           }
@@ -537,40 +545,41 @@ var PathfindingFX = (function () {
 
       const self = this;
 
-      walker.to = new Proxy(this.addCircle(settings.to, {
-        ...settings,
-        ...{
-          onPosChange: (node, pos) => {
-            walker.to.pos = pos;
-            this.findPathForWalker(walker);
+      walker.to = new Proxy(
+        this.addCircle(settings.to, {
+          ...settings,
+          ...{
+            onPosChange: (node, pos) => {
+              walker.to.pos = pos;
+              this.findPathForWalker(walker);
+            },
           },
-        },
-      }), {
-        set(obj, prop, value) {
-        // The default behavior to store the value
-        obj[prop] = value;
+        }),
+        {
+          set(obj, prop, value) {
+            // The default behavior to store the value
+            obj[prop] = value;
 
+            if (prop === "pos") {
+              self.findPathForWalker(walker);
+            }
 
-        if(prop === 'pos') {
-          self.findPathForWalker(walker)
+            // Indicate success
+            return true;
+          },
         }
-
-        // Indicate success
-        return true;
-        }
-      });
+      );
 
       this.findPathForWalker(walker);
 
-      const handler = { 
+      const handler = {
         set(obj, prop, value) {
-
           // The default behavior to store the value
           obj[prop] = value;
 
           // Indicate success
           return true;
-        } 
+        },
       };
 
       this.walkers.push(new Proxy(walker, handler));
@@ -637,9 +646,14 @@ var PathfindingFX = (function () {
         }
         this.drawNode(node, node.config);
       });
-      if (this.currentContext) {
-        this.drawContext(this.currentContext);
+
+      
+      if (this.interactionFocus) {
+        this.drawContext(this.interactionFocus);
+      } else if (this.position){
+        this.drawContext({pos: this.position});
       }
+      
       return this;
     }
 
@@ -909,37 +923,90 @@ var PathfindingFX = (function () {
 
     mouseDown(event) {
       this.mouseIsDown = true;
-      this.mousePos = this.normalizePointFromEvent(event);
+      this.pixelPosition = this.normalizePointFromEvent(event);
+      this.position = this.getXYFromPoint(this.pixelPosition);
 
-      let c = this.getXYFromPoint(this.normalizePointFromEvent(event));
+      const { type, node } = this.detectContext(this.position, event);
 
-      this.interactionMode = this.detectContext(c, event);
+      var setPos = null;
+      switch (type) {
+        case "free":
+          setPos = (pos) => {
+            let newMap = this.map;
+            newMap[pos.y][pos.x] = 0;
+            this.updateMap(newMap);
+          };
+          break;
+        case "wall":
+          setPos = (pos) => {
+            let newMap = this.map;
+            newMap[pos.y][pos.x] = 1;
+            this.updateMap(newMap);
+          };
+          break;
+        case "walker":
+          setPos = (pos) => {
+            // Determine if node can have new position
+            if (this.map[pos.y][pos.x]) {
+              node.pos = pos;
 
-      if (
+              // Also setting the pixel position of the walker
+              node.x = pos.x * this.tileSize.w;
+              node.y = pos.y * this.tileSize.h;
+
+              this.findPathForWalker(node);
+            }
+          };
+          break;
+        case "node":
+          setPos = (pos) => {
+            // Determine if node can have new position
+            if (this.map[pos.y][pos.x]) {
+              node.pos = pos;
+              if (typeof node.config.onPosChange === "function")
+                node.config.onPosChange(node, pos);
+            }
+          };
+          break;
+      }
+
+      this.interactionFocus = {
+        pos: { x: -1, y: -1 },
+        node: node,
+        setPos: function (pos) {
+          this.pos = pos;
+          setPos(pos);
+        },
+      };
+
+      this.interactionFocus.setPos(this.position);
+
+      this.interactionMode = this.detectContext(this.position, event); // TODO needed?
+
+      /*if (
         this.interactionMode.type == "wall" ||
         this.interactionMode.type == "free"
       ) {
         let newMap = this.map;
         newMap[c.y][c.x] = this.interactionMode.type == "wall" ? 1 : 0;
         this.updateMap(newMap);
-      }
+      }*/
 
       if (this.animationFrameId === null) {
         this.render();
       }
-
-      this.targetAxis = c;
     }
 
     mouseLeave(event) {
       this.currentContext = null;
-      this.mousePos = null;
+      this.pixelPosition = null;
       this.mouseUp(event);
     }
 
     mouseUp(event) {
       // if (!this.mouseIsDown) return; // ! this will not properly reset
       this.mouseIsDown = false;
+      this.interactionFocus = null;
       this.interactionMode = null;
       if (this.targetNodeIndex !== null) {
         let node = this.nodesList[this.targetNodeIndex];
@@ -979,104 +1046,70 @@ var PathfindingFX = (function () {
       */
     }
 
-    detectContext(c, event) {
-      if (!c) return;
+    detectContext(pos, event) {
+      if (!pos) return;
 
       const walkerIndex = this.walkers.findIndex((n) =>
-        this.walkerIsHovered(n, c, this.normalizePointFromEvent(event))
+        this.walkerIsHovered(n, pos, this.normalizePointFromEvent(event))
       );
 
       if (walkerIndex >= 0) {
-        this.targetWalkerIndex = walkerIndex;
-        return { ...this.walkers[walkerIndex], ...{ type: "walker" } };
+        return {
+          node: this.walkers[walkerIndex],
+          type: "walker",
+        };
       }
 
       const nodeIndex = this.nodesList.findIndex(
-        (n) => n.pos.x == c.x && n.pos.y == c.y
+        (n) => n.pos.x == pos.x && n.pos.y == pos.y
       );
 
       if (nodeIndex >= 0) {
-        this.targetNodeIndex = nodeIndex;
-        return { ...this.nodesList[nodeIndex], ...{ type: "node" } };
+        return {
+          node: this.nodesList[nodeIndex],
+          type: "node",
+        };
       }
 
       if (
-        typeof this.map[c.y] == "undefined" ||
-        typeof this.map[c.y][c.x] == "undefined"
+        typeof this.map[pos.y] == "undefined" ||
+        typeof this.map[pos.y][pos.x] == "undefined"
       ) {
         return false;
       }
 
       // Check if current node might be a wall
-      if (this.map[c.y][c.x] === 0) {
+      if (this.map[pos.y][pos.x] === 0) {
         return {
           type: "wall",
-          pos: { x: c.x, y: c.y },
+          node: { pos: { x: pos.x, y: pos.y } },
         };
       }
-      if (this.map[c.y][c.x] === 1) {
+      if (this.map[pos.y][pos.x] === 1) {
         return {
           type: "free",
-          pos: { x: c.x, y: c.y },
+          node: { pos: { x: pos.x, y: pos.y } },
         };
       }
     }
 
     mouseMove(event) {
-      this.mousePos = this.normalizePointFromEvent(event);
+      this.pixelPosition = this.normalizePointFromEvent(event);
+      this.position = this.getXYFromPoint(this.pixelPosition);
 
-      let c = this.getXYFromPoint(this.mousePos);
-
-      if (c) {
-        if (this.mouseIsDown) {
-          if (c.x != this.targetAxis.x || c.y != this.targetAxis.y) {
-            if (
-              this.interactionMode.type == "wall" ||
-              this.interactionMode.type == "free"
-            ) {
-              let newMap = this.map;
-              newMap[c.y][c.x] = this.interactionMode.type == "wall" ? 1 : 0;
-              this.updateMap(newMap);
-            } else {
-              if (this.interactionMode.type == "node") {
-                this.nodesList[this.targetNodeIndex].pos = c;
-
-                if (
-                  typeof this.nodesList[this.targetNodeIndex].config
-                    .onPosChange != "undefined"
-                )
-                  this.nodesList[this.targetNodeIndex].config.onPosChange(
-                    this.nodesList[this.targetNodeIndex],
-                    c
-                  );
-              }
-              if (this.interactionMode.type == "walker") {
-                this.walkers[this.targetWalkerIndex].pos = c;
-
-                // Also setting the pixel position of the walker
-                this.walkers[this.targetWalkerIndex].x = c.x * this.tileSize.w;
-                this.walkers[this.targetWalkerIndex].y = c.y * this.tileSize.h;
-                this.findPathForWalker(this.walkers[this.targetWalkerIndex]);
-              }
-
-              // Update all paths
-              this.pathsList.forEach((path) => {
-                path.path = this.findPath(path.from.pos, path.to.pos);
-              });
-
-              if (typeof this.onNodesListUpdate != "undefined")
-                this.onNodesListUpdate(this.nodesList);
-            }
-            this.targetAxis = c;
-          }
+      if (this.interactionFocus) {
+        if (
+          this.interactionFocus.pos.x !== this.position.x ||
+          this.interactionFocus.pos.y !== this.position.y
+        ) {
+          this.interactionFocus.setPos(this.position);
         }
+      } else {
+        this.detectContext(this.position, event);
+      }
 
-        this.currentContext = this.detectContext(c, event);
-
-        if (this.animationFrameId === null) {
-          this.render();
-          // this.drawContext(this.currentContext);
-        }
+      if (this.animationFrameId === null) {
+        this.render();
       }
     }
 
