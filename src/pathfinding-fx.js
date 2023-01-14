@@ -218,7 +218,33 @@ var PathfindingFX = (function () {
 
     findPathForWalker(node) {
       if (typeof node.path == "undefined") node.path = [];
-      node.path = this.findPath(node.pos, node.to.pos);
+
+      // Check if node is trapped
+
+      const isTrapped =
+        typeof this.map[node.pos.y - 1] != "undefined" &&
+        typeof this.map[node.pos.y - 1][node.pos.x] != "undefined" &&
+        this.map[node.pos.y - 1][node.pos.x] == 0 &&
+        typeof this.map[node.pos.y] != "undefined" &&
+        typeof this.map[node.pos.y][node.pos.x + 1] != "undefined" &&
+        this.map[node.pos.y][node.pos.x + 1] == 0 &&
+        typeof this.map[node.pos.y + 1] != "undefined" &&
+        typeof this.map[node.pos.y + 1][node.pos.x] != "undefined" &&
+        this.map[node.pos.y + 1][node.pos.x] == 0 &&
+        typeof this.map[node.pos.y] != "undefined" &&
+        typeof this.map[node.pos.y][node.pos.x - 1] != "undefined" &&
+        this.map[node.pos.y][node.pos.x - 1] == 0;
+
+      node.to.show = !isTrapped;
+
+      if (!isTrapped) {
+        node.path = this.findPath(node.pos, node.to.pos);
+      } else {
+        node.path = [];
+        node.x = node.pos.x * this.tileSize.w;
+        node.y = node.pos.y * this.tileSize.h;
+      }
+
       if (node.path.length <= 1) {
         if (typeof node.config.onNoPath == "function") {
           try {
@@ -321,6 +347,77 @@ var PathfindingFX = (function () {
       return flood;
     };
 
+    getAccessiblePositions = (from, options = {}) => {
+      this.initMatrix();
+
+      let open = [this.matrix[from.y][from.x]];
+      let closed = [];
+
+      while (open.length) {
+        var lowInd = 0;
+        for (var i = 0; i < open.length; i++) {
+          if (open[i].f < open[lowInd].f) {
+            lowInd = i;
+          }
+        }
+
+        let currentNode = open[lowInd];
+
+        open.splice(lowInd, 1);
+
+        closed.push(currentNode);
+
+        let neighbors = this.neighbors(currentNode);
+        for (let n = 0; n < neighbors.length; n++) {
+          let neighbor = neighbors[n];
+          let invalid = false;
+          for (let c = 0; c < closed.length; c++) {
+            if (
+              closed[c].pos.x == neighbor.pos.x &&
+              closed[c].pos.y == neighbor.pos.y
+            )
+              invalid = true;
+          }
+          if (invalid) continue;
+          let g = currentNode.g;
+          // Diagonal g
+          if (
+            neighbor.pos.x != currentNode.pos.x &&
+            neighbor.pos.y != currentNode.pos.y
+          ) {
+            g += this.sqrt2;
+          } else {
+            g += 1;
+          }
+          let gBest = false;
+          let found = false;
+          for (let o = 0; o < open.length; o++)
+            if (
+              open[o].pos.x == neighbor.pos.x &&
+              open[o].pos.y == neighbor.pos.y
+            )
+              found = true;
+
+          if (!found) {
+            gBest = true;
+            neighbor.h = 0; //Math.round(this.distance(neighbor.pos, to.pos));
+            open.push(neighbor);
+          } else if (g < neighbor.g) {
+            gBest = true;
+          }
+
+          if (gBest) {
+            neighbor.g = g;
+            neighbor.p = currentNode;
+            neighbor.f = neighbor.g + neighbor.h;
+          }
+        }
+      }
+
+      closed.shift(); // Removing current from position from the array
+      return closed;
+    };
+
     neighbors = (node) => {
       let neighbors = [];
       if (
@@ -405,6 +502,13 @@ var PathfindingFX = (function () {
       }
     };
 
+    positionNotOccupied = (pos) => {
+      return (
+        this.nodesList.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) == -1 &&
+        this.walkers.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) == -1
+      );
+    };
+
     update(delta) {
       this.walkers.forEach((walker) => {
         if (walker.isHovered) return;
@@ -454,7 +558,7 @@ var PathfindingFX = (function () {
 
             this.findPathForWalker(walker);
             if (
-              walker.path.length == 1 &&
+              walker.path.length <= 1 &&
               typeof walker.config.onPathEnd == "function"
             ) {
               walker.config.onPathEnd(walker);
@@ -539,6 +643,10 @@ var PathfindingFX = (function () {
         from: settings.from,
         config: settings,
         color: settings.color, // !We need to take this color, also for path and circle?
+      };
+
+      walker.getAccessiblePositions = () => {
+        return this.getAccessiblePositions(walker.pos);
       };
 
       settings.to.size = { w: walker.size.w / 2, h: walker.size.h / 2 }; // TODO this should be configurable
@@ -637,7 +745,7 @@ var PathfindingFX = (function () {
       this.pathsList.forEach((path) => {
         this.drawPath(path);
       });
-      this.drawNodes(this.nodesList);
+      //this.drawNodes(this.nodesList);
       this.walkers.forEach((node) => {
         if (node.path.length) {
           node.path.shift();
@@ -645,15 +753,16 @@ var PathfindingFX = (function () {
           this.drawPath(node, node.config);
         }
         this.drawNode(node, node.config);
+        if (typeof node.to.show == "undefined" || node.to.show)
+          this.drawNode(node.to, node.to.config);
       });
 
-      
       if (this.interactionFocus) {
         this.drawContext(this.interactionFocus);
-      } else if (this.position){
-        this.drawContext({pos: this.position});
+      } else if (this.position) {
+        this.drawContext({ pos: this.position });
       }
-      
+
       return this;
     }
 
@@ -932,16 +1041,20 @@ var PathfindingFX = (function () {
       switch (type) {
         case "free":
           setPos = (pos) => {
-            let newMap = this.map;
-            newMap[pos.y][pos.x] = 0;
-            this.updateMap(newMap);
+            if (this.positionNotOccupied(pos)) {
+              let newMap = this.map;
+              newMap[pos.y][pos.x] = 0;
+              this.updateMap(newMap);
+            }
           };
           break;
         case "wall":
           setPos = (pos) => {
-            let newMap = this.map;
-            newMap[pos.y][pos.x] = 1;
-            this.updateMap(newMap);
+            if (this.positionNotOccupied(pos)) {
+              let newMap = this.map;
+              newMap[pos.y][pos.x] = 1;
+              this.updateMap(newMap);
+            }
           };
           break;
         case "walker":
@@ -1023,7 +1136,7 @@ var PathfindingFX = (function () {
     }
 
     walkerIsHovered(node, c, pos) {
-      node.isHovered = node.pos.x == c.x && node.pos.y == c.y;
+      node.isHovered = (!this.interactionFocus || this.interactionFocus.node==node) && node.pos.x == c.x && node.pos.y == c.y;
       return node.isHovered;
 
       /*

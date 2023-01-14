@@ -7,6 +7,7 @@ function getRandomInt(min, max) {
 }
 
 function findRandomNode(map) {
+  
   while (true) {
     let checkY = getRandomInt(0, map.length - 1);
     let checkX = getRandomInt(0, map[checkY].length - 1);
@@ -32,10 +33,14 @@ function loadPathfinding() {
 
   const cbs = {
     onPathEnd: (node) => {
-      node.to.pos = findRandomNode(map).pos;
+      const accessablePositions = node.getAccessiblePositions()
+      if(accessablePositions.length > 0)
+        node.to.pos = accessablePositions[Math.floor(Math.random() * accessablePositions.length)].pos;
     },
     onNoPath: (node) => {
-      node.to.pos = findRandomNode(map).pos;
+      const accessablePositions = node.getAccessiblePositions()
+      if(accessablePositions.length > 0)
+        node.to.pos = accessablePositions[Math.floor(Math.random() * accessablePositions.length)].pos;
     },
   };
 
