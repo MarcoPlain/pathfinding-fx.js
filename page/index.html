@@ -398,7 +398,7 @@ PFX.drawNodes(path);
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="flood()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="flood" style="width: 225px; height: 225px"></canvas>
+          <div id="flood" style="width: 225px; height: 225px"></div>
           <script>
             const flood = () => ({
               map: [
@@ -416,6 +416,9 @@ PFX.drawNodes(path);
               sliderValueMax: null,
               greedy: true,
               run() {
+                if (document.querySelector("#flood > canvas"))
+                  document.querySelector("#flood > canvas").remove();
+
                 const PFX = new PathfindingFX(
                   document.getElementById("flood"),
                   { map: this.map }
@@ -423,20 +426,26 @@ PFX.drawNodes(path);
 
                 PFX.drawMap();
 
-                const fromNode = { pos: { x: 2, y: 3 } };
-                const toNode = { pos: { x: 6, y: 3 } };
+                const node = { pos: { x: 2, y: 3 } };
 
-                PFX.addEndNode(toNode);
+                PFX.addNode(node);
+                const aP = PFX.getAccessiblePositions(node.pos);
+                this.sliderValueMax = Math.ceil(
+                  Math.max(...aP.map((n) => n.g))
+                );
 
-                const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
-                  greedy: this.greedy,
-                });
-                this.sliderValueMax = Math.max(...flood.map((o) => o.g));
                 if (this.step === null)
                   this.step = Math.round(this.sliderValueMax / 2);
 
-                //PFX.drawNodes(flood.filter((p) => p.g <= this.step));
-                PFX.addStartNode(fromNode);
+                PFX.getAccessiblePositions(node.pos)
+                  .filter((n) => n.g <= this.step)
+                  .map((n) => {
+                    PFX.addNode({ ...n, ...{ style: { color: 'red' } } });
+                  });
+
+                /*const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
+                  greedy: this.greedy,
+                }); */
               },
               init() {
                 this.run();
@@ -470,7 +479,7 @@ PFX.drawNodes(path);
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="sequence()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="sequence" style="width: 225px; height: 225px"></canvas>
+          <div id="sequence" style="width: 225px; height: 225px"></div>
           <script>
             const sequence = () => ({
               map: [
@@ -488,6 +497,9 @@ PFX.drawNodes(path);
               sliderValueMax: null,
               greedy: true,
               run() {
+                if (document.querySelector("#sequence > canvas"))
+                  document.querySelector("#sequence > canvas").remove();
+
                 const PFX = new PathfindingFX(
                   document.getElementById("sequence"),
                   { map: this.map }
@@ -495,20 +507,24 @@ PFX.drawNodes(path);
 
                 PFX.drawMap();
 
-                const fromNode = { pos: { x: 2, y: 3 } };
-                const toNode = { pos: { x: 6, y: 3 } };
+                const node = { pos: { x: 2, y: 3 } };
 
-                PFX.addEndNode(toNode);
+                PFX.addNode(node);
+                const aP = PFX.getAccessiblePositions(node.pos);
+                this.sliderValueMax = aP.length;
 
-                const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
-                  greedy: this.greedy,
-                });
-                this.sliderValueMax = flood.length;
                 if (this.step === null)
                   this.step = Math.round(this.sliderValueMax / 2);
 
-                //PFX.drawNodes(flood.slice(0, this.step));
-                PFX.addStartNode(fromNode);
+                PFX.getAccessiblePositions(node.pos)
+                  .filter((n,k) => k < this.step)
+                  .map((n) => {
+                    PFX.addNode({ ...n, ...{ style: { color: 'red' } } });
+                  });
+
+                /*const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
+                  greedy: this.greedy,
+                }); */
               },
               init() {
                 this.run();
@@ -542,7 +558,7 @@ PFX.drawNodes(path);
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="walker()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="walker" style="width: 225px; height: 225px"></canvas>
+          <div id="walker" style="width: 225px; height: 225px"></div>
           <script>
             const walker = () => ({
               PFXObj: null,
