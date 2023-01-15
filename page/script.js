@@ -11,6 +11,13 @@ const COLORS_DATAFLOW = [
   "#1E6091",
   "#184E77",
 ];
+const COLORS_MAZERUNNERS = [
+  "#ff595e",
+  "#ffca3a",
+  "#8ac926",
+  "#1982c4",
+  "#6a4c93",
+];
 
 var PFX = null;
 
@@ -65,11 +72,6 @@ function loadPathfinding() {
   PFX = new PathfindingFX(canvas, {
     map: map,
   })
-    /*.addPath({
-      from: findRandomNode(map),
-      to: findRandomNode(map),
-      color: "gray",
-    })*/
     .addNode({
       ...findRandomNode(map),
       ...{
@@ -175,36 +177,90 @@ function loadExampleDataFlow() {
       },
     });
   }
-  /* .addPath({
-      from: findRandomNode(map),
-      to: findRandomNode(map),
-      color: "gray",
-    })
-    .addMovingNode({
-      ...{
-        from: findRandomNode(map),
-        to: findRandomNode(map),
-        color: "purple",
-        speed: 50,
-      },
-      ...cbs,
-    })
-    .addMovingNode({
-      ...{
-        from: findRandomNode(map),
-        to: findRandomNode(map),
-        color: "orange",
-        speed: 200,
-      },
-      ...cbs,
-    });*/
 
   PFX.play();
 }
-/*
-loadPathfinding();
-loadExampleDataFlow();
-*/
+function loadExampleMazeRunners() {
+  if (PFX) clearDemo();
+  const canvas = document.getElementById("demo-examples");
+  let map = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1],
+    [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+    [1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1],
+    [1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  ];
+
+  PFX = new PathfindingFX(canvas, {
+    map: map,
+  });
+
+  const sides = ["top", "left", "right", "bottom"];
+
+  for (let i = 0; i < 100; i++) {
+    let color =
+      COLORS_MAZERUNNERS[Math.floor(Math.random() * COLORS_MAZERUNNERS.length)];
+
+    var pos = null;
+    switch (sides[Math.floor(Math.random() * sides.length)]) {
+      case "top":
+        pos = { y: 0, x: Math.floor(Math.random() * map[0].length) };
+        break;
+      case "left":
+        pos = { x: 0, y: Math.floor(Math.random() * map.length) };
+        break;
+      case "right":
+        pos = { x: map[0].length-1, y: Math.floor(Math.random() * map.length) };
+        break;
+      case "bottom":
+        pos = { y: map.length-1, x: Math.floor(Math.random() * map[0].length) };
+        break;
+    }
+
+    PFX.addNode({
+      ...{
+        pos: pos,
+        start: { pos: pos },
+        to: {
+          pos: { x: Math.floor(map[0].length/2), y: Math.floor(map.length/2) },
+        },
+        style: { color: color, size: { w: 15, h: 15 } },
+        speed: 80 + Math.random() * 120,
+      },
+      ...{
+        onPathEnd: (node) => {
+          node.x = node.start.pos.x * SIZE;
+          node.y = node.start.pos.y * SIZE;
+          node.pos.x = node.start.pos.x;
+          node.pos.y = node.start.pos.y;
+          PFX.findPathForWalker(node);
+        },
+      },
+    });
+  }
+
+  PFX.play();
+}
 
 function clearDemo() {
   PFX.reset();

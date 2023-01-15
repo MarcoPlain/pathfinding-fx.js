@@ -40,6 +40,7 @@
     <div class="container mx-auto my-2">
       <a onclick="loadPathfinding()">Example 1</a>
       <a onclick="loadExampleDataFlow()">Data Flow</a>
+      <a onclick="loadExampleMazeRunners()">Maze Runners</a>
       <a onclick="clearDemo()">Clear</a>
 
       <div
@@ -189,8 +190,12 @@ PFX.drawMap();
                 [0, 1, 1, 1, 1, 1, 1, 1, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
               ],
-              nodeA: { pos: { x: 2, y: 2 }, color: "#2a9d8f" },
-              nodeB: { pos: { x: 6, y: 3 }, color: "#e76f51", to: {pos:{x:6, y:6}} },
+              nodeA: { pos: { x: 2, y: 2 }, style: { color: "#2a9d8f" } },
+              nodeB: {
+                pos: { x: 6, y: 3 },
+                style: { color: "#e76f51" },
+                to: { pos: { x: 6, y: 6 } },
+              },
               run() {
                 const PFX = new PathfindingFX(
                   document.getElementById("addNode"),
@@ -199,19 +204,6 @@ PFX.drawMap();
                   .drawMap()
                   .addNode(this.nodeA)
                   .addNode(this.nodeB);
-
-                /*PFX.onNodesListUpdate = (nodesList) => {
-                  nodesList.forEach((node) => {
-                    if (node.config.color == "red") {
-                      this.nodeA.pos.x = node.pos.x;
-                      this.nodeA.pos.y = node.pos.y;
-                    }
-                    if (node.config.color == "green") {
-                      this.nodeB.pos.x = node.pos.x;
-                      this.nodeB.pos.y = node.pos.y;
-                    }
-                  });
-                };*/
               },
               init() {
                 this.run();
@@ -574,7 +566,7 @@ PFX.drawNodes(path);
                 );
 
                 // PFX.drawMap();
-                PFX.addNode({...this.fromNode, ...{to: this.toNode }});
+                PFX.addNode({ ...this.fromNode, ...{ to: this.toNode } });
                 PFX.render();
               },
               init() {
