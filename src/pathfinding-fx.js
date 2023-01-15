@@ -940,7 +940,7 @@ var PathfindingFX = (function () {
           node.path.unshift({ x: node.x, y: node.y });
           this.drawPath(node);
 
-          if (node.to && node.to.size) this.drawNode(node.to);
+          if (node.to && node.to.style) this.drawNode(node.to);
         }
         this.drawNode(node);
       });
@@ -1053,9 +1053,9 @@ var PathfindingFX = (function () {
       return this;
     }
 
-    drawPath(path, config = {}) {
-      path.path.forEach((node, key) => {
-        let next = path.path[key + 1];
+    drawPath(nodeWithPath, config = {}) {
+      nodeWithPath.path.forEach((node, key) => {
+        let next = nodeWithPath.path[key + 1];
         if (!next) return;
 
         var drawX =
@@ -1063,7 +1063,12 @@ var PathfindingFX = (function () {
         var drawY =
           typeof node.y != "undefined" ? node.y : node.pos.y * this.tileSize.h;
 
-        this.ctx.strokeStyle = path.color || this.settings.pathNodeColor;
+        this.ctx.strokeStyle =
+          nodeWithPath.path.color ||
+          (typeof nodeWithPath.style != "undefined" &&
+            typeof nodeWithPath.style.color != "undefined")
+            ? nodeWithPath.style.color
+            : this.settings.pathNodeColor;
         this.ctx.beginPath(); // Start a new path
         this.ctx.moveTo(
           drawX + this.tileSize.w / 2,
@@ -1111,24 +1116,34 @@ var PathfindingFX = (function () {
 
       var drawX =
         (node.x || node.pos.x * this.tileSize.w) +
-        (typeof node.size != "undefined"
-          ? (this.tileSize.w - node.size.w) / 2
+        (typeof node.style != "undefined" &&
+        typeof node.style.size != "undefined"
+          ? (this.tileSize.w - node.style.size.w) / 2
           : 0);
       var drawY =
         (node.y || node.pos.y * this.tileSize.h) +
-        (typeof node.size != "undefined"
-          ? (this.tileSize.h - node.size.h) / 2
+        (typeof node.style != "undefined" &&
+        typeof node.style.size != "undefined"
+          ? (this.tileSize.h - node.style.size.h) / 2
           : 0);
 
       var sizeX =
-        typeof node.size != "undefined" ? node.size.w : this.tileSize.w;
+        typeof node.style != "undefined" &&
+        typeof node.style.size != "undefined"
+          ? node.style.size.w
+          : this.tileSize.w;
       var sizeY =
-        typeof node.size != "undefined" ? node.size.h : this.tileSize.h;
+        typeof node.style != "undefined" &&
+        typeof node.style.size != "undefined"
+          ? node.style.size.h
+          : this.tileSize.h;
 
       switch (draw.mode) {
         case "fill":
           this.ctx.fillStyle =
-            node.color || config.color || this.settings.pathNodeColor;
+            typeof node.style != "undefined"
+              ? node.style.color
+              : config.color || this.settings.pathNodeColor;
           this.ctx.fillRect(drawX, drawY, sizeX, sizeY);
 
           if (config.highlightEdges) {
@@ -1276,8 +1291,10 @@ var PathfindingFX = (function () {
               node.pos = pos;
 
               // Also setting the pixel position of the node, if it exists
-              if(typeof node.x != 'undefined') node.x = pos.x * this.tileSize.w;
-              if(typeof node.y != 'undefined') node.y = pos.y * this.tileSize.h;
+              if (typeof node.x != "undefined")
+                node.x = pos.x * this.tileSize.w;
+              if (typeof node.y != "undefined")
+                node.y = pos.y * this.tileSize.h;
 
               if (typeof node.onPosChange === "function")
                 node.onPosChange(node, pos);
@@ -1368,7 +1385,7 @@ var PathfindingFX = (function () {
       return node.isHovered;
       */
     }
-   /* walkerIsHovered(node, c, pos) {
+    /* walkerIsHovered(node, c, pos) {
       node.isHovered =
         (!this.interactionFocus || this.interactionFocus.node == node) &&
         node.pos.x == c.x &&
@@ -1420,13 +1437,16 @@ var PathfindingFX = (function () {
         };
       }
 
-      nodeIndex = this.nodesList.filter(n=>n.to).map(n=>n.to).findIndex((n) =>
-        this.nodeIsHovered(n, pos, this.normalizePointFromEvent(event))
-      );
+      nodeIndex = this.nodesList
+        .filter((n) => n.to)
+        .map((n) => n.to)
+        .findIndex((n) =>
+          this.nodeIsHovered(n, pos, this.normalizePointFromEvent(event))
+        );
 
       if (nodeIndex >= 0) {
         return {
-          node: this.nodesList.filter(n=>n.to).map(n=>n.to)[nodeIndex],
+          node: this.nodesList.filter((n) => n.to).map((n) => n.to)[nodeIndex],
           type: "node",
         };
       }

@@ -25,7 +25,7 @@ function findRandomNode(map) {
     let checkY = getRandomInt(0, map.length - 1);
     let checkX = getRandomInt(0, map[checkY].length - 1);
     if (map[checkY][checkX]) {
-      return { pos: { x: checkX, y: checkY }, color: "pink" };
+      return { pos: { x: checkX, y: checkY } };
       break;
     }
   }
@@ -73,9 +73,11 @@ function loadPathfinding() {
     .addNode({
       ...findRandomNode(map),
       ...{
-        to: {...findRandomNode(map), ...{size: {w:10, h:10}, color: "blue"}},
-        color: "blue",
-        size: { w: 15, h: 15 },
+        to: {
+          ...findRandomNode(map),
+          ...{ style: { size: { w: 10, h: 10 }, color: "blue" } },
+        },
+        style: { color: "blue", size: { w: 15, h: 15 } },
         speed: 100,
       },
       ...cbs,
@@ -83,9 +85,11 @@ function loadPathfinding() {
     .addNode({
       ...findRandomNode(map),
       ...{
-        to: {...findRandomNode(map), ...{size: {w:10, h:10}, color: "purple"}},
-        color: "purple",
-        size: { w: 15, h: 15 },
+        to: {
+          ...findRandomNode(map),
+          ...{ style: { size: { w: 10, h: 10 }, color: "purple" } },
+        },
+        style: { color: "purple", size: { w: 15, h: 15 } },
         speed: 50,
       },
       ...cbs,
@@ -93,9 +97,11 @@ function loadPathfinding() {
     .addNode({
       ...findRandomNode(map),
       ...{
-        to: {...findRandomNode(map), ...{size: {w:10, h:10}, color: "orange"}},
-        color: "orange",
-        size: { w: 15, h: 15 },
+        to: {
+          ...findRandomNode(map),
+          ...{ style: { size: { w: 10, h: 10 }, color: "orange" } },
+        },
+        style: { color: "orange", size: { w: 15, h: 15 } },
         speed: 200,
       },
       ...cbs,
@@ -145,14 +151,17 @@ function loadExampleDataFlow() {
   });
 
   for (let i = 0; i < 100; i++) {
-    let color = COLORS_DATAFLOW[Math.floor(Math.random() * COLORS_DATAFLOW.length)]
+    let color =
+      COLORS_DATAFLOW[Math.floor(Math.random() * COLORS_DATAFLOW.length)];
     PFX.addNode({
       ...{
         pos: { x: 1, y: 6 + Math.floor(Math.random() * 13) },
         start: { pos: { x: 1, y: 6 + Math.floor(Math.random() * 13) } },
-        to: { pos: { x: 23, y: 6 + Math.floor(Math.random() * 13) } ,size: {w:10, h:10}, color: color },
-        color: color,
-        size: { w: 15, h: 15 },
+        to: {
+          pos: { x: 23, y: 6 + Math.floor(Math.random() * 13) },
+          style: { size: { w: 10, h: 10 }, color: color },
+        },
+        style: { color: color, size: { w: 15, h: 15 } },
         speed: 80 + Math.random() * 120,
       },
       ...{
