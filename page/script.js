@@ -1,4 +1,18 @@
 const SIZE = 20;
+const COLORS_DATAFLOW = [
+  "#D9ED92",
+  "#B5E48C",
+  "#99D98C",
+  "#76C893",
+  "#52B69A",
+  "#34A0A4",
+  "#168AAD",
+  "#1A759F",
+  "#1E6091",
+  "#184E77",
+];
+
+var PFX = null;
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -7,7 +21,6 @@ function getRandomInt(min, max) {
 }
 
 function findRandomNode(map) {
-  
   while (true) {
     let checkY = getRandomInt(0, map.length - 1);
     let checkX = getRandomInt(0, map[checkY].length - 1);
@@ -19,32 +32,37 @@ function findRandomNode(map) {
 }
 
 function loadPathfinding() {
-  const canvas = document.getElementById("pathfinding-canvas");
-  canvas.style.height = "500px";
-  canvas.style.width = "500px";
+  if(PFX) clearDemo();
+  const canvas = document.getElementById("demo-examples");
   let map = [];
 
   for (let y = 0; y < Math.floor(canvas.offsetHeight / SIZE); y++) {
     map[y] = [];
     for (let x = 0; x < Math.floor(canvas.offsetWidth / SIZE); x++) {
-      map[y][x] = Math.random() > 0.8 ? 0 : 1;
+      map[y][x] = Math.random() > 0.6 ? 0 : 1;
     }
   }
 
   const cbs = {
     onPathEnd: (node) => {
-      const accessablePositions = node.getAccessiblePositions()
-      if(accessablePositions.length > 0)
-        node.to.pos = accessablePositions[Math.floor(Math.random() * accessablePositions.length)].pos;
+      const accessablePositions = node.getAccessiblePositions();
+      if (accessablePositions.length > 0)
+        node.to.pos =
+          accessablePositions[
+            Math.floor(Math.random() * accessablePositions.length)
+          ].pos;
     },
     onNoPath: (node) => {
-      const accessablePositions = node.getAccessiblePositions()
-      if(accessablePositions.length > 0)
-        node.to.pos = accessablePositions[Math.floor(Math.random() * accessablePositions.length)].pos;
+      const accessablePositions = node.getAccessiblePositions();
+      if (accessablePositions.length > 0)
+        node.to.pos =
+          accessablePositions[
+            Math.floor(Math.random() * accessablePositions.length)
+          ].pos;
     },
   };
 
-  const PFX = new PathfindingFX(canvas, {
+  PFX = new PathfindingFX(canvas, {
     map: map,
   })
     .addPath({
@@ -52,26 +70,128 @@ function loadPathfinding() {
       to: findRandomNode(map),
       color: "gray",
     })
-    .addMovingNode({...{
-      from: findRandomNode(map),
-      to: findRandomNode(map),
-      color: "blue",
-      speed: 100,
-    }, ...cbs})
-    /*.addMovingNode({...{
-      from: findRandomNode(map),
-      to: findRandomNode(map),
-      color: "purple",
-      speed: 50,
-    }, ...cbs})
-    .addMovingNode({...{
-      from: findRandomNode(map),
-      to: findRandomNode(map),
-      color: "orange",
-      speed: 200,
-    }, ...cbs})*/
+    .addMovingNode({
+      ...{
+        from: findRandomNode(map),
+        to: findRandomNode(map),
+        color: "blue",
+        speed: 100,
+      },
+      ...cbs,
+    })
+    .addMovingNode({
+      ...{
+        from: findRandomNode(map),
+        to: findRandomNode(map),
+        color: "purple",
+        speed: 50,
+      },
+      ...cbs,
+    })
+    .addMovingNode({
+      ...{
+        from: findRandomNode(map),
+        to: findRandomNode(map),
+        color: "orange",
+        speed: 200,
+      },
+      ...cbs,
+    });
 
   PFX.animate();
 }
 
+function loadExampleDataFlow() {
+  if(PFX) clearDemo();
+  const canvas = document.getElementById("demo-examples");
+  let map = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  ];
+
+  PFX = new PathfindingFX(canvas, {
+    map: map,
+    emptyNodeColor: '#242424', 
+    wallNodeColor: '#464646', 
+    onUpdateMap: (map) => {
+      console.log(JSON.stringify(map));
+    },
+  });
+
+  for (let i = 0; i < 100; i++) {
+    PFX.addMovingNode({
+      ...{
+        from: { pos: { x: 1, y: 6 + Math.floor(Math.random() * 13) } },
+        to: { pos: { x: 23, y: 6 + Math.floor(Math.random() * 13) } },
+        color: COLORS_DATAFLOW[Math.floor(Math.random() * COLORS_DATAFLOW.length)],
+        speed: 80 + Math.random() * 120,
+      },
+      ...{
+        onPathEnd: (node) => {
+          node.x = node.from.pos.x * SIZE;
+          node.y = node.from.pos.y * SIZE;
+          node.pos.x = node.from.pos.x;
+          node.pos.y = node.from.pos.y;
+          PFX.findPathForWalker(node);
+        },
+      },
+    });
+  }
+  /* .addPath({
+      from: findRandomNode(map),
+      to: findRandomNode(map),
+      color: "gray",
+    })
+    .addMovingNode({
+      ...{
+        from: findRandomNode(map),
+        to: findRandomNode(map),
+        color: "purple",
+        speed: 50,
+      },
+      ...cbs,
+    })
+    .addMovingNode({
+      ...{
+        from: findRandomNode(map),
+        to: findRandomNode(map),
+        color: "orange",
+        speed: 200,
+      },
+      ...cbs,
+    });*/
+
+  PFX.animate();
+}
+/*
 loadPathfinding();
+loadExampleDataFlow();
+*/
+
+function clearDemo(){
+  PFX.reset();
+  PFX.stop();
+}

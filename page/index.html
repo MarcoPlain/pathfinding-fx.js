@@ -38,13 +38,16 @@
       </div>
     </div>
 
-    <div class="container mx-auto">
-      <canvas
-        id="pathfinding-canvas"
-        width="500px"
-        height="500px"
-        class="mx-auto border border-[#dbdbdb] border-4 bg-[#f8f8f8] rounded"
-      ></canvas>
+    <a class="container mx-auto my-2">
+      <a onclick="loadPathfinding()">Example 1</a>
+      <a onclick="loadExampleDataFlow()">Data Flow</a>
+      <a onclick="clearDemo()">Clear</a>
+
+      <div
+        id="demo-examples"
+        style="height:500px; width: 500px;"
+        class="mx-auto border border-[#dbdbdb] border-4 bg-[#f8f8f8] rounded box-content"
+      ></div>
     </div>
 
 
@@ -96,7 +99,7 @@
             Use <code>data-pathfinding</code> for inline path drawing
             autoloading
           </p>
-          <pre><code class="text-code">&lt;canvas width="225" height="225" 
+          <pre><code class="text-code">&lt;canvas style="width:225px; height:225px;" 
     <span class="text-code-important">data-pathfinding="[
         [0,0,0,0,0,0,0,0,0],
         [0,1,1,1,1,1,1,1,0],
@@ -118,7 +121,7 @@
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawMap()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="drawMap" width="225" height="225"></canvas>
+          <div id="drawMap" style="width:225px; height:225px;"></div>
           <script>
             const drawMap = () => ({
               map: [
@@ -174,7 +177,7 @@ PUI.drawMap();
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNode()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="drawNode" width="225" height="225"></canvas>
+          <div id="drawNode" style="width:225px; height:225px;"></div>
           <script>
             const drawNode = () => ({
               map: [
@@ -240,7 +243,7 @@ PUI.drawNode(nodeB, {color:'green'});
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNodes()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="drawNodes" width="225" height="225"></canvas>
+          <div id="drawNodes" style="width:225px; height:225px;"></div>
           <script>
             const drawNodes = () => ({
               PUIObj: null,
@@ -316,7 +319,7 @@ PUI.drawNodes(path);
     <!-- <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNodesWithSteps()">
         <div>
           <div class="bg-blue-200">
-            <canvas id="drawNodesWithSteps" width="225" height="225"></canvas>
+            <div id="drawNodesWithSteps" style="width:225px; height:225px;"></div>
             <script>
               const drawNodesWithSteps = () => ({
                 PUIObj: null,
@@ -414,7 +417,7 @@ PUI.drawNodes(path);
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="flood()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="flood" width="225" height="225"></canvas>
+          <canvas id="flood" style="width:225px; height:225px;"></canvas>
           <script>
             const flood = () => ({
               map: [
@@ -486,7 +489,7 @@ PUI.drawNodes(path);
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="sequence()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="sequence" width="225" height="225"></canvas>
+          <canvas id="sequence" style="width:225px; height:225px;"></canvas>
           <script>
             const sequence = () => ({
               map: [
@@ -558,7 +561,7 @@ PUI.drawNodes(path);
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="walker()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="walker" width="225" height="225"></canvas>
+          <canvas id="walker" style="width:225px; height:225px;"></canvas>
           <script>
             const walker = () => ({
               PUIObj: null,
@@ -649,6 +652,6 @@ PUI.drawNodes(path);
       </div>
     </div>
 
-    <script type="module" src="./script.js"></script>
+    <script src="./script.js"></script>
   </body>
 </html>

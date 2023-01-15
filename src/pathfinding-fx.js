@@ -43,10 +43,16 @@ var PathfindingFX = (function () {
           " is not a Node."
         );
       }
-      this.canvas = element;
       this.width = element.offsetWidth;
       this.height = element.offsetHeight;
-      this.ctx = element.getContext("2d");
+
+      this.canvas = document.createElement("canvas");
+
+      this.canvas.width = this.width;
+      this.canvas.height = this.height;
+      element.appendChild(this.canvas);
+
+      this.ctx = this.canvas.getContext("2d");
 
       this.tileSize = {
         h: Math.floor(this.height / this.map.length),
@@ -67,10 +73,15 @@ var PathfindingFX = (function () {
 
       this.mouseIsDown = false;
 
-      element.addEventListener("mousedown", (evt) => this.mouseDown(evt));
-      element.addEventListener("mouseup", (evt) => this.mouseUp(evt));
-      element.addEventListener("mouseleave", (evt) => this.mouseLeave(evt));
-      element.addEventListener("mousemove", (evt) => this.mouseMove(evt));
+      this._mouseDownHandler = (evt) => this.mouseDown(evt);
+      this._mouseUpHandler = (evt) => this.mouseUp(evt);
+      this._mouseLeaveHandler = (evt) => this.mouseLeave(evt);
+      this._mouseMoveHandler = (evt) => this.mouseMove(evt);
+
+      element.addEventListener("mousedown", this._mouseDownHandler);
+      element.addEventListener("mouseup", this._mouseUpHandler);
+      element.addEventListener("mouseleave", this._mouseLeaveHandler);
+      element.addEventListener("mousemove", this._mouseMoveHandler);
 
       this.canvas.style.width = rect.width + "px";
       this.canvas.style.height = rect.height + "px";
@@ -103,13 +114,16 @@ var PathfindingFX = (function () {
 
       // Animation Stuff
       this.animationFrameId = null;
-      (this.lastFrameTimeMs = 0),
+      (this.lastFrameTimeMs = null),
         (this.maxFPS = 60),
         (this.delta = 0),
         (this.timestep = 1000 / 24);
 
       // Walkers Stuff
       this.walkers = [];
+
+      // Callbacks Stuff
+      this.onUpdateMap = settings.onUpdateMap || null;
 
       return this;
     }
@@ -504,8 +518,10 @@ var PathfindingFX = (function () {
 
     positionNotOccupied = (pos) => {
       return (
-        this.nodesList.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) == -1 &&
-        this.walkers.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) == -1
+        this.nodesList.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) ==
+          -1 &&
+        this.walkers.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) ==
+          -1
       );
     };
 
@@ -568,32 +584,53 @@ var PathfindingFX = (function () {
       });
     }
 
-    animationLoop(pui, timestamp) {
+    animationLoop(pfx, timestamp) {
+
+      if (pfx.lastFrameTimeMs === null) {
+        pfx.lastFrameTimeMs = timestamp;
+        pfx.delta = 0;
+      }
+
       // Throttle the frame rate.
-      if (timestamp < pui.lastFrameTimeMs + 1000 / pui.maxFPS) {
-        requestAnimationFrame(pui.animationLoop.bind(0, pui));
+      if (timestamp < pfx.lastFrameTimeMs + 1000 / pfx.maxFPS) {
+        pfx.animationFrameId = requestAnimationFrame(
+          pfx.animationLoop.bind(0, pfx)
+        );
         return;
       }
-      pui.delta += timestamp - pui.lastFrameTimeMs;
-      pui.lastFrameTimeMs = timestamp;
+
+      pfx.delta += timestamp - pfx.lastFrameTimeMs;
+      pfx.lastFrameTimeMs = timestamp;
 
       var numUpdateSteps = 0;
-      while (pui.delta >= pui.timestep) {
-        pui.update(pui.timestep);
-        pui.delta -= pui.timestep;
+      while (pfx.delta >= pfx.timestep) {
+        pfx.update(pfx.timestep);
+        pfx.delta -= pfx.timestep;
         if (++numUpdateSteps >= 240) {
-          pui.delta = 0;
+          pfx.delta = 0;
           break;
         }
       }
-      pui.render();
-      requestAnimationFrame(pui.animationLoop.bind(0, pui));
+      pfx.render();
+      pfx.animationFrameId = requestAnimationFrame(
+        pfx.animationLoop.bind(0, pfx)
+      );
     }
 
     animate() {
+      this.lastFrameTimeMs = null;
       this.animationFrameId = requestAnimationFrame(
         this.animationLoop.bind(0, this)
       );
+    }
+
+    stop() {
+      if (this.animationFrameId) {
+        cancelAnimationFrame(this.animationFrameId);
+        this.animationFrameId = null;
+      }
+      this.lastFrameTimeMs = null;
+      this.delta = 0;
     }
 
     // START : ADDING DATA TO PFX
@@ -732,6 +769,21 @@ var PathfindingFX = (function () {
       };
       this.nodesList.push(node);
       return node;
+    }
+
+    reset() {
+      this.nodesList.length = 0;
+      this.walkers.length = 0;
+      this.map.length = 0;
+
+      this.canvas.removeEventListener("mousedown", this._mouseDownHandler);
+      this.canvas.removeEventListener("mouseup", this._mouseUpHandler);
+      this.canvas.removeEventListener("mouseleave", this._mouseLeaveHandler);
+      this.canvas.removeEventListener("mousemove", this._mouseMoveHandler);
+      this.mouseLeave();
+      this.clearCanvas();
+
+      this.canvas.remove();
     }
 
     // END : ADDING DATA TO PFX
@@ -1120,8 +1172,9 @@ var PathfindingFX = (function () {
       // if (!this.mouseIsDown) return; // ! this will not properly reset
       this.mouseIsDown = false;
       this.interactionFocus = null;
+      this.position = null;
       this.interactionMode = null;
-      if (this.targetNodeIndex !== null) {
+      /*if (this.targetNodeIndex !== null) {
         let node = this.nodesList[this.targetNodeIndex];
 
         this.targetNodeIndex = null;
@@ -1130,13 +1183,16 @@ var PathfindingFX = (function () {
       if (this.targetWalkerIndex !== null) {
         this.findPathForWalker(this.walkers[this.targetWalkerIndex]);
         this.targetWalkerIndex = null;
-      }
+      }*/
 
       this.render();
     }
 
     walkerIsHovered(node, c, pos) {
-      node.isHovered = (!this.interactionFocus || this.interactionFocus.node==node) && node.pos.x == c.x && node.pos.y == c.y;
+      node.isHovered =
+        (!this.interactionFocus || this.interactionFocus.node == node) &&
+        node.pos.x == c.x &&
+        node.pos.y == c.y;
       return node.isHovered;
 
       /*
