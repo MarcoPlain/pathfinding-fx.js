@@ -77,9 +77,11 @@ function loadPathfinding() {
       ...{
         to: {
           ...findRandomNode(map),
-          ...{ style: { size: { w: 10, h: 10 }, color: "blue" } },
+          ...{
+            style: { size: { w: 10, h: 10 }, color: "blue", shape: "circle" },
+          },
         },
-        style: { color: "blue", size: { w: 15, h: 15 } },
+        style: { color: "blue", size: { w: 15, h: 15 }, shape: "circle" },
         speed: 100,
       },
       ...cbs,
@@ -161,9 +163,9 @@ function loadExampleDataFlow() {
         start: { pos: { x: 1, y: 6 + Math.floor(Math.random() * 13) } },
         to: {
           pos: { x: 23, y: 6 + Math.floor(Math.random() * 13) },
-          style: { size: { w: 10, h: 10 }, color: color },
+          style: { size: { w: 10, h: 10 }, color: color, shape: "circle" },
         },
-        style: { color: color, size: { w: 15, h: 15 } },
+        style: { color: color, size: { w: 15, h: 15 }, shape: "circle" },
         speed: 80 + Math.random() * 120,
       },
       ...{
@@ -230,10 +232,16 @@ function loadExampleMazeRunners() {
         pos = { x: 0, y: Math.floor(Math.random() * map.length) };
         break;
       case "right":
-        pos = { x: map[0].length-1, y: Math.floor(Math.random() * map.length) };
+        pos = {
+          x: map[0].length - 1,
+          y: Math.floor(Math.random() * map.length),
+        };
         break;
       case "bottom":
-        pos = { y: map.length-1, x: Math.floor(Math.random() * map[0].length) };
+        pos = {
+          y: map.length - 1,
+          x: Math.floor(Math.random() * map[0].length),
+        };
         break;
     }
 
@@ -242,7 +250,10 @@ function loadExampleMazeRunners() {
         pos: pos,
         start: { pos: pos },
         to: {
-          pos: { x: Math.floor(map[0].length/2), y: Math.floor(map.length/2) },
+          pos: {
+            x: Math.floor(map[0].length / 2),
+            y: Math.floor(map.length / 2),
+          },
         },
         style: { color: color, size: { w: 15, h: 15 } },
         speed: 80 + Math.random() * 120,

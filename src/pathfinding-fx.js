@@ -1086,8 +1086,11 @@ var PathfindingFX = (function () {
       //this.ctx.save();
       //this.ctx.globalAlpha = 0.3;
 
-      config.color = this.settings.wallNodeColor;
-      config.draw = { mode: "stroke", type: "roundRect" };
+      node.style = {
+        color: this.settings.wallNodeColor,
+        mode: "stroke",
+        shape: "roundRect",
+      };
       // config.size = node.size;
 
       /*if (node.type == "empty" || !config.color) {
@@ -1112,7 +1115,8 @@ var PathfindingFX = (function () {
     drawNode(node, config = {}) {
       if (!node) return;
 
-      const draw = config.draw || node.draw || { mode: "fill", type: "rect" };
+      const shape = node.style && node.style.shape ? node.style.shape : "rect";
+      const mode = node.style && node.style.mode ? node.style.mode : "fill";
 
       var drawX =
         (node.x || node.pos.x * this.tileSize.w) +
@@ -1138,47 +1142,65 @@ var PathfindingFX = (function () {
           ? node.style.size.h
           : this.tileSize.h;
 
-      switch (draw.mode) {
+      switch (mode) {
         case "fill":
           this.ctx.fillStyle =
             typeof node.style != "undefined"
               ? node.style.color
               : config.color || this.settings.pathNodeColor;
-          this.ctx.fillRect(drawX, drawY, sizeX, sizeY);
 
-          if (config.highlightEdges) {
-            if (config.highlightEdges.top) {
-              this.ctx.fillStyle = config.highlightEdges.top.color;
-              this.ctx.fillRect(drawX, drawY, sizeX, 2);
-            }
-            if (config.highlightEdges.right) {
-              this.ctx.fillStyle = config.highlightEdges.right.color;
-              this.ctx.fillRect(drawX + sizeX - 2, drawY, 2, sizeY);
-            }
-            if (config.highlightEdges.bottom) {
-              this.ctx.fillStyle = config.highlightEdges.bottom.color;
-              this.ctx.fillRect(drawX, drawY + sizeY - 2, sizeX, 2);
-            }
-            if (config.highlightEdges.left) {
-              this.ctx.fillStyle = config.highlightEdges.left.color;
-              this.ctx.fillRect(drawX, drawY, 2, sizeY);
-            }
-            if (config.highlightEdges.topLeft) {
-              this.ctx.fillStyle = config.highlightEdges.topLeft.color;
-              this.ctx.fillRect(drawX, drawY, 2, 2);
-            }
-            if (config.highlightEdges.topRight) {
-              this.ctx.fillStyle = config.highlightEdges.topRight.color;
-              this.ctx.fillRect(drawX + sizeX - 2, drawY, 2, 2);
-            }
-            if (config.highlightEdges.bottomRight) {
-              this.ctx.fillStyle = config.highlightEdges.bottomRight.color;
-              this.ctx.fillRect(drawX + sizeX - 2, drawY + sizeY - 2, 2, 2);
-            }
-            if (config.highlightEdges.bottomLeft) {
-              this.ctx.fillStyle = config.highlightEdges.bottomLeft.color;
-              this.ctx.fillRect(drawX, drawY + sizeY - 2, 2, 2);
-            }
+          switch (shape) {
+            case "rect":
+              this.ctx.fillRect(drawX, drawY, sizeX, sizeY);
+              if (config.highlightEdges) {
+                if (config.highlightEdges.top) {
+                  this.ctx.fillStyle = config.highlightEdges.top.color;
+                  this.ctx.fillRect(drawX, drawY, sizeX, 2);
+                }
+                if (config.highlightEdges.right) {
+                  this.ctx.fillStyle = config.highlightEdges.right.color;
+                  this.ctx.fillRect(drawX + sizeX - 2, drawY, 2, sizeY);
+                }
+                if (config.highlightEdges.bottom) {
+                  this.ctx.fillStyle = config.highlightEdges.bottom.color;
+                  this.ctx.fillRect(drawX, drawY + sizeY - 2, sizeX, 2);
+                }
+                if (config.highlightEdges.left) {
+                  this.ctx.fillStyle = config.highlightEdges.left.color;
+                  this.ctx.fillRect(drawX, drawY, 2, sizeY);
+                }
+                if (config.highlightEdges.topLeft) {
+                  this.ctx.fillStyle = config.highlightEdges.topLeft.color;
+                  this.ctx.fillRect(drawX, drawY, 2, 2);
+                }
+                if (config.highlightEdges.topRight) {
+                  this.ctx.fillStyle = config.highlightEdges.topRight.color;
+                  this.ctx.fillRect(drawX + sizeX - 2, drawY, 2, 2);
+                }
+                if (config.highlightEdges.bottomRight) {
+                  this.ctx.fillStyle = config.highlightEdges.bottomRight.color;
+                  this.ctx.fillRect(drawX + sizeX - 2, drawY + sizeY - 2, 2, 2);
+                }
+                if (config.highlightEdges.bottomLeft) {
+                  this.ctx.fillStyle = config.highlightEdges.bottomLeft.color;
+                  this.ctx.fillRect(drawX, drawY + sizeY - 2, 2, 2);
+                }
+                break;
+              }
+              break;
+            case "circle":
+              this.ctx.beginPath();
+              this.ctx.arc(
+                drawX + sizeX / 2,
+                drawY + sizeY / 2,
+                (sizeX + sizeY) / 2 / 2, // First normalize w and h and the divide by 2
+                0,
+                2 * Math.PI
+              );
+              this.ctx.fill();
+              this.ctx.stroke();
+              break;
+              break;
           }
 
           break;
@@ -1186,7 +1208,7 @@ var PathfindingFX = (function () {
           this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
           this.ctx.strokeStyle = config.color || this.settings.pathNodeColor;
 
-          switch (draw.type) {
+          switch (shape) {
             case "rect":
               this.ctx.strokeRect(drawX - 2, drawY - 2, sizeX + 4, sizeY + 4);
               break;
