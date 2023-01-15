@@ -27,29 +27,27 @@
     <script src="../src/pathfinding-fx.js"></script>
   </head>
   <body class="bg-gray-100 text-gray-700 overflow-x-hidden">
-
-
     <div class="container mx-auto">
-      <div class="p-8  text-center">
-        <h1 class="text-primary text-4xl">
-          pathfinding-fx.js
-        </h1>
-        <p>A visualization library for stunning website effects based on pathfinding algorithms</p>
+      <div class="p-8 text-center">
+        <h1 class="text-primary text-4xl">pathfinding-fx.js</h1>
+        <p>
+          A visualization library for stunning website effects based on
+          pathfinding algorithms
+        </p>
       </div>
     </div>
 
-    <a class="container mx-auto my-2">
+    <div class="container mx-auto my-2">
       <a onclick="loadPathfinding()">Example 1</a>
       <a onclick="loadExampleDataFlow()">Data Flow</a>
       <a onclick="clearDemo()">Clear</a>
 
       <div
         id="demo-examples"
-        style="height:500px; width: 500px;"
+        style="height: 500px; width: 500px"
         class="mx-auto border border-[#dbdbdb] border-4 bg-[#f8f8f8] rounded box-content"
       ></div>
     </div>
-
 
     <!-- autoload-usage -->
     <!--<div class="bg-gray-500 my-8 flex gap-4 p-8">
@@ -117,11 +115,11 @@
         </div>
       </div>-->
 
-    <!-- PUI :: drawMap() -->
+    <!-- PFX :: drawMap() -->
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawMap()">
       <div>
         <div class="bg-blue-200">
-          <div id="drawMap" style="width:225px; height:225px;"></div>
+          <div id="drawMap" style="width: 225px; height: 225px"></div>
           <script>
             const drawMap = () => ({
               map: [
@@ -136,13 +134,13 @@
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
               ],
               run() {
-                const PUI = new PathfindingFX(
+                const PFX = new PathfindingFX(
                   document.getElementById("drawMap"),
                   { map: this.map }
                 );
 
-                PUI.drawMap();
-                PUI.onUpdateMap = (map) => {
+                PFX.drawMap();
+                PFX.onUpdateMap = (map) => {
                   this.map = map;
                 };
               },
@@ -154,10 +152,10 @@
         </div>
       </div>
       <div>
-        <h1 class="text-xl text-primary">PUI :: drawMap()</h1>
+        <h1 class="text-xl text-primary">PFX :: drawMap()</h1>
         <pre>
             <code>
-const PUI = new PathfindingFX(
+const PFX = new PathfindingFX(
     document.getElementById("drawMap"),
     { 
         map: [
@@ -166,20 +164,20 @@ const PUI = new PathfindingFX(
     }
 );
 
-PUI.drawMap();
+PFX.drawMap();
 
           </code>
         </pre>
       </div>
     </div>
 
-    <!-- PUI :: drawNode() -->
-    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNode()">
+    <!-- PFX :: addNode() -->
+    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="addNode()">
       <div>
         <div class="bg-blue-200">
-          <div id="drawNode" style="width:225px; height:225px;"></div>
+          <div id="addNode" style="width: 225px; height: 225px"></div>
           <script>
-            const drawNode = () => ({
+            const addNode = () => ({
               map: [
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 1, 1, 1, 0, 1, 1, 1, 0],
@@ -191,20 +189,18 @@ PUI.drawMap();
                 [0, 1, 1, 1, 1, 1, 1, 1, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
               ],
-              nodeA: { pos: {x: 2, y: 5}, config: { color: "red" } },
-              nodeB: { pos: {x: 6, y: 2}, config: { color: "green" } },
+              nodeA: { pos: { x: 2, y: 2 }, color: "#2a9d8f" },
+              nodeB: { pos: { x: 6, y: 3 }, color: "#e76f51", to: {pos:{x:6, y:6}} },
               run() {
-                const PUI = new PathfindingFX(
-                  document.getElementById("drawNode"),
+                const PFX = new PathfindingFX(
+                  document.getElementById("addNode"),
                   { map: this.map }
-                );
+                )
+                  .drawMap()
+                  .addNode(this.nodeA)
+                  .addNode(this.nodeB);
 
-                PUI.drawMap();
-
-                PUI.addNode(this.nodeA, { color: "red" });
-                PUI.addNode(this.nodeB, { color: "green" });
-
-                PUI.onNodesListUpdate = (nodesList) => {
+                /*PFX.onNodesListUpdate = (nodesList) => {
                   nodesList.forEach((node) => {
                     if (node.config.color == "red") {
                       this.nodeA.pos.x = node.pos.x;
@@ -215,7 +211,7 @@ PUI.drawMap();
                       this.nodeB.pos.y = node.pos.y;
                     }
                   });
-                };
+                };*/
               },
               init() {
                 this.run();
@@ -225,28 +221,28 @@ PUI.drawMap();
         </div>
       </div>
       <div>
-        <h1 class="text-xl text-primary">PUI :: drawNode()</h1>
+        <h1 class="text-xl text-primary">PFX :: addNode()</h1>
         <pre>
             <code>
-const nodeA = <span x-html="JSON.stringify(nodeA, ['pos', 'x', 'y'])"></span>;
-const nodeB = <span x-html="JSON.stringify(nodeB, ['pos', 'x', 'y'])"></span>;
+const nodeA = <span x-html="JSON.stringify(nodeA)"></span>;
+const nodeB = <span x-html="JSON.stringify(nodeB)"></span>;
 
-PUI.drawNode(nodeA, {color:'red'});
-PUI.drawNode(nodeB, {color:'green'});
+PFX.addNode(nodeA);
+PFX.addNode(nodeB);
 
           </code>
         </pre>
       </div>
     </div>
 
-    <!-- PUI :: drawNodes() -->
-    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNodes()">
+    <!-- PFX :: addPath() -->
+    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="addPath()">
       <div>
         <div class="bg-blue-200">
-          <div id="drawNodes" style="width:225px; height:225px;"></div>
+          <div id="addPath" style="width: 225px; height: 225px"></div>
           <script>
-            const drawNodes = () => ({
-              PUIObj: null,
+            const addPath = () => ({
+              PFXObj: null,
               map: [
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 1, 1, 1, 0, 1, 1, 1, 0],
@@ -258,22 +254,19 @@ PUI.drawNode(nodeB, {color:'green'});
                 [0, 1, 1, 1, 1, 1, 1, 1, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
               ],
-              fromNode: { pos: {x: 2, y: 2} },
-              toNode: { pos: {x: 6, y: 3} },
+              from: { pos: { x: 2, y: 2 } },
+              to: { pos: { x: 6, y: 3 } },
               run() {
                 const PFX = new PathfindingFX(
-                  document.getElementById("drawNodes"),
+                  document.getElementById("addPath"),
                   { map: this.map }
-                );
-                this.PUIObj = PFX;
-
-                PFX.drawMap();
-
-                //const path = PFX.addPath({from:this.fromNode, to:this.toNode}); 
+                )
+                  .drawMap()
+                  .addPath({ from: this.from, to: this.to });
 
                 //PFX.drawNodes(path);
 
-                PFX.addNode(this.fromNode, {
+                /*PFX.addNode(this.fromNode, {
                   color: "red",
                   onPosChange: (node, pos) => {
                     this.fromNode.pos.x = pos.pos.x;
@@ -283,9 +276,9 @@ PUI.drawNode(nodeB, {color:'green'});
                 PFX.addNode(this.toNode, {
                   color: "green",
                   onPosChange: (node, pos) => {
-                    this.toNode.pos = pos
+                    this.toNode.pos = pos;
                   },
-                });
+                });*/
 
                 //PFX.render();
               },
@@ -297,32 +290,28 @@ PUI.drawNode(nodeB, {color:'green'});
         </div>
       </div>
       <div>
-        <h1 class="text-xl text-primary">PUI :: drawNodes()</h1>
+        <h1 class="text-xl text-primary">PFX :: addPath()</h1>
 
         <pre>
             <code>
-const fromNode = <span x-html="JSON.stringify(fromNode, ['pos', 'x', 'y'])"></span>;
-const toNode = <span x-html="JSON.stringify(toNode, ['pos', 'x', 'y'])"></span>;
+const from = <span x-html="JSON.stringify(from)"></span>;
+const to = <span x-html="JSON.stringify(to)"></span>;
 
-PUI.addStartNode(fromNode);
-PUI.addEndNode(toNode);
+PFX.addPath({from:from, to:to});
 
-const path = PUI.findPath(fromNode, toNode);
-
-PUI.drawNodes(path);
           </code>
         </pre>
       </div>
     </div>
 
-    <!-- PUI :: drawNodes with max() -->
+    <!-- PFX :: drawNodes with max() -->
     <!-- <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNodesWithSteps()">
         <div>
           <div class="bg-blue-200">
             <div id="drawNodesWithSteps" style="width:225px; height:225px;"></div>
             <script>
               const drawNodesWithSteps = () => ({
-                PUIObj: null,
+                PFXObj: null,
                 map: [
                   [0, 0, 0, 0, 0, 0, 0, 0, 0],
                   [0, 1, 1, 1, 0, 1, 1, 1, 0],
@@ -339,26 +328,26 @@ PUI.drawNodes(path);
                 step: null,
                 sliderValueMax: null,
                 run() {
-                  const PUI = new PathfindingFX(
+                  const PFX = new PathfindingFX(
                     document.getElementById("drawNodesWithSteps"),
                     { map: this.map }
                   );
-                  this.PUIObj = PUI;
+                  this.PFXObj = PFX;
 
-                  PUI.drawMap();
+                  PFX.drawMap();
 
-                  const path = PUI.addPath(this.fromNode, this.toNode);
+                  const path = PFX.addPath(this.fromNode, this.toNode);
                   this.sliderValueMax = path.length;
                   if (this.step === null) {
                     this.step = Math.round(this.sliderValueMax / 2);
                   }
 
-                  PUI.drawNodes(path.filter((p) => p.g <= this.step));
+                  PFX.drawNodes(path.filter((p) => p.g <= this.step));
 
-                  PUI.addNode(this.fromNode, { color: "red" });
-                  PUI.addNode(this.toNode, { color: "green" });
+                  PFX.addNode(this.fromNode, { color: "red" });
+                  PFX.addNode(this.toNode, { color: "green" });
 
-                  PUI.onNodesListUpdate = (nodesList) => {
+                  PFX.onNodesListUpdate = (nodesList) => {
                     nodesList.forEach((node) => {
                       if (node.config.color == "red") {
                         this.fromNode.pos.x = node.pos.x;
@@ -368,14 +357,14 @@ PUI.drawNodes(path);
                         this.toNode.pos.x = node.pos.x;
                         this.toNode.pos.y = node.pos.y;
                       }
-                      const PUI = this.PUIObj;
-                      PUI.clearAllPaths();
+                      const PFX = this.PFXObj;
+                      PFX.clearAllPaths();
 
-                      const path = PUI.addPath(this.fromNode, this.toNode);
+                      const path = PFX.addPath(this.fromNode, this.toNode);
                       this.sliderValueMax = path.length;
                       this.step = Math.round(this.sliderValueMax / 2);
 
-                      PUI.drawNodes(path.filter((p) => p.g <= this.step));
+                      PFX.drawNodes(path.filter((p) => p.g <= this.step));
                     });
                   };
                 },
@@ -388,7 +377,7 @@ PUI.drawNodes(path);
           </div>
         </div>
         <div>
-          <h1 class="text-xl text-primary">PUI :: drawNodes with steps()</h1>
+          <h1 class="text-xl text-primary">PFX :: drawNodes with steps()</h1>
           <input
             id="default-range"
             type="range"
@@ -402,22 +391,22 @@ PUI.drawNodes(path);
 const fromNode = { x: 2, y: 3 };
 const toNode = { x: 6, y: 3 };
 
-PUI.addStartNode(fromNode);
-PUI.addEndNode(toNode);
+PFX.addStartNode(fromNode);
+PFX.addEndNode(toNode);
 
-const path = PUI.findPath(fromNode, toNode);
+const path = PFX.findPath(fromNode, toNode);
 
-PUI.drawNodes(path);
+PFX.drawNodes(path);
           </code>
         </pre>
         </div>
       </div>-->
 
-    <!-- PUI :: drawFlood() -->
+    <!-- PFX :: drawFlood() -->
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="flood()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="flood" style="width:225px; height:225px;"></canvas>
+          <canvas id="flood" style="width: 225px; height: 225px"></canvas>
           <script>
             const flood = () => ({
               map: [
@@ -435,27 +424,27 @@ PUI.drawNodes(path);
               sliderValueMax: null,
               greedy: true,
               run() {
-                const PUI = new PathfindingFX(
+                const PFX = new PathfindingFX(
                   document.getElementById("flood"),
                   { map: this.map }
                 );
 
-                PUI.drawMap();
+                PFX.drawMap();
 
-                const fromNode = { pos: {x: 2, y: 3} };
-                const toNode = { pos: {x: 6, y: 3} };
+                const fromNode = { pos: { x: 2, y: 3 } };
+                const toNode = { pos: { x: 6, y: 3 } };
 
-                PUI.addEndNode(toNode);
+                PFX.addEndNode(toNode);
 
-                const flood = PUI.findFlood(fromNode.pos, toNode.pos, {
+                const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
                   greedy: this.greedy,
                 });
                 this.sliderValueMax = Math.max(...flood.map((o) => o.g));
                 if (this.step === null)
                   this.step = Math.round(this.sliderValueMax / 2);
 
-                PUI.drawNodes(flood.filter((p) => p.g <= this.step));
-                PUI.addStartNode(fromNode);
+                //PFX.drawNodes(flood.filter((p) => p.g <= this.step));
+                PFX.addStartNode(fromNode);
               },
               init() {
                 this.run();
@@ -485,11 +474,11 @@ PUI.drawNodes(path);
       </div>
     </div>
 
-    <!-- PUI :: sequence() -->
+    <!-- PFX :: sequence() -->
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="sequence()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="sequence" style="width:225px; height:225px;"></canvas>
+          <canvas id="sequence" style="width: 225px; height: 225px"></canvas>
           <script>
             const sequence = () => ({
               map: [
@@ -507,27 +496,27 @@ PUI.drawNodes(path);
               sliderValueMax: null,
               greedy: true,
               run() {
-                const PUI = new PathfindingFX(
+                const PFX = new PathfindingFX(
                   document.getElementById("sequence"),
                   { map: this.map }
                 );
 
-                PUI.drawMap();
+                PFX.drawMap();
 
-                const fromNode = { pos: {x: 2, y: 3} };
-                const toNode = { pos: {x: 6, y: 3} };
+                const fromNode = { pos: { x: 2, y: 3 } };
+                const toNode = { pos: { x: 6, y: 3 } };
 
-                PUI.addEndNode(toNode);
+                PFX.addEndNode(toNode);
 
-                const flood = PUI.findFlood(fromNode.pos, toNode.pos, {
+                const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
                   greedy: this.greedy,
                 });
                 this.sliderValueMax = flood.length;
                 if (this.step === null)
                   this.step = Math.round(this.sliderValueMax / 2);
 
-                PUI.drawNodes(flood.slice(0, this.step));
-                PUI.addStartNode(fromNode);
+                //PFX.drawNodes(flood.slice(0, this.step));
+                PFX.addStartNode(fromNode);
               },
               init() {
                 this.run();
@@ -557,14 +546,14 @@ PUI.drawNodes(path);
       </div>
     </div>
 
-    <!-- PUI :: Walker() -->
+    <!-- PFX :: Walker() -->
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="walker()">
       <div>
         <div class="bg-blue-200">
-          <canvas id="walker" style="width:225px; height:225px;"></canvas>
+          <canvas id="walker" style="width: 225px; height: 225px"></canvas>
           <script>
             const walker = () => ({
-              PUIObj: null,
+              PFXObj: null,
               map: [
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 1, 1, 1, 1, 1, 1, 1, 0],
@@ -576,8 +565,8 @@ PUI.drawNodes(path);
                 [0, 1, 1, 1, 1, 1, 1, 1, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
               ],
-              fromNode: { pos: {x: 2, y: 2} },
-              toNode: { pos: {x: 6, y: 5} },
+              fromNode: { pos: { x: 2, y: 2 } },
+              toNode: { pos: { x: 6, y: 5 } },
               run() {
                 const PFX = new PathfindingFX(
                   document.getElementById("walker"),
@@ -585,7 +574,7 @@ PUI.drawNodes(path);
                 );
 
                 // PFX.drawMap();
-                PFX.addMovingNode({from: this.fromNode, to: this.toNode})
+                PFX.addNode({...this.fromNode, ...{to: this.toNode }});
                 PFX.render();
               },
               init() {
@@ -603,12 +592,12 @@ PUI.drawNodes(path);
 const fromNode = <span x-html="JSON.stringify(fromNode, ['x','y'])"></span>;
 const toNode = <span x-html="JSON.stringify(toNode, ['x','y'])"></span>;
 
-PUI.addStartNode(fromNode);
-PUI.addEndNode(toNode);
+PFX.addStartNode(fromNode);
+PFX.addEndNode(toNode);
 
-const path = PUI.findPath(fromNode, toNode);
+const path = PFX.findPath(fromNode, toNode);
 
-PUI.drawNodes(path);
+PFX.drawNodes(path);
           </code>
         </pre>
       </div>
