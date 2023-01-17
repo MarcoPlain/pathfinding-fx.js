@@ -619,7 +619,26 @@ var PathfindingFX = (function () {
             }
           }
         });
-      this.walkers.forEach((walker) => {
+      this.nodesList
+        .filter((n) => n.flood)
+        .forEach((node) => {
+          var speed = node.flood.speed || 10;
+          if (typeof node.flood._displayRange == "undefined") {
+            node.flood._displayRange = 0;
+          } else {
+            node.flood._displayRange += speed / delta;
+          }
+          if (!node.flood.nodes) {
+            node.flood.nodes = this.getAccessiblePositions(node.pos);
+            node.flood._maxF = Math.ceil(
+              Math.max(...node.flood.nodes.map((n) => n.g))
+            );
+          }
+
+          if (node.flood._displayRange >= node.flood._maxF)
+            node.flood._displayRange = 0;
+        });
+      /*this.walkers.forEach((walker) => {
         if (walker.isHovered) return;
 
         var speed = walker.config.speed || 10;
@@ -674,7 +693,7 @@ var PathfindingFX = (function () {
             }
           }
         }
-      });
+      });*/
     }
 
     animationLoop(pfx, timestamp) {
@@ -941,6 +960,13 @@ var PathfindingFX = (function () {
           this.drawPath(node);
 
           if (node.to && node.to.style) this.drawNode(node.to);
+        }
+        if (node.flood && node.flood.nodes) {
+          node.flood.nodes
+            .filter((n) => n.g <= node.flood._displayRange || 0)
+            .forEach((n) =>
+              this.drawNode({ ...n, ...{ style: { color: node.style.color } } })
+            );
         }
         this.drawNode(node);
       });
