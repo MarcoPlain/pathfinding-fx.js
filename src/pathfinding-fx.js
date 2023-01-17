@@ -16,6 +16,14 @@ var PathfindingFX = (function () {
     endNodeColor: "#00bb88",
 
     greedy: true,
+
+    weightColors: [
+      { w: 1, color: "#6c584c" },
+      { w: 0.75, color: "#a98467" },
+      { w: 0.5, color: "#adc178" },
+      { w: 0.25, color: "#dde5b6" },
+      { w: 0, color: "#f0ead2" },
+    ],
   };
 
   class PathfindingFX {
@@ -25,8 +33,6 @@ var PathfindingFX = (function () {
       // START PATHFINDING
 
       this.heuristics = "manhattan";
-
-      this.initMatrix();
 
       this.path = [];
 
@@ -110,6 +116,8 @@ var PathfindingFX = (function () {
 
       this.sqrt2 = Math.sqrt(2);
 
+      this.initMatrix();
+
       this.clearCanvas();
 
       // Animation Stuff
@@ -129,10 +137,38 @@ var PathfindingFX = (function () {
     }
 
     initMatrix() {
+      const highestWeight = Math.max(...this.map.flat());
+
       let nodeMatrix = [];
       for (let y = 0; y < this.map.length; y++) {
         nodeMatrix[y] = [];
         for (let x = 0; x < this.map[y].length; x++) {
+          const weight = this.map[y][x];
+
+          var color = null;
+          if (highestWeight > 1) {
+            if (weight == 0) {
+              color = defaults.weightColors[0];
+              color = color.color;
+            } else {
+              const weightPercentage = weight / highestWeight;
+              var color = defaults.weightColors.filter(
+                (color) => weightPercentage >= color.w
+              );
+              color = color.shift();
+              color = color.color;
+            }
+          } else {
+            switch (weight) {
+              case 1:
+                color = this.settings.emptyNodeColor;
+                break;
+              case 0:
+                color = this.settings.wallNodeColor;
+                break;
+            }
+          }
+
           nodeMatrix[y][x] = {
             pos: {
               x: x,
@@ -141,6 +177,9 @@ var PathfindingFX = (function () {
             w: this.map[y][x],
             f: 0,
             g: 0,
+            style: {
+              color: color,
+            },
           };
         }
       }
@@ -198,9 +237,9 @@ var PathfindingFX = (function () {
             neighbor.pos.x != currentNode.pos.x &&
             neighbor.pos.y != currentNode.pos.y
           ) {
-            g += this.sqrt2;
+            g += neighbor.w * this.sqrt2;
           } else {
-            g += 1;
+            g += neighbor.w;
           }
           let gBest = false;
           let found = false;
@@ -265,7 +304,7 @@ var PathfindingFX = (function () {
         }
       }
     }
-    findPathForWalker(node) {
+    /*ÜfindPathForWalker(node) {
       if (typeof node.path == "undefined") node.path = [];
 
       // Check if node is trapped
@@ -324,11 +363,7 @@ var PathfindingFX = (function () {
 
         let currentNode = open[lowInd];
         flood.push(currentNode);
-        /*console.log("currentNode", {
-          x: currentNode.pos.x,
-          y: currentNode.pos.y,
-          h: Math.round(currentNode.h),
-        });*/
+        
 
         // End case -- result has been found, return the traced path
 
@@ -394,7 +429,7 @@ var PathfindingFX = (function () {
       }
 
       return flood;
-    };
+    };*/
 
     getAccessiblePositions = (from, options = {}) => {
       this.initMatrix();
@@ -465,6 +500,27 @@ var PathfindingFX = (function () {
 
       closed.shift(); // Removing current from position from the array
       return closed;
+    };
+
+    jumpNode = (node, steps) => {
+      if (node.path) {
+        // Updating internal values becuase node has reached next path position
+        node.pos = node.path[steps].pos;
+        node.x = node.pos.x * this.tileSize.w;
+        node.y = node.pos.y * this.tileSize.h;
+
+        if (typeof node.onPosChange === "function")
+          node.onPosChange(node, node.pos);
+
+        // When mouse is inside canvas we need to check, if by this change the mouse is now hovering over the node
+        if (this.pixelPosition)
+          this.nodeIsHovered(node, this.getXYFromPoint(this.pixelPosition));
+
+        this.findPathForNode(node);
+        if (node.path.length <= 1 && typeof node.onPathEnd === "function") {
+          node.onPathEnd(node);
+        }
+      }
     };
 
     neighbors = (node) => {
@@ -594,28 +650,7 @@ var PathfindingFX = (function () {
             );
 
             if (distanceX + distanceY < speed / delta) {
-              // Updating internal values becuase node has reached next path position
-              node.pos = node.path[1].pos;
-              node.x = node.pos.x * this.tileSize.w;
-              node.y = node.pos.y * this.tileSize.h;
-
-              if (typeof node.onPosChange === "function")
-                node.onPosChange(node, node.pos);
-
-              // When mouse is inside canvas we need to check, if by this change the mouse is now hovering over the node
-              if (this.pixelPosition)
-                this.nodeIsHovered(
-                  node,
-                  this.getXYFromPoint(this.pixelPosition)
-                );
-
-              this.findPathForNode(node);
-              if (
-                node.path.length <= 1 &&
-                typeof node.onPathEnd === "function"
-              ) {
-                node.onPathEnd(node);
-              }
+              this.jumpNode(node, 1);
             }
           }
         });
@@ -759,6 +794,10 @@ var PathfindingFX = (function () {
         return this.getAccessiblePositions(node.pos);
       };
 
+      node.jump = (steps) => {
+        this.jumpNode(node, steps);
+      };
+
       this.nodesList.push(node);
 
       this.drawNode(node);
@@ -777,14 +816,10 @@ var PathfindingFX = (function () {
           },
           {
             set(obj, prop, value) {
-              // The default behavior to store the value
               obj[prop] = value;
-
               if (prop === "pos") {
                 self.findPathForNode(node);
               }
-
-              // Indicate success
               return true;
             },
           }
@@ -793,6 +828,11 @@ var PathfindingFX = (function () {
         this.findPathForNode(node);
         this.drawPath(node);
       }
+
+      if (typeof node.onAdd === "function") {
+        node.onAdd(node);
+      }
+
       return this;
     }
 
@@ -824,7 +864,7 @@ var PathfindingFX = (function () {
       return this.render();
     }
 
-    addMovingNode_DEPRECATED(settings = {}) {
+    /*addMovingNode_DEPRECATED(settings = {}) {
       var walker = {
         pos: settings.from.pos,
         size: {
@@ -886,7 +926,7 @@ var PathfindingFX = (function () {
       this.walkers.push(new Proxy(walker, handler));
 
       return this;
-    }
+    }*/
 
     addStartNode(node, config = {}) {
       config = {
@@ -996,10 +1036,17 @@ var PathfindingFX = (function () {
 
     drawMap(config = {}) {
       this.clearCanvas();
+
       for (let y = 0; y < this.map.length; y++) {
         for (let x = 0; x < this.map[y].length; x++) {
           const color =
-            this.map[y][x] === 1
+            this.matrix &&
+            this.matrix[y] &&
+            this.matrix[y][x] &&
+            this.matrix[y][x].style &&
+            this.matrix[y][x].style.color
+              ? this.matrix[y][x].style.color
+              : this.map[y][x] === 1
               ? this.settings.emptyNodeColor
               : this.settings.wallNodeColor;
 
@@ -1347,7 +1394,7 @@ var PathfindingFX = (function () {
               if (typeof node.onPosChange === "function")
                 node.onPosChange(node, pos);
               if (node.to) {
-                this.findPathForWalker(node);
+                this.findPathForNode(node);
               }
             }
           };
@@ -1559,7 +1606,7 @@ var PathfindingFX = (function () {
       this.nodesList
         .filter((n) => n.to)
         .forEach((node) => {
-          this.findPathForWalker(node);
+          this.findPathForNode(node);
         });
 
       this.pathsList.forEach((path) => {

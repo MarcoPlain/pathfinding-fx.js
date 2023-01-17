@@ -169,12 +169,15 @@ function loadExampleDataFlow() {
         speed: 80 + Math.random() * 120,
       },
       ...{
+        onAdd: (node) => {
+          node.jump(Math.floor(Math.random() * node.path.length));
+        },
         onPathEnd: (node) => {
           node.x = node.start.pos.x * SIZE;
           node.y = node.start.pos.y * SIZE;
           node.pos.x = node.start.pos.x;
           node.pos.y = node.start.pos.y;
-          PFX.findPathForWalker(node);
+          PFX.findPathForNode(node);
         },
       },
     });
