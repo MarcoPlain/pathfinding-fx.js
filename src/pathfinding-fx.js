@@ -93,6 +93,7 @@ var PathfindingFX = (function () {
       this.canvas.style.height = rect.height + "px";
 
       this.nodesList = [];
+      this.blockedPositions = [];
       this.pathsList = [];
       this.interactionMode = null;
       this.targetNodeIndex = null;
@@ -609,12 +610,16 @@ var PathfindingFX = (function () {
       }
     };
 
+    /*setBlockedPositions(nodes) {
+      if (!Array.isArray(nodes)) nodes = [nodes];
+      this.blockedPositions = [...this.blockedPositions, ...nodes];
+    }*/
+
     positionNotOccupied = (pos) => {
       return (
         this.nodesList.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) ==
-          -1 &&
-        this.walkers.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) ==
-          -1
+        -1 /*&& this.blockedPositions.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) ==
+        -1*/
       );
     };
 
@@ -798,9 +803,9 @@ var PathfindingFX = (function () {
       };
 
       node.getAccessiblePositions = () => {
-        if (!node.accessible)
-          node.accessible = this.getAccessiblePositions(node.pos);
-        return node.accessible;
+        if (!node.accessibleNodes)
+          node.accessibleNodes = this.getAccessiblePositions(node.pos);
+        return node.accessibleNodes;
       };
 
       node.jump = (steps) => {
@@ -877,70 +882,6 @@ var PathfindingFX = (function () {
       return this.render();
     }
 
-    /*addMovingNode_DEPRECATED(settings = {}) {
-      var walker = {
-        pos: settings.from.pos,
-        size: {
-          w: this.tileSize.w / 1.5,
-          h: this.tileSize.h / 1.5,
-        },
-        x: settings.from.pos.x * this.tileSize.w,
-        y: settings.from.pos.y * this.tileSize.h,
-        from: settings.from,
-        config: settings,
-        color: settings.color, // !We need to take this color, also for path and circle?
-      };
-
-      walker.getAccessiblePositions = () => {
-        return this.getAccessiblePositions(walker.pos);
-      };
-
-      settings.to.size = { w: walker.size.w / 2, h: walker.size.h / 2 }; // TODO this should be configurable
-
-      const self = this;
-
-      walker.to = new Proxy(
-        this.addCircle(settings.to, {
-          ...settings,
-          ...{
-            onPosChange: (node, pos) => {
-              walker.to.pos = pos;
-              this.findPathForWalker(walker);
-            },
-          },
-        }),
-        {
-          set(obj, prop, value) {
-            // The default behavior to store the value
-            obj[prop] = value;
-
-            if (prop === "pos") {
-              self.findPathForWalker(walker);
-            }
-
-            // Indicate success
-            return true;
-          },
-        }
-      );
-
-      this.findPathForWalker(walker);
-
-      const handler = {
-        set(obj, prop, value) {
-          // The default behavior to store the value
-          obj[prop] = value;
-
-          // Indicate success
-          return true;
-        },
-      };
-
-      this.walkers.push(new Proxy(walker, handler));
-
-      return this;
-    }*/
-
     addStartNode(node, config = {}) {
       config = {
         ...config,
@@ -1016,24 +957,8 @@ var PathfindingFX = (function () {
 
           if (node.to && node.to.style) this.drawNode(node.to);
         }
-        /*if (node.flood && node.flood.nodes) {
-          node.flood.nodes
-            .filter((n) => n.g <= node.flood._displayRange || 0)
-            .forEach((n) =>
-              this.drawNode({ ...n, ...{ style: { color: node.style.color } } })
-            );
-        }*/
+
         this.drawNode(node);
-      });
-      this.walkers.forEach((node) => {
-        if (node.path.length) {
-          node.path.shift();
-          node.path.unshift({ x: node.x, y: node.y });
-          this.drawPath(node, node.config);
-        }
-        this.drawNode(node, node.config);
-        if (typeof node.to.show == "undefined" || node.to.show)
-          this.drawNode(node.to, node.to.config);
       });
 
       if (this.interactionFocus) {
@@ -1041,6 +966,8 @@ var PathfindingFX = (function () {
       } else if (this.position) {
         this.drawContext({ pos: this.position });
       }
+
+      //this.blockedPositions = [];
 
       return this;
     }
@@ -1400,7 +1327,7 @@ var PathfindingFX = (function () {
             ) {
               node.pos = pos;
 
-              node.accessible = null;
+              node.accessibleNodes = null;
 
               // Also setting the pixel position of the node, if it exists
               if (typeof node.x != "undefined")
@@ -1497,32 +1424,6 @@ var PathfindingFX = (function () {
       return node.isHovered;
       */
     }
-    /* walkerIsHovered(node, c, pos) {
-      node.isHovered =
-        (!this.interactionFocus || this.interactionFocus.node == node) &&
-        node.pos.x == c.x &&
-        node.pos.y == c.y;
-      return node.isHovered;
-
-      /*
-      TODO Is this pixel perfect hover collusion detection still needed?
-      const minX =
-          node.x +
-          (typeof node.size != "undefined"
-            ? (this.tileSize.w - node.size.w) / 2
-            : 0),
-        maxX = minX + node.size.w,
-        minY =
-          node.y +
-          (typeof node.size != "undefined"
-            ? (this.tileSize.h - node.size.h) / 2
-            : 0),
-        maxY = minY + node.size.h;
-      node.isHovered =
-        pos.x >= minX && pos.x <= maxX && pos.y >= minY && pos.y <= maxY;
-      return node.isHovered;
-      
-    }*/
 
     detectContext(pos, event) {
       if (!pos) return;
@@ -1621,9 +1522,10 @@ var PathfindingFX = (function () {
       });
 
       this.nodesList
-        .filter((n) => n.to)
+        //.filter((n) => n.to)
         .forEach((node) => {
-          this.findPathForNode(node);
+          node.accessibleNodes = null;
+          if (node.to) this.findPathForNode(node);
         });
 
       this.pathsList.forEach((path) => {
