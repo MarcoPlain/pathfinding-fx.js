@@ -436,6 +436,7 @@ var PathfindingFX = (function () {
 
       let open = [this.matrix[from.y][from.x]];
       let closed = [];
+      let positions = [];
 
       while (open.length) {
         var lowInd = 0;
@@ -450,6 +451,7 @@ var PathfindingFX = (function () {
         open.splice(lowInd, 1);
 
         closed.push(currentNode);
+        positions.push({ ...currentNode });
 
         let neighbors = this.neighbors(currentNode);
         for (let n = 0; n < neighbors.length; n++) {
@@ -498,8 +500,8 @@ var PathfindingFX = (function () {
         }
       }
 
-      closed.shift(); // Removing current from position from the array
-      return closed;
+      positions.shift(); // Removing current from position from the array
+      return positions;
     };
 
     jumpNode = (node, steps) => {
@@ -618,8 +620,10 @@ var PathfindingFX = (function () {
 
     update(delta) {
       this.nodesList
-        .filter((n) => n.to)
+        //.filter((n) => n.to)
         .forEach((node) => {
+          if (typeof node.onUpdate === "function") node.onUpdate(node, delta);
+          if (!node.to) return;
           if (node.isHovered) return;
 
           var speed = node.speed || 10;
@@ -654,7 +658,8 @@ var PathfindingFX = (function () {
             }
           }
         });
-      this.nodesList
+
+      /*this.nodesList
         .filter((n) => n.flood)
         .forEach((node) => {
           var speed = node.flood.speed || 10;
@@ -667,12 +672,13 @@ var PathfindingFX = (function () {
             node.flood.nodes = this.getAccessiblePositions(node.pos);
             node.flood._maxF = Math.ceil(
               Math.max(...node.flood.nodes.map((n) => n.g))
-            );
+            ); 
           }
 
           if (node.flood._displayRange >= node.flood._maxF)
             node.flood._displayRange = 0;
-        });
+        });*/
+
       /*this.walkers.forEach((walker) => {
         if (walker.isHovered) return;
 
@@ -787,15 +793,22 @@ var PathfindingFX = (function () {
         ...{
           x: node.pos.x * this.tileSize.w,
           y: node.pos.y * this.tileSize.h,
+          pfx: this,
         },
       };
 
       node.getAccessiblePositions = () => {
-        return this.getAccessiblePositions(node.pos);
+        if (!node.accessible)
+          node.accessible = this.getAccessiblePositions(node.pos);
+        return node.accessible;
       };
 
       node.jump = (steps) => {
         this.jumpNode(node, steps);
+      };
+
+      node.render = (params) => {
+        this.drawNode(params);
       };
 
       this.nodesList.push(node);
@@ -994,6 +1007,8 @@ var PathfindingFX = (function () {
         this.drawPath(path);
       });
       this.nodesList.forEach((node) => {
+        if (typeof node.onRender === "function") node.onRender(node);
+
         if (node.path && node.path.length) {
           node.path.shift();
           node.path.unshift({ x: node.x, y: node.y });
@@ -1001,13 +1016,13 @@ var PathfindingFX = (function () {
 
           if (node.to && node.to.style) this.drawNode(node.to);
         }
-        if (node.flood && node.flood.nodes) {
+        /*if (node.flood && node.flood.nodes) {
           node.flood.nodes
             .filter((n) => n.g <= node.flood._displayRange || 0)
             .forEach((n) =>
               this.drawNode({ ...n, ...{ style: { color: node.style.color } } })
             );
-        }
+        }*/
         this.drawNode(node);
       });
       this.walkers.forEach((node) => {
@@ -1384,6 +1399,8 @@ var PathfindingFX = (function () {
               (node.pos.x != pos.x || node.pos.y != pos.y)
             ) {
               node.pos = pos;
+
+              node.accessible = null;
 
               // Also setting the pixel position of the node, if it exists
               if (typeof node.x != "undefined")

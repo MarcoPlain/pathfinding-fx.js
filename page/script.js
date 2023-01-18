@@ -468,32 +468,53 @@ function loadExampleFlooding() {
     },
   });
 
+  const cbs = {
+    onUpdate: (node, delta) => {
+
+      node.currentFloodAmount += node.floodDir * (20 / delta);
+      if(node.currentFloodAmount > 50) node.floodDir = -1;
+      if(node.currentFloodAmount <= 0) node.floodDir = 1;
+
+      node.floodToDraw = node
+        .getAccessiblePositions()
+        .filter((p) => p.f < node.currentFloodAmount);
+    },
+    onRender: (node) => {
+      if (node.floodToDraw)
+        node.floodToDraw.map((p) => {
+          p.style = { color: node.style.color, size: { w: 5, h: 5 } , shape: "circle"};
+          node.pfx.drawNode(p)
+        });
+    },
+  }
+
   PFX.addNode({
     ...{
+      floodDir: 1,
+      currentFloodAmount: 0,
       pos: {
-        x: Math.floor(map[0].length / 2) - 5,
-        y: Math.floor(map.length / 2) - 5,
+        x: Math.floor(map[0].length / 2) - 3,
+        y: Math.floor(map.length / 2) - 3,
       },
-      style: { color: "red", size: { w: 15, h: 15 } },
-      flood: {
+      style: { color: "red", size: { w: 10, h: 10 } },
+      /*flood: {
         speed: 20,
-      },
+      },*/
     },
-    ...{},
+    ...cbs,
   });
 
   PFX.addNode({
     ...{
+      floodDir: 1,
+      currentFloodAmount: 0,
       pos: {
         x: Math.floor(map[0].length / 2) + 5,
         y: Math.floor(map.length / 2) + 5,
       },
-      style: { color: "green", size: { w: 15, h: 15 } },
-      flood: {
-        speed: 10,
-      },
+      style: { color: "green", size: { w: 10, h: 10 } },
     },
-    ...{},
+    ...cbs,
   });
 
   PFX.play();
@@ -503,4 +524,4 @@ function clearDemo() {
   PFX.reset();
   PFX.stop();
 }
-loadPathfinding();
+loadExampleFlooding();
