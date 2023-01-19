@@ -9,13 +9,14 @@ var PathfindingFX = (function () {
 
   const defaults = {
     wallNodeColor: "#dbdbdb",
+    wallEdgeColor: "#a8a8a8",
     emptyNodeColor: "#f8f8f8",
     pathNodeColor: "#a8a8a8",
     floodNodeColor: "#585858",
     startNodeColor: "#0088bb",
     endNodeColor: "#00bb88",
 
-    greedy: true,
+    highlightEdges: true,
 
     weightColors: [
       { w: 1, color: "#6c584c" },
@@ -115,6 +116,15 @@ var PathfindingFX = (function () {
       this.settings.endNodeColor =
         settings.endNodeColor || defaults.endNodeColor;
 
+      this.settings.highlightEdges =
+        typeof settings.highlightEdges != "undefined"
+          ? settings.highlightEdges
+          : defaults.highlightEdges;
+      this.settings.wallEdgeColor =
+        typeof settings.wallEdgeColor != "undefined"
+          ? settings.wallEdgeColor
+          : defaults.wallEdgeColor;
+
       this.sqrt2 = Math.sqrt(2);
 
       this.initMatrix();
@@ -133,6 +143,12 @@ var PathfindingFX = (function () {
 
       // Callbacks Stuff
       this.onUpdateMap = settings.onUpdateMap || null;
+
+      this.onInteractionWithAFreeNode =
+        settings.onInteractionWithAFreeNode || null;
+      this.onInteractionWithAWallNode =
+        settings.onInteractionWithAWallNode || null;
+      this.onInteractionWithANode = settings.onInteractionWithANode || null;
 
       return this;
     }
@@ -457,6 +473,36 @@ var PathfindingFX = (function () {
         let neighbors = this.neighbors(currentNode);
         for (let n = 0; n < neighbors.length; n++) {
           let neighbor = neighbors[n];
+
+          if (
+            neighbor.pos.x == currentNode.pos.x - 1 &&
+            neighbor.pos.y == currentNode.pos.y
+          ) {
+            neighbor.dir = "left";
+          }
+          if (
+            neighbor.pos.x == currentNode.pos.x + 1 &&
+            neighbor.pos.y == currentNode.pos.y
+          ) {
+            neighbor.dir = "right";
+          }
+          if (
+            neighbor.pos.x == currentNode.pos.x &&
+            neighbor.pos.y == currentNode.pos.y - 1
+          ) {
+            neighbor.dir = "top";
+          }
+          if (
+            neighbor.pos.x == currentNode.pos.x &&
+            neighbor.pos.y == currentNode.pos.y + 1
+          ) {
+            neighbor.dir = "bottom";
+          }
+
+          neighbor.linear =
+            typeof currentNode.dir == "undefined" ||
+            (currentNode.linear && currentNode.dir == neighbor.dir);
+
           let invalid = false;
           for (let c = 0; c < closed.length; c++) {
             if (
@@ -472,9 +518,9 @@ var PathfindingFX = (function () {
             neighbor.pos.x != currentNode.pos.x &&
             neighbor.pos.y != currentNode.pos.y
           ) {
-            g += this.sqrt2;
+            g += neighbor.w * this.sqrt2;
           } else {
-            g += 1;
+            g += neighbor.w;
           }
           let gBest = false;
           let found = false;
@@ -803,8 +849,9 @@ var PathfindingFX = (function () {
       };
 
       node.getAccessiblePositions = () => {
-        if (!node.accessibleNodes)
+        if (!node.accessibleNodes) {
           node.accessibleNodes = this.getAccessiblePositions(node.pos);
+        }
         return node.accessibleNodes;
       };
 
@@ -850,6 +897,8 @@ var PathfindingFX = (function () {
       if (typeof node.onAdd === "function") {
         node.onAdd(node);
       }
+
+      this.render();
 
       return this;
     }
@@ -1004,28 +1053,28 @@ var PathfindingFX = (function () {
                   (this.map[y][x] == 0 &&
                     this.map[y - 1] &&
                     this.map[y - 1][x] != 0)
-                    ? { color: "#a8a8a8" }
+                    ? { color: this.settings.wallEdgeColor }
                     : null,
                 right:
                   (x == this.map[y].length - 1 && this.map[y][x] != 0) ||
                   (this.map[y][x] == 0 &&
                     typeof this.map[y][x + 1] != "undefined" &&
                     this.map[y][x + 1] != 0)
-                    ? { color: "#a8a8a8" }
+                    ? { color: this.settings.wallEdgeColor }
                     : null,
                 bottom:
                   (y == this.map.length - 1 && this.map[y][x] != 0) ||
                   (this.map[y][x] == 0 &&
                     this.map[y + 1] &&
                     this.map[y + 1][x] != 0)
-                    ? { color: "#a8a8a8" }
+                    ? { color: this.settings.wallEdgeColor }
                     : null,
                 left:
                   (x == 0 && this.map[y][x] != 0) ||
                   (this.map[y][x] == 0 &&
                     typeof this.map[y][x - 1] != "undefined" &&
                     this.map[y][x - 1] != 0)
-                    ? { color: "#a8a8a8" }
+                    ? { color: this.settings.wallEdgeColor }
                     : null,
                 // also corners
                 topLeft:
@@ -1034,7 +1083,7 @@ var PathfindingFX = (function () {
                   this.map[y - 1][x] == 0 &&
                   this.map[y][x - 1] == 0 &&
                   this.map[y - 1][x - 1] != 0
-                    ? { color: "#a8a8a8" }
+                    ? { color: this.settings.wallEdgeColor }
                     : null,
                 topRight:
                   this.map[y][x] == 0 &&
@@ -1042,7 +1091,7 @@ var PathfindingFX = (function () {
                   this.map[y - 1][x] == 0 &&
                   this.map[y][x + 1] == 0 &&
                   this.map[y - 1][x + 1] != 0
-                    ? { color: "#a8a8a8" }
+                    ? { color: this.settings.wallEdgeColor }
                     : null,
                 bottomRight:
                   this.map[y][x] == 0 &&
@@ -1050,7 +1099,7 @@ var PathfindingFX = (function () {
                   this.map[y + 1][x] == 0 &&
                   this.map[y][x + 1] == 0 &&
                   this.map[y + 1][x + 1] != 0
-                    ? { color: "#a8a8a8" }
+                    ? { color: this.settings.wallEdgeColor }
                     : null,
                 bottomLeft:
                   this.map[y][x] == 0 &&
@@ -1058,7 +1107,7 @@ var PathfindingFX = (function () {
                   this.map[y + 1][x] == 0 &&
                   this.map[y][x - 1] == 0 &&
                   this.map[y + 1][x - 1] != 0
-                    ? { color: "#a8a8a8" }
+                    ? { color: this.settings.wallEdgeColor }
                     : null,
               },
             }
@@ -1167,7 +1216,7 @@ var PathfindingFX = (function () {
           switch (shape) {
             case "rect":
               this.ctx.fillRect(drawX, drawY, sizeX, sizeY);
-              if (config.highlightEdges) {
+              if (this.settings.highlightEdges && config.highlightEdges) {
                 if (config.highlightEdges.top) {
                   this.ctx.fillStyle = config.highlightEdges.top.color;
                   this.ctx.fillRect(drawX, drawY, sizeX, 2);
@@ -1287,19 +1336,25 @@ var PathfindingFX = (function () {
       switch (type) {
         case "free":
           setPos = (pos) => {
-            if (this.positionNotOccupied(pos)) {
-              let newMap = this.map;
-              newMap[pos.y][pos.x] = 0;
-              this.updateMap(newMap);
+            if (typeof this.onInteractionWithAFreeNode === "function") {
+              this.onInteractionWithAFreeNode(node, pos, this);
+            } else {
+              if (this.positionNotOccupied(pos)) {
+                this.map[pos.y][pos.x] = 0;
+                this.updateMap(this.map);
+              }
             }
           };
           break;
         case "wall":
           setPos = (pos) => {
-            if (this.positionNotOccupied(pos)) {
-              let newMap = this.map;
-              newMap[pos.y][pos.x] = 1;
-              this.updateMap(newMap);
+            if (typeof this.onInteractionWithAWallNode === "function") {
+              this.onInteractionWithAWallNode(node, pos, this);
+            } else {
+              if (this.positionNotOccupied(pos)) {
+                this.map[pos.y][pos.x] = 1;
+                this.updateMap(this.map);
+              }
             }
           };
           break;
@@ -1319,26 +1374,30 @@ var PathfindingFX = (function () {
           break;*/
         case "node":
           setPos = (pos) => {
-            // Determine if node can have new position
-            if (
-              this.map[pos.y] &&
-              this.map[pos.y][pos.x] &&
-              (node.pos.x != pos.x || node.pos.y != pos.y)
-            ) {
-              node.pos = pos;
+            if (typeof this.onInteractionWithANode === "function") {
+              this.onInteractionWithANode(node, pos, this);
+            } else {
+              // Determine if node can have new position
+              if (
+                this.map[pos.y] &&
+                this.map[pos.y][pos.x] &&
+                (node.pos.x != pos.x || node.pos.y != pos.y)
+              ) {
+                node.pos = pos;
 
-              node.accessibleNodes = null;
+                node.accessibleNodes = null;
 
-              // Also setting the pixel position of the node, if it exists
-              if (typeof node.x != "undefined")
-                node.x = pos.x * this.tileSize.w;
-              if (typeof node.y != "undefined")
-                node.y = pos.y * this.tileSize.h;
+                // Also setting the pixel position of the node, if it exists
+                if (typeof node.x != "undefined")
+                  node.x = pos.x * this.tileSize.w;
+                if (typeof node.y != "undefined")
+                  node.y = pos.y * this.tileSize.h;
 
-              if (typeof node.onPosChange === "function")
-                node.onPosChange(node, pos);
-              if (node.to) {
-                this.findPathForNode(node);
+                if (typeof node.onPosChange === "function")
+                  node.onPosChange(node, pos);
+                if (node.to) {
+                  this.findPathForNode(node);
+                }
               }
             }
           };
@@ -1478,7 +1537,7 @@ var PathfindingFX = (function () {
           node: { pos: { x: pos.x, y: pos.y } },
         };
       }
-      if (this.map[pos.y][pos.x] === 1) {
+      if (this.map[pos.y][pos.x] > 0) {
         return {
           type: "free",
           node: { pos: { x: pos.x, y: pos.y } },

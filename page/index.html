@@ -31,25 +31,34 @@
       <div class="p-8 text-center">
         <h1 class="text-primary text-4xl">pathfinding-fx.js</h1>
         <p>
-          A visualization library for stunning website effects based on
-          pathfinding algorithms
+          An visualization library experiment for interactive website effects
+          based on pathfinding algorithms
         </p>
       </div>
     </div>
 
-    <div class="container mx-auto my-2">
-      <a onclick="loadPathfinding()">Example 1</a>
-      <a onclick="loadExampleDataFlow()">Data Flow</a>
-      <a onclick="loadExampleMazeRunners()">Maze Runners</a>
-      <a onclick="loadExampleFlooding()">Flooding</a>
-      <a onclick="loadExampleFlooding()">Lightbulb</a>
-      <a onclick="clearDemo()">Clear</a>
-
+    <div class="container mx-auto my-2 flex flex-col gap-4">
+      <div class="flex gap-2 justify-center items-center">
+        <a onclick="loadExamplePathfinding()" data-demo="ExamplePathfinding" class="text-white bg-primary px-3 py-2 rounded-lg cursor-pointer">Pathfinding</a>
+        <a onclick="loadExampleDataFlow()" data-demo="ExampleDataFlow" class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer">Data Flow</a>
+        <a onclick="loadExampleMazeRunners()" data-demo="ExampleMazeRunners" class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer">Maze Runners</a>
+        <a onclick="loadExampleFlooding()" data-demo="ExampleFlooding" class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer">Flooding</a>
+        <a onclick="loadExampleMountainClimber()" data-demo="ExampleMountainClimber" class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer">Mountain Climber</a>
+        <a onclick="loadExampleLightSource()" data-demo="ExampleLightSource" class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer">Lightbulb</a>
+        <!--<a onclick="clearDemo()">Clear</a>-->
+      </div>
+      <div class="grid lg:grid-cols-2 gap-4">
       <div
         id="demo-examples"
         style="height: 500px; width: 500px"
         class="mx-auto border border-[#dbdbdb] border-4 bg-[#f8f8f8] rounded box-content"
       ></div>
+      <div>
+        <h2 class="text-lg">Mountain Climber</h2>
+        <p>Making use of a weighted map the pathfinding algorithm makes sure to find the easiest path for our old and brave mountain climber.</p>
+        <p>Interact with the map to toggle between different 'heights'</p>
+      </div>
+    </div>
     </div>
 
     <!-- autoload-usage -->
@@ -442,7 +451,7 @@ PFX.drawNodes(path);
                 PFX.getAccessiblePositions(node.pos)
                   .filter((n) => n.g <= this.step)
                   .map((n) => {
-                    PFX.addNode({ ...n, ...{ style: { color: 'red' } } });
+                    PFX.addNode({ ...n, ...{ style: { color: "red" } } });
                   });
 
                 /*const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
@@ -519,9 +528,9 @@ PFX.drawNodes(path);
                   this.step = Math.round(this.sliderValueMax / 2);
 
                 PFX.getAccessiblePositions(node.pos)
-                  .filter((n,k) => k < this.step)
+                  .filter((n, k) => k < this.step)
                   .map((n) => {
-                    PFX.addNode({ ...n, ...{ style: { color: 'red' } } });
+                    PFX.addNode({ ...n, ...{ style: { color: "red" } } });
                   });
 
                 /*const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
@@ -613,7 +622,6 @@ PFX.drawNodes(path);
       </div>
     </div>
 
-
     <!-- PFX :: Weighted Map -->
     <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="weighted()">
       <div>
@@ -633,7 +641,7 @@ PFX.drawNodes(path);
                 [0, 1, 1, 1, 2, 1, 1, 1, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
               ],
-              fromNode: { pos: { x: 2, y: 2 }, style: {color:"purple"} },
+              fromNode: { pos: { x: 2, y: 2 }, style: { color: "purple" } },
               toNode: { pos: { x: 6, y: 5 } },
               run() {
                 const PFX = new PathfindingFX(
