@@ -155,8 +155,12 @@ var PathfindingFX = (function () {
       return this;
     }
 
+    /**
+     * Initializes the matrix based on
+     * the current state of the map in order to
+     * find a path.
+     */
     initMatrix() {
-
       let nodeMatrix = [];
       for (let y = 0; y < this.map.length; y++) {
         nodeMatrix[y] = [];
@@ -204,7 +208,13 @@ var PathfindingFX = (function () {
       this.matrix = nodeMatrix;
     }
 
-    findPath = (from, to, options = {}) => {
+    /**
+     * Calculates the path between two nodes
+     * @param Object from
+     * @param Object to
+     * @returns Array of nodes
+     */
+    findPath = (from, to) => {
       this.initMatrix();
       to = this.matrix[to.y][to.x];
 
@@ -323,134 +333,8 @@ var PathfindingFX = (function () {
         }
       }
     }
-    /*ÜfindPathForWalker(node) {
-      if (typeof node.path == "undefined") node.path = [];
 
-      // Check if node is trapped
-
-      const isTrapped =
-        typeof this.map[node.pos.y - 1] != "undefined" &&
-        typeof this.map[node.pos.y - 1][node.pos.x] != "undefined" &&
-        this.map[node.pos.y - 1][node.pos.x] == 0 &&
-        typeof this.map[node.pos.y] != "undefined" &&
-        typeof this.map[node.pos.y][node.pos.x + 1] != "undefined" &&
-        this.map[node.pos.y][node.pos.x + 1] == 0 &&
-        typeof this.map[node.pos.y + 1] != "undefined" &&
-        typeof this.map[node.pos.y + 1][node.pos.x] != "undefined" &&
-        this.map[node.pos.y + 1][node.pos.x] == 0 &&
-        typeof this.map[node.pos.y] != "undefined" &&
-        typeof this.map[node.pos.y][node.pos.x - 1] != "undefined" &&
-        this.map[node.pos.y][node.pos.x - 1] == 0;
-
-      node.to.show = !isTrapped;
-
-      if (!isTrapped) {
-        node.path = this.findPath(node.pos, node.to.pos);
-      } else {
-        node.path = [];
-        node.x = node.pos.x * this.tileSize.w;
-        node.y = node.pos.y * this.tileSize.h;
-      }
-
-      if (node.path.length <= 1) {
-        if (typeof node.onNoPath == "function") {
-          try {
-            node.onNoPath(node);
-          } catch (e) {}
-        }
-      }
-    }
-
-    findFlood = (from, to, options = {}) => {
-      this.initMatrix();
-      const greedy = options.greedy || this.greedy;
-
-      to = this.matrix[to.y][to.x];
-
-      let open = [this.matrix[from.y][from.x]];
-      let closed = [];
-
-      let flood = [];
-
-      while (open.length) {
-        var lowInd = 0;
-        for (var i = 0; i < open.length; i++) {
-          if (open[i].f < open[lowInd].f) {
-            lowInd = i;
-          }
-        }
-
-        let currentNode = open[lowInd];
-        flood.push(currentNode);
-        
-
-        // End case -- result has been found, return the traced path
-
-        if (
-          greedy &&
-          currentNode.pos.x == to.pos.x &&
-          currentNode.pos.y == to.pos.y
-        ) {
-          return flood;
-        }
-
-        open.splice(lowInd, 1);
-
-        closed.push(currentNode);
-
-        let neighbors = this.neighbors(currentNode);
-        for (let n = 0; n < neighbors.length; n++) {
-          let neighbor = neighbors[n];
-          let invalid = false;
-          for (let c = 0; c < closed.length; c++) {
-            if (
-              closed[c].pos.x == neighbor.pos.x &&
-              closed[c].pos.y == neighbor.pos.y
-            )
-              invalid = true;
-          }
-          if (invalid) continue;
-
-          let g = currentNode.g;
-          // Diagonal g
-          if (
-            neighbor.pos.x != currentNode.pos.x &&
-            neighbor.pos.y != currentNode.pos.y
-          ) {
-            g += this.sqrt2;
-          } else {
-            g += 1;
-          }
-
-          let gBest = false;
-          let found = false;
-          for (let o = 0; o < open.length; o++)
-            if (
-              open[o].pos.x == neighbor.pos.x &&
-              open[o].pos.y == neighbor.pos.y
-            )
-              found = true;
-
-          if (!found) {
-            gBest = true;
-            neighbor.h = Math.round(this.distance(neighbor.pos, to.pos));
-            open.push(neighbor);
-          } else if (g < neighbor.g) {
-            gBest = true;
-          }
-
-          if (gBest) {
-            neighbor.g = g;
-            neighbor.p = currentNode;
-            neighbor.f = neighbor.g + neighbor.h;
-          }
-        }
-      }
-
-      return flood;
-    };*/
-
-    getAccessiblePositions = (from, options = {}) => {
+    getAccessiblePositions = (from) => {
       this.initMatrix();
 
       let open = [this.matrix[from.y][from.x]];
@@ -555,8 +439,11 @@ var PathfindingFX = (function () {
 
     jumpNode = (node, steps) => {
       if (node.path) {
-        // Updating internal values becuase node has reached next path position
-        node.pos = node.path[steps].pos;
+        // Updating internal values because node has reached next path position
+
+        node.pos.x = node.path[steps].pos.x;
+        node.pos.y = node.path[steps].pos.y;
+
         node.x = node.pos.x * this.tileSize.w;
         node.y = node.pos.y * this.tileSize.h;
 
@@ -847,9 +734,35 @@ var PathfindingFX = (function () {
           x: node.pos.x * this.tileSize.w,
           y: node.pos.y * this.tileSize.h,
           pfx: this,
-          interactive: typeof node.interactive != 'undefined' ? node.interactive : true
+          interactive:
+            typeof node.interactive != "undefined" ? node.interactive : true,
         },
       };
+
+      const self = this;
+
+      node.pos = new Proxy(
+        {
+          ...node.pos,
+          ...{
+            onPosChange: (n, p) => {
+              this.findPathForNode(node);
+            },
+          },
+        },
+        {
+          set(obj, prop, value) {
+            obj[prop] = value;
+
+            node.x = node.pos.x * self.tileSize.w;
+            node.y = node.pos.y * self.tileSize.h;
+
+            //node.findPath()
+            //obj.onPosChange(node, obj);
+            return true;
+          },
+        }
+      );
 
       node.getAccessiblePositions = () => {
         if (!node.accessibleNodes) {
@@ -863,7 +776,45 @@ var PathfindingFX = (function () {
       };
 
       node.render = (params) => {
+        // TODO Can be deleted ?
         this.drawNode(params);
+      };
+
+      node.findPath = (to = null) => {
+        if (typeof node.path == "undefined") node.path = [];
+        if (typeof to === null) to = node.to;
+        // Check if node is trapped
+
+        const isTrapped =
+          typeof this.map[node.pos.y - 1] != "undefined" &&
+          typeof this.map[node.pos.y - 1][node.pos.x] != "undefined" &&
+          this.map[node.pos.y - 1][node.pos.x] == 0 &&
+          typeof this.map[node.pos.y] != "undefined" &&
+          typeof this.map[node.pos.y][node.pos.x + 1] != "undefined" &&
+          this.map[node.pos.y][node.pos.x + 1] == 0 &&
+          typeof this.map[node.pos.y + 1] != "undefined" &&
+          typeof this.map[node.pos.y + 1][node.pos.x] != "undefined" &&
+          this.map[node.pos.y + 1][node.pos.x] == 0 &&
+          typeof this.map[node.pos.y] != "undefined" &&
+          typeof this.map[node.pos.y][node.pos.x - 1] != "undefined" &&
+          this.map[node.pos.y][node.pos.x - 1] == 0;
+
+        node.to.show = !isTrapped;
+
+        if (!isTrapped) {
+          node.path = this.findPath(node.pos, node.to.pos);
+        } else {
+          node.path = [];
+          node.x = node.pos.x * this.tileSize.w;
+          node.y = node.pos.y * this.tileSize.h;
+        }
+
+        if (node.path.length <= 1) {
+          node.accessibleNodes = null;
+          if (typeof node.onNoPath == "function") {
+            node.onNoPath(node);
+          }
+        }
       };
 
       this.nodesList.push(node);
@@ -871,7 +822,6 @@ var PathfindingFX = (function () {
       this.drawNode(node);
 
       if (node.to) {
-        const self = this;
 
         node.to = new Proxy(
           {
@@ -1501,9 +1451,11 @@ var PathfindingFX = (function () {
         };
       }*/
 
-      let nodeIndex = this.nodesList.filter(n=>n.interactive).findIndex((n) =>
-        this.nodeIsHovered(n, pos, this.normalizePointFromEvent(event))
-      );
+      let nodeIndex = this.nodesList
+        .filter((n) => n.interactive)
+        .findIndex((n) =>
+          this.nodeIsHovered(n, pos, this.normalizePointFromEvent(event))
+        );
 
       if (nodeIndex >= 0) {
         return {

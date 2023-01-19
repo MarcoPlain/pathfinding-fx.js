@@ -184,11 +184,15 @@ function loadExampleDataFlow() {
           node.jump(Math.floor(Math.random() * node.path.length));
         },
         onPathEnd: (node) => {
-          node.x = node.start.pos.x * SIZE;
-          node.y = node.start.pos.y * SIZE;
+
+          // Reset the nodes position back to the start position 
+          // which we stored upon creating the node.
           node.pos.x = node.start.pos.x;
           node.pos.y = node.start.pos.y;
-          PFX.findPathForNode(node);
+
+          // Node has new position now, the goal is the same, 
+          // but we need to find the Path again.
+          node.findPath();
         },
       },
     });
