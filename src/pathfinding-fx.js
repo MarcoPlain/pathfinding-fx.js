@@ -31,6 +31,8 @@ var PathfindingFX = (function () {
     constructor(element, settings = {}) {
       this.map = settings.map || [];
 
+      this.highestWeight = Math.max(...this.map.flat());
+
       // START PATHFINDING
 
       this.heuristics = "manhattan";
@@ -154,7 +156,6 @@ var PathfindingFX = (function () {
     }
 
     initMatrix() {
-      const highestWeight = Math.max(...this.map.flat());
 
       let nodeMatrix = [];
       for (let y = 0; y < this.map.length; y++) {
@@ -163,12 +164,12 @@ var PathfindingFX = (function () {
           const weight = this.map[y][x];
 
           var color = null;
-          if (highestWeight > 1) {
+          if (this.highestWeight > 1) {
             if (weight == 0) {
               color = defaults.weightColors[0];
               color = color.color;
             } else {
-              const weightPercentage = weight / highestWeight;
+              const weightPercentage = weight / this.highestWeight;
               var color = defaults.weightColors.filter(
                 (color) => weightPercentage >= color.w
               );
@@ -316,6 +317,7 @@ var PathfindingFX = (function () {
       }
 
       if (node.path.length <= 1) {
+        node.accessibleNodes = null;
         if (typeof node.onNoPath == "function") {
           node.onNoPath(node);
         }
@@ -845,6 +847,7 @@ var PathfindingFX = (function () {
           x: node.pos.x * this.tileSize.w,
           y: node.pos.y * this.tileSize.h,
           pfx: this,
+          interactive: typeof node.interactive != 'undefined' ? node.interactive : true
         },
       };
 
@@ -1498,7 +1501,7 @@ var PathfindingFX = (function () {
         };
       }*/
 
-      let nodeIndex = this.nodesList.findIndex((n) =>
+      let nodeIndex = this.nodesList.filter(n=>n.interactive).findIndex((n) =>
         this.nodeIsHovered(n, pos, this.normalizePointFromEvent(event))
       );
 
@@ -1573,6 +1576,8 @@ var PathfindingFX = (function () {
       if (typeof this.onUpdateMap === "function") this.onUpdateMap(map);
       this.map = map;
       this.initMatrix();
+
+      this.highestWeight = Math.max(...this.map.flat());
 
       //if (this.animationFrameId === null)
 

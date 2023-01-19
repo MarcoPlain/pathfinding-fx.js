@@ -31,34 +31,70 @@
       <div class="p-8 text-center">
         <h1 class="text-primary text-4xl">pathfinding-fx.js</h1>
         <p>
-          An visualization library experiment for interactive website effects
+          A visualization library experiment for interactive website effects
           based on pathfinding algorithms
         </p>
       </div>
     </div>
 
     <div class="container mx-auto my-2 flex flex-col gap-4">
-      <div class="flex gap-2 justify-center items-center">
-        <a onclick="loadExamplePathfinding()" data-demo="ExamplePathfinding" class="text-white bg-primary px-3 py-2 rounded-lg cursor-pointer">Pathfinding</a>
-        <a onclick="loadExampleDataFlow()" data-demo="ExampleDataFlow" class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer">Data Flow</a>
-        <a onclick="loadExampleMazeRunners()" data-demo="ExampleMazeRunners" class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer">Maze Runners</a>
-        <a onclick="loadExampleFlooding()" data-demo="ExampleFlooding" class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer">Flooding</a>
-        <a onclick="loadExampleMountainClimber()" data-demo="ExampleMountainClimber" class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer">Mountain Climber</a>
-        <a onclick="loadExampleLightSource()" data-demo="ExampleLightSource" class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer">Lightbulb</a>
-        <!--<a onclick="clearDemo()">Clear</a>-->
+      <div class="flex gap-4">
+        <div
+          id="demo-examples"
+          style="height: 500px; width: 500px"
+          class="flex-none border border-[#dbdbdb] border-4 bg-[#f8f8f8] rounded box-content"
+        ></div>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-none gap-2 items-center text-sm">
+            <a
+              onclick="loadExamplePathfinding()"
+              data-demo="ExamplePathfinding"
+              class="text-white bg-primary px-3 py-2 rounded-lg cursor-pointer"
+              >Pathfinding</a
+            >
+            <a
+              onclick="loadExampleDataFlow()"
+              data-demo="ExampleDataFlow"
+              class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+              >Data Flow</a
+            >
+            <a
+              onclick="loadExampleMazeRunners()"
+              data-demo="ExampleMazeRunners"
+              class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+              >Maze Runners</a
+            >
+            <a
+              onclick="loadExampleFlooding()"
+              data-demo="ExampleFlooding"
+              class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+              >Flooding</a
+            >
+            <a
+              onclick="loadExampleMountainClimber()"
+              data-demo="ExampleMountainClimber"
+              class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+              >Mountain Climber</a
+            >
+            <a
+              onclick="loadExampleLightSource()"
+              data-demo="ExampleLightSource"
+              class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+              >Lightbulb</a
+            >
+            <!--<a onclick="clearDemo()">Clear</a>-->
+          </div>
+          <div class="flex-1 flex flex-col gap-2 justify-between py-4">
+            <div class="flex flex-col gap-4">
+              <h2 id="example-title" class="text-3xl font-serif"></h2>
+              <p id="example-description" class="text-lg font-sans"></p>
+            </div>
+            <div>
+              <p id="example-instructions" class="text-md font-mono"></p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="grid lg:grid-cols-2 gap-4">
-      <div
-        id="demo-examples"
-        style="height: 500px; width: 500px"
-        class="mx-auto border border-[#dbdbdb] border-4 bg-[#f8f8f8] rounded box-content"
-      ></div>
-      <div>
-        <h2 class="text-lg">Mountain Climber</h2>
-        <p>Making use of a weighted map the pathfinding algorithm makes sure to find the easiest path for our old and brave mountain climber.</p>
-        <p>Interact with the map to toggle between different 'heights'</p>
-      </div>
-    </div>
     </div>
 
     <!-- autoload-usage -->

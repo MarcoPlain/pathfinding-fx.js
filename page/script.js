@@ -35,13 +35,19 @@ function findRandomNode(map) {
   }
 }
 function loadExamplePathfinding() {
+  document.querySelector("#example-title").innerHTML = "Basic Pathfinding";
+  document.querySelector("#example-description").innerHTML =
+    "The most basic example, showing 3 nodes following their way to their goal. Once reached, they get a new one, forever damned to never truly get to the end!";
+  document.querySelector("#example-instructions").innerHTML =
+    "Use your mouse or finger to remove walls, add them, or drag the nodes and their goals around!";
+
   if (PFX) clearDemo();
   document
     .querySelector("[data-demo='ExamplePathfinding']")
     .classList.add("bg-primary");
-    document
-      .querySelector("[data-demo='ExamplePathfinding']")
-      .classList.remove("bg-secondary");
+  document
+    .querySelector("[data-demo='ExamplePathfinding']")
+    .classList.remove("bg-secondary");
   const canvas = document.getElementById("demo-examples");
   let map = [];
 
@@ -53,14 +59,6 @@ function loadExamplePathfinding() {
   }
 
   const cbs = {
-    onPathEnd: (node) => {
-      const accessablePositions = node.getAccessiblePositions();
-      if (accessablePositions.length > 0)
-        node.to.pos =
-          accessablePositions[
-            Math.floor(Math.random() * accessablePositions.length)
-          ].pos;
-    },
     onNoPath: (node) => {
       const accessablePositions = node.getAccessiblePositions();
       if (accessablePositions.length > 0)
@@ -120,6 +118,11 @@ function loadExamplePathfinding() {
   PFX.play();
 }
 function loadExampleDataFlow() {
+  document.querySelector("#example-title").innerHTML = "Data Flow";
+  document.querySelector("#example-description").innerHTML =
+    "Using mutiple similar nodes going the same direction, and resetting them on reaching their goal we got a 'stream like' effect.";
+  document.querySelector("#example-instructions").innerHTML =
+    "Use your mouse or finger to remove walls, add them, or drag the nodes and their goals around!";
   if (PFX) clearDemo();
   document
     .querySelector("[data-demo='ExampleDataFlow']")
@@ -194,13 +197,18 @@ function loadExampleDataFlow() {
   PFX.play();
 }
 function loadExampleMazeRunners() {
+  document.querySelector("#example-title").innerHTML = "Maze Runners";
+  document.querySelector("#example-description").innerHTML =
+    "Probably the best way to show the strength of pathfinding is to send nodes into a maze with the goal to reach the center.";
+  document.querySelector("#example-instructions").innerHTML =
+    "Use your mouse or finger to remove walls, add them, or drag the nodes and their goals around!";
   if (PFX) clearDemo();
   document
     .querySelector("[data-demo='ExampleMazeRunners']")
     .classList.add("bg-primary");
-    document
-      .querySelector("[data-demo='ExampleMazeRunners']")
-      .classList.remove("bg-secondary");
+  document
+    .querySelector("[data-demo='ExampleMazeRunners']")
+    .classList.remove("bg-secondary");
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -289,13 +297,18 @@ function loadExampleMazeRunners() {
   PFX.play();
 }
 function loadExampleFlooding() {
+  document.querySelector("#example-title").innerHTML = "Flooding";
+  document.querySelector("#example-description").innerHTML =
+    "By figuring out how far every position is from a specific node, and then allowing to show more and more, we've got a pretty floor flooding effect of colors!";
+  document.querySelector("#example-instructions").innerHTML =
+    "Use your mouse or finger to remove or add walls, see how it effects the flooding effect!";
   if (PFX) clearDemo();
   document
     .querySelector("[data-demo='ExampleFlooding']")
     .classList.add("bg-primary");
-    document
-      .querySelector("[data-demo='ExampleFlooding']")
-      .classList.remove("bg-secondary");
+  document
+    .querySelector("[data-demo='ExampleFlooding']")
+    .classList.remove("bg-secondary");
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -336,8 +349,11 @@ function loadExampleFlooding() {
   const cbs = {
     onUpdate: (node, delta) => {
       node.currentFloodAmount += node.floodSpeed / delta;
-      if (node.currentFloodAmount > 32) node.currentFloodAmount = 0;
-
+      const highestF = Math.max(
+        ...node.getAccessiblePositions().map((p) => p.f)
+      );
+      if (node.currentFloodAmount > highestF * 1.25)
+        node.currentFloodAmount = 0;
       node.floodToDraw = node
         .getAccessiblePositions()
         .filter((p) => p.f < node.currentFloodAmount);
@@ -358,6 +374,7 @@ function loadExampleFlooding() {
 
   PFX.addNode({
     ...{
+      interactive: false,
       floodSpeed: 12,
       currentFloodAmount: 0,
       pos: {
@@ -371,6 +388,7 @@ function loadExampleFlooding() {
 
   PFX.addNode({
     ...{
+      interactive: false,
       floodSpeed: 18,
       currentFloodAmount: 0,
       pos: {
@@ -384,6 +402,7 @@ function loadExampleFlooding() {
 
   PFX.addNode({
     ...{
+      interactive: false,
       floodSpeed: 22,
       currentFloodAmount: 0,
       pos: {
@@ -397,6 +416,7 @@ function loadExampleFlooding() {
 
   PFX.addNode({
     ...{
+      interactive: false,
       floodSpeed: 10,
       currentFloodAmount: 0,
       pos: {
@@ -411,13 +431,20 @@ function loadExampleFlooding() {
   PFX.play();
 }
 function loadExampleMountainClimber() {
-  if (PFX) clearDemo();
+  document.querySelector("#example-title").innerHTML = "Mountain Climber";
+  document.querySelector("#example-description").innerHTML =
+    "Making use of a weighted map the pathfinding algorithm makes sure to find the easiest path for our old and brave mountain climber.";
+    document.querySelector("#example-instructions").innerHTML =
+    "Interact with the map to toggle between different 'heights'";
   document
     .querySelector("[data-demo='ExampleMountainClimber']")
     .classList.add("bg-primary");
-    document
-      .querySelector("[data-demo='ExampleMountainClimber']")
-      .classList.remove("bg-secondary");
+  document
+    .querySelector("[data-demo='ExampleMountainClimber']")
+    .classList.remove("bg-secondary");
+
+  if (PFX) clearDemo();
+
   const canvas = document.getElementById("demo-examples");
   let map = [
     [5, 5, 5, 5, 5, 4, 4, 4, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2],
@@ -479,13 +506,18 @@ function loadExampleMountainClimber() {
   PFX.play();
 }
 function loadExampleLightSource() {
+  document.querySelector("#example-title").innerHTML = "Light Bulb";
+  document.querySelector("#example-description").innerHTML =
+    "By playing around with colors and calculated reachable positions we've got a light bulb effect.";
+    document.querySelector("#example-instructions").innerHTML =
+    "Drag around the light bulb node to increase its intensity, there is a smiley hidden somewhere!";
   if (PFX) clearDemo();
   document
     .querySelector("[data-demo='ExampleLightSource']")
     .classList.add("bg-primary");
-    document
-      .querySelector("[data-demo='ExampleLightSource']")
-      .classList.remove("bg-secondary");
+  document
+    .querySelector("[data-demo='ExampleLightSource']")
+    .classList.remove("bg-secondary");
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
