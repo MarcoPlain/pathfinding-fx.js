@@ -297,43 +297,6 @@ var PathfindingFX = (function () {
       return [];
     };
 
-    findPathForNode(node) {
-      if (typeof node.path == "undefined") node.path = [];
-
-      // Check if node is trapped
-
-      const isTrapped =
-        typeof this.map[node.pos.y - 1] != "undefined" &&
-        typeof this.map[node.pos.y - 1][node.pos.x] != "undefined" &&
-        this.map[node.pos.y - 1][node.pos.x] == 0 &&
-        typeof this.map[node.pos.y] != "undefined" &&
-        typeof this.map[node.pos.y][node.pos.x + 1] != "undefined" &&
-        this.map[node.pos.y][node.pos.x + 1] == 0 &&
-        typeof this.map[node.pos.y + 1] != "undefined" &&
-        typeof this.map[node.pos.y + 1][node.pos.x] != "undefined" &&
-        this.map[node.pos.y + 1][node.pos.x] == 0 &&
-        typeof this.map[node.pos.y] != "undefined" &&
-        typeof this.map[node.pos.y][node.pos.x - 1] != "undefined" &&
-        this.map[node.pos.y][node.pos.x - 1] == 0;
-
-      node.to.show = !isTrapped;
-
-      if (!isTrapped) {
-        node.path = this.findPath(node.pos, node.to.pos);
-      } else {
-        node.path = [];
-        node.x = node.pos.x * this.tileSize.w;
-        node.y = node.pos.y * this.tileSize.h;
-      }
-
-      if (node.path.length <= 1) {
-        node.accessibleNodes = null;
-        if (typeof node.onNoPath == "function") {
-          node.onNoPath(node);
-        }
-      }
-    }
-
     getAccessiblePositions = (from) => {
       this.initMatrix();
 
@@ -454,7 +417,7 @@ var PathfindingFX = (function () {
         if (this.pixelPosition)
           this.nodeIsHovered(node, this.getXYFromPoint(this.pixelPosition));
 
-        this.findPathForNode(node);
+        node.findPath();
         if (node.path.length <= 1 && typeof node.onPathEnd === "function") {
           node.onPathEnd(node);
         }
@@ -739,14 +702,12 @@ var PathfindingFX = (function () {
         },
       };
 
-      const self = this;
-
       node.pos = new Proxy(
         {
           ...node.pos,
           ...{
             onPosChange: (n, p) => {
-              this.findPathForNode(node);
+              node.findPath();
             },
           },
         },
@@ -754,8 +715,8 @@ var PathfindingFX = (function () {
           set(obj, prop, value) {
             obj[prop] = value;
 
-            node.x = node.pos.x * self.tileSize.w;
-            node.y = node.pos.y * self.tileSize.h;
+            node.x = node.pos.x * node.pfx.tileSize.w;
+            node.y = node.pos.y * node.pfx.tileSize.h;
 
             //node.findPath()
             //obj.onPosChange(node, obj);
@@ -822,13 +783,12 @@ var PathfindingFX = (function () {
       this.drawNode(node);
 
       if (node.to) {
-
         node.to = new Proxy(
           {
             ...node.to,
             ...{
               onPosChange: (n, p) => {
-                this.findPathForNode(node);
+                node.findPath();
               },
             },
           },
@@ -836,14 +796,14 @@ var PathfindingFX = (function () {
             set(obj, prop, value) {
               obj[prop] = value;
               if (prop === "pos") {
-                self.findPathForNode(node);
+                node.findPath();
               }
               return true;
             },
           }
         );
 
-        this.findPathForNode(node);
+        node.findPath();
         this.drawPath(node);
       }
 
@@ -1348,9 +1308,7 @@ var PathfindingFX = (function () {
 
                 if (typeof node.onPosChange === "function")
                   node.onPosChange(node, pos);
-                if (node.to) {
-                  this.findPathForNode(node);
-                }
+                if (node.to) node.findPath();
               }
             }
           };
@@ -1541,7 +1499,7 @@ var PathfindingFX = (function () {
         //.filter((n) => n.to)
         .forEach((node) => {
           node.accessibleNodes = null;
-          if (node.to) this.findPathForNode(node);
+          if (node.to) node.findPath()
         });
 
       this.pathsList.forEach((path) => {
