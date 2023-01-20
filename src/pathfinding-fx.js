@@ -297,7 +297,7 @@ var PathfindingFX = (function () {
       return [];
     };
 
-    getAccessiblePositions = (from) => {
+    positions = (from) => {
       this.initMatrix();
 
       let open = [this.matrix[from.y][from.x]];
@@ -400,30 +400,6 @@ var PathfindingFX = (function () {
       return positions;
     };
 
-    jumpNode = (node, steps) => {
-      if (node.path) {
-        // Updating internal values because node has reached next path position
-
-        node.pos.x = node.path[steps].pos.x;
-        node.pos.y = node.path[steps].pos.y;
-
-        node.x = node.pos.x * this.tileSize.w;
-        node.y = node.pos.y * this.tileSize.h;
-
-        if (typeof node.onPosChange === "function")
-          node.onPosChange(node, node.pos);
-
-        // When mouse is inside canvas we need to check, if by this change the mouse is now hovering over the node
-        if (this.pixelPosition)
-          this.nodeIsHovered(node, this.getXYFromPoint(this.pixelPosition));
-
-        node.findPath();
-        if (node.path.length <= 1 && typeof node.onPathEnd === "function") {
-          node.onPathEnd(node);
-        }
-      }
-    };
-
     neighbors = (node) => {
       let neighbors = [];
       if (
@@ -508,12 +484,7 @@ var PathfindingFX = (function () {
       }
     };
 
-    /*setBlockedPositions(nodes) {
-      if (!Array.isArray(nodes)) nodes = [nodes];
-      this.blockedPositions = [...this.blockedPositions, ...nodes];
-    }*/
-
-    positionNotOccupied = (pos) => {
+    free = (pos) => {
       return (
         this.nodesList.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) ==
         -1 /*&& this.blockedPositions.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) ==
@@ -557,90 +528,13 @@ var PathfindingFX = (function () {
             );
 
             if (distanceX + distanceY < speed / delta) {
-              this.jumpNode(node, 1);
+              node.jump(1);
             }
           }
         });
-
-      /*this.nodesList
-        .filter((n) => n.flood)
-        .forEach((node) => {
-          var speed = node.flood.speed || 10;
-          if (typeof node.flood._displayRange == "undefined") {
-            node.flood._displayRange = 0;
-          } else {
-            node.flood._displayRange += speed / delta;
-          }
-          if (!node.flood.nodes) {
-            node.flood.nodes = this.getAccessiblePositions(node.pos);
-            node.flood._maxF = Math.ceil(
-              Math.max(...node.flood.nodes.map((n) => n.g))
-            ); 
-          }
-
-          if (node.flood._displayRange >= node.flood._maxF)
-            node.flood._displayRange = 0;
-        });*/
-
-      /*this.walkers.forEach((walker) => {
-        if (walker.isHovered) return;
-
-        var speed = walker.config.speed || 10;
-
-        if (walker.path.length > 1) {
-          var dX = walker.path[1].pos.x * this.tileSize.w - walker.x;
-          var dY = walker.path[1].pos.y * this.tileSize.h - walker.y;
-          var sX = 0;
-          var sY = 0;
-          if (dX > 0) sX = speed / delta;
-          if (dX < 0) sX = -speed / delta;
-          if (dY > 0) sY = speed / delta;
-          if (dY < 0) sY = -speed / delta;
-
-          if (sY != 0 && sX != 0) {
-            sX /= this.sqrt2;
-            sY /= this.sqrt2;
-          }
-
-          walker.x += sX;
-          walker.y += sY;
-
-          var distanceX = Math.abs(
-            walker.path[1].pos.x * this.tileSize.w - walker.x
-          );
-          var distanceY = Math.abs(
-            walker.path[1].pos.y * this.tileSize.h - walker.y
-          );
-
-          if (distanceX + distanceY < speed / delta) {
-            // Updating internal values becuase walker has reached next path position
-            walker.pos = walker.path[1].pos;
-            walker.x = walker.pos.x * this.tileSize.w;
-            walker.y = walker.pos.y * this.tileSize.h;
-
-            if (typeof walker.config.onPosChange != "undefined")
-              walker.config.onPosChange(walker, walker.pos);
-
-            // When mouse is inside canvas we need to check, if by this change the mouse is now hovering over the walker
-            if (this.pixelPosition)
-              this.walkerIsHovered(
-                walker,
-                this.getXYFromPoint(this.pixelPosition)
-              );
-
-            this.findPathForWalker(walker);
-            if (
-              walker.path.length <= 1 &&
-              typeof walker.config.onPathEnd == "function"
-            ) {
-              walker.config.onPathEnd(walker);
-            }
-          }
-        }
-      });*/
     }
 
-    animationLoop(pfx, timestamp) {
+    animation(pfx, timestamp) {
       if (pfx.lastFrameTimeMs === null) {
         pfx.lastFrameTimeMs = timestamp;
         pfx.delta = 0;
@@ -649,7 +543,7 @@ var PathfindingFX = (function () {
       // Throttle the frame rate.
       if (timestamp < pfx.lastFrameTimeMs + 1000 / pfx.maxFPS) {
         pfx.animationFrameId = requestAnimationFrame(
-          pfx.animationLoop.bind(0, pfx)
+          pfx.animation.bind(0, pfx)
         );
         return;
       }
@@ -668,14 +562,14 @@ var PathfindingFX = (function () {
       }
       pfx.render();
       pfx.animationFrameId = requestAnimationFrame(
-        pfx.animationLoop.bind(0, pfx)
+        pfx.animation.bind(0, pfx)
       );
     }
 
     play() {
       this.lastFrameTimeMs = null;
       this.animationFrameId = requestAnimationFrame(
-        this.animationLoop.bind(0, this)
+        this.animation.bind(0, this)
       );
     }
 
@@ -725,15 +619,35 @@ var PathfindingFX = (function () {
         }
       );
 
-      node.getAccessiblePositions = () => {
+      node.positions = () => {
         if (!node.accessibleNodes) {
-          node.accessibleNodes = this.getAccessiblePositions(node.pos);
+          node.accessibleNodes = this.positions(node.pos);
         }
         return node.accessibleNodes;
       };
 
       node.jump = (steps) => {
-        this.jumpNode(node, steps);
+        if (node.path) {
+          // Updating internal values because node has reached next path position
+  
+          node.pos.x = node.path[steps].pos.x;
+          node.pos.y = node.path[steps].pos.y;
+  
+          node.x = node.pos.x * this.tileSize.w;
+          node.y = node.pos.y * this.tileSize.h;
+  
+          if (typeof node.onPosChange === "function")
+            node.onPosChange(node, node.pos);
+  
+          // When mouse is inside canvas we need to check, if by this change the mouse is now hovering over the node
+          if (this.pixelPosition)
+            this.nodeIsHovered(node, this.getXYFromPoint(this.pixelPosition));
+  
+          node.findPath();
+          if (node.path.length <= 1 && typeof node.onPathEnd === "function") {
+            node.onPathEnd(node);
+          }
+        }
       };
 
       node.render = (params) => {
@@ -816,76 +730,8 @@ var PathfindingFX = (function () {
       return this;
     }
 
-    addPath(settings = {}) {
-      if (
-        typeof settings.from == "undefined" ||
-        typeof settings.from.pos == "undefined" ||
-        typeof settings.from.pos.x == "undefined" ||
-        typeof settings.from.pos.y == "undefined"
-      ) {
-        throw 'pathfinding-fx.js : addPath() requires a valid "from" setting.';
-      }
-      if (
-        typeof settings.to == "undefined" ||
-        typeof settings.to.pos == "undefined" ||
-        typeof settings.to.pos.x == "undefined" ||
-        typeof settings.to.pos.y == "undefined"
-      ) {
-        throw 'pathfinding-fx.js : addPath() requires a valid "to" setting.';
-      }
-
-      const path = {
-        from: settings.from,
-        to: settings.to,
-        path: this.findPath(settings.from.pos, settings.to.pos, settings),
-        color: settings.color,
-      };
-      this.pathsList.push(path);
-      return this.render();
-    }
-
-    addStartNode(node, config = {}) {
-      config = {
-        ...config,
-        ...{
-          color: config.color || this.settings.startNodeColor,
-        },
-      };
-      this.nodesList.push({ ...node, ...{ config: config } });
-      this.drawNode(node, {
-        config,
-      });
-
-      return this.nodesList[this.nodesList.length - 1];
-    }
-
-    addEndNode(node, config = {}) {
-      config = {
-        ...config,
-        ...{
-          color: config.color || this.settings.endNodeColor,
-        },
-      };
-      this.nodesList.push({ ...node, ...{ config: config } });
-      this.drawNode(node, {
-        config,
-      });
-      return this.nodesList[this.nodesList.length - 1];
-    }
-
-    addCircle(node, config = {}) {
-      node = {
-        ...node,
-        ...{ config: config },
-        ...{ draw: { mode: "stroke", type: "circle" } },
-      };
-      this.nodesList.push(node);
-      return node;
-    }
-
     reset() {
       this.nodesList.length = 0;
-      this.walkers.length = 0;
       this.map.length = 0;
 
       this.canvas.removeEventListener("mousedown", this._mouseDownHandler);
@@ -902,7 +748,7 @@ var PathfindingFX = (function () {
 
     // START : RENDER AND DRAW FUNCTIONS
 
-    render(settings = {}) {
+    render() {
       //console.log('PFX::render()');
       //this.clearCanvas();
       this.drawMap();
@@ -938,7 +784,7 @@ var PathfindingFX = (function () {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    drawMap(config = {}) {
+    drawMap() {
       this.clearCanvas();
 
       for (let y = 0; y < this.map.length; y++) {
@@ -1030,21 +876,21 @@ var PathfindingFX = (function () {
       return this;
     }
 
-    drawPath(nodeWithPath, config = {}) {
-      nodeWithPath.path.forEach((node, key) => {
-        let next = nodeWithPath.path[key + 1];
+    drawPath(node) {
+      node.path.forEach((n, key) => {
+        let next = node.path[key + 1];
         if (!next) return;
 
         var drawX =
-          typeof node.x != "undefined" ? node.x : node.pos.x * this.tileSize.w;
+          typeof n.x != "undefined" ? n.x : n.pos.x * this.tileSize.w;
         var drawY =
-          typeof node.y != "undefined" ? node.y : node.pos.y * this.tileSize.h;
+          typeof n.y != "undefined" ? n.y : n.pos.y * this.tileSize.h;
 
         this.ctx.strokeStyle =
-          nodeWithPath.path.color ||
-          (typeof nodeWithPath.style != "undefined" &&
-            typeof nodeWithPath.style.color != "undefined")
-            ? nodeWithPath.style.color
+          node.path.color ||
+          (typeof node.style != "undefined" &&
+            typeof node.style.color != "undefined")
+            ? node.style.color
             : this.settings.pathNodeColor;
         this.ctx.beginPath(); // Start a new path
         this.ctx.moveTo(
@@ -1252,7 +1098,7 @@ var PathfindingFX = (function () {
             if (typeof this.onInteractionWithAFreeNode === "function") {
               this.onInteractionWithAFreeNode(node, pos, this);
             } else {
-              if (this.positionNotOccupied(pos)) {
+              if (this.free(pos)) {
                 this.map[pos.y][pos.x] = 0;
                 this.updateMap(this.map);
               }
@@ -1264,7 +1110,7 @@ var PathfindingFX = (function () {
             if (typeof this.onInteractionWithAWallNode === "function") {
               this.onInteractionWithAWallNode(node, pos, this);
             } else {
-              if (this.positionNotOccupied(pos)) {
+              if (this.free(pos)) {
                 this.map[pos.y][pos.x] = 1;
                 this.updateMap(this.map);
               }
@@ -1489,14 +1335,11 @@ var PathfindingFX = (function () {
 
       this.highestWeight = Math.max(...this.map.flat());
 
-      //if (this.animationFrameId === null)
-
       this.walkers.forEach((walker) => {
         this.findPathForWalker(walker);
       });
 
       this.nodesList
-        //.filter((n) => n.to)
         .forEach((node) => {
           node.accessibleNodes = null;
           if (node.to) node.findPath()

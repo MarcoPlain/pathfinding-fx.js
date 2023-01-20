@@ -304,7 +304,6 @@ PFX.addNode(nodeB);
                   { map: this.map }
                 )
                   .drawMap()
-                  .addPath({ from: this.from, to: this.to });
 
                 //PFX.drawNodes(path);
 
@@ -479,7 +478,7 @@ PFX.drawNodes(path);
                 const node = { pos: { x: 2, y: 3 } };
 
                 PFX.addNode(node);
-                const aP = PFX.getAccessiblePositions(node.pos);
+                const aP = PFX.positions(node.pos);
                 this.sliderValueMax = Math.ceil(
                   Math.max(...aP.map((n) => n.g))
                 );
@@ -487,7 +486,7 @@ PFX.drawNodes(path);
                 if (this.step === null)
                   this.step = Math.round(this.sliderValueMax / 2);
 
-                PFX.getAccessiblePositions(node.pos)
+                PFX.positions(node.pos)
                   .filter((n) => n.g <= this.step)
                   .map((n) => {
                     PFX.addNode({ ...n, ...{ style: { color: "red" } } });
@@ -560,13 +559,13 @@ PFX.drawNodes(path);
                 const node = { pos: { x: 2, y: 3 } };
 
                 PFX.addNode(node);
-                const aP = PFX.getAccessiblePositions(node.pos);
+                const aP = PFX.positions(node.pos);
                 this.sliderValueMax = aP.length;
 
                 if (this.step === null)
                   this.step = Math.round(this.sliderValueMax / 2);
 
-                PFX.getAccessiblePositions(node.pos)
+                PFX.positions(node.pos)
                   .filter((n, k) => k < this.step)
                   .map((n) => {
                     PFX.addNode({ ...n, ...{ style: { color: "red" } } });

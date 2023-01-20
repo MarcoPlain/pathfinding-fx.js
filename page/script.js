@@ -37,7 +37,7 @@ function findRandomNode(map) {
 function loadExamplePathfinding() {
   document.querySelector("#example-title").innerHTML = "Basic Pathfinding";
   document.querySelector("#example-description").innerHTML =
-    "The most basic example, showing 3 nodes following their way to their goal. Once reached, they get a new one, forever damned to never truly get to the end!";
+    "The most basic example, showing 3 nodes following their way to their goal. Once reached, they simply get a new one.";
   document.querySelector("#example-instructions").innerHTML =
     "Use your mouse or finger to remove walls, add them, or drag the nodes and their goals around!";
 
@@ -60,7 +60,7 @@ function loadExamplePathfinding() {
 
   const cbs = {
     onNoPath: (node) => {
-      const accessablePositions = node.getAccessiblePositions();
+      const accessablePositions = node.positions();
       if (accessablePositions.length > 0)
         node.to.pos =
           accessablePositions[
@@ -292,7 +292,7 @@ function loadExampleMazeRunners() {
           node.pos = findRandomNode(map).pos;
           node.x = node.pos.x * SIZE;
           node.y = node.pos.y * SIZE;
-          PFX.findPathForNode(node);
+          node.findPath();
         },
       },
     });
@@ -354,24 +354,19 @@ function loadExampleFlooding() {
     onUpdate: (node, delta) => {
       node.currentFloodAmount += node.floodSpeed / delta;
       const highestF = Math.max(
-        ...node.getAccessiblePositions().map((p) => p.f)
+        ...node.positions().map((p) => p.f)
       );
       if (node.currentFloodAmount > highestF * 1.25)
         node.currentFloodAmount = 0;
       node.floodToDraw = node
-        .getAccessiblePositions()
+        .positions()
         .filter((p) => p.f < node.currentFloodAmount);
     },
     onRender: (node) => {
-      //return;
-      //console.log(node.style.color);
       if (node.floodToDraw)
         node.floodToDraw.map((p) => {
-          //if(node.pfx.positionNotOccupied(p)){
           p.style = { color: node.style.color, size: { w: 20, h: 20 } };
           node.pfx.drawNode(p);
-          //  node.pfx.setBlockedPositions(p)
-          //}
         });
     },
   };
@@ -498,7 +493,7 @@ function loadExampleMountainClimber() {
     style: { color: "#6b705c", shape: "circle", size: { w: 15, h: 15 } },
     speed: 100,
     onPathEnd: (node) => {
-      const accessablePositions = node.getAccessiblePositions();
+      const accessablePositions = node.positions();
       if (accessablePositions.length > 0)
         node.to.pos =
           accessablePositions[
@@ -555,7 +550,7 @@ function loadExampleLightSource() {
     onUpdate: (node, delta) => {},
     onRender: (node) => {
       node
-        .getAccessiblePositions()
+        .positions()
         .filter((p) => p.f < (node.pos.x + node.pos.y) / 1.5)
         .map((p) => {
           p.style = {
