@@ -51,15 +51,15 @@ function loadExamplePathfinding() {
   const canvas = document.getElementById("demo-examples");
   let map = [];
 
-  for (let y = 0; y < Math.floor(canvas.offsetHeight / SIZE); y++) {
+  for (let y = 0; y < 20; y++) {
     map[y] = [];
-    for (let x = 0; x < Math.floor(canvas.offsetWidth / SIZE); x++) {
+    for (let x = 0; x <20; x++) {
       map[y][x] = Math.random() > 0.6 ? 0 : 1;
     }
   }
 
   const cbs = {
-    onNoPath: (node) => {
+    onNoPath: (node) => { 
       const accessablePositions = node.positions();
       if (accessablePositions.length > 0)
         node.to.pos =
@@ -68,7 +68,6 @@ function loadExamplePathfinding() {
           ].pos;
     },
   };
-
   PFX = new PathfindingFX(canvas, {
     map: map,
   })
@@ -476,7 +475,7 @@ function loadExampleMountainClimber() {
   PFX = new PathfindingFX(canvas, {
     map: map,
     onInteractionWithAFreeNode: (node, pos, pfx) => {
-      if (pfx.positionNotOccupied(pos)) {
+      if (pfx.free(pos)) {
         if (pfx.map[pos.y][pos.x] == 5) pfx.map[pos.y][pos.x] = 1;
         pfx.map[pos.y][pos.x]++;
         pfx.updateMap(pfx.map);

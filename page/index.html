@@ -24,7 +24,6 @@
       defer
       src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"
     ></script>
-
     <script src="../src/pathfinding-fx.js"></script>
   </head>
   <body class="overflow-x-hidden bg-gray-50">
@@ -40,53 +39,53 @@
       </div>
 
       <div class="container mx-auto my-2 flex flex-col gap-4">
-        <div class="flex gap-4">
+        <div class="flex flex-col lg:flex-row gap-4">
           <div
             id="demo-examples"
-            style="height: 500px; width: 500px"
-            class="flex-none border border-[#dbdbdb] border-4 bg-[#f8f8f8] rounded box-content"
+            style="max-width: 500px;"
+            class="flex-none w-full mx-auto"
           ></div>
           <div class="flex flex-col gap-4">
-            <div class="flex flex-none gap-2 items-center text-sm">
+            <div class="flex flex-none flex-wrap justify-center lg:justify-start gap-2 items-center text-sm">
               <a
                 onclick="loadExamplePathfinding()"
                 data-demo="ExamplePathfinding"
-                class="text-white bg-primary px-3 py-2 rounded-lg cursor-pointer"
+                class="text-white bg-primary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
                 >Pathfinding</a
               >
               <a
                 onclick="loadExampleDataFlow()"
                 data-demo="ExampleDataFlow"
-                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
                 >Data Flow</a
               >
               <a
                 onclick="loadExampleMazeRunners()"
                 data-demo="ExampleMazeRunners"
-                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
                 >Maze Runners</a
               >
               <a
                 onclick="loadExampleFlooding()"
                 data-demo="ExampleFlooding"
-                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
                 >Flooding</a
               >
               <a
                 onclick="loadExampleMountainClimber()"
                 data-demo="ExampleMountainClimber"
-                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
                 >Mountain Climber</a
               >
               <a
                 onclick="loadExampleLightSource()"
                 data-demo="ExampleLightSource"
-                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
                 >Lightbulb</a
               >
               <!--<a onclick="clearDemo()">Clear</a>-->
             </div>
-            <div class="flex-1 flex flex-col gap-2 justify-between py-12">
+            <div class="flex-1 flex flex-col gap-2 justify-between py-12 px-4 lg:px-0">
               <div class="flex flex-col gap-4">
                 <h2 id="example-title" class="text-3xl font-serif"></h2>
                 <p
@@ -103,75 +102,9 @@
       </div>
     </div>
 
-    <!-- autoload-usage -->
-    <!--<div class="bg-gray-500 my-8 flex gap-4 p-8">
-        <div>
-          <div class="bg-blue-200 mb-2">
-            <canvas
-              width="200"
-              height="200"
-              data-pathfinding="[
-                [0,0,0,0,0,0,0,0,0],
-                [0,1,1,1,1,1,1,1,0],
-                [0,1,1,1,1,1,1,1,0],
-                [0,1,1,1,0,1,1,1,0],
-                [0,1,1,1,0,1,1,1,0],
-                [0,1,1,1,0,1,1,1,0],
-                [0,1,1,1,1,1,1,1,0],
-                [0,1,1,1,1,1,1,1,0],
-                [0,0,0,0,0,0,0,0,0]
-            ]"
-              data-from='{"x":"2", "y":"4"}'
-              data-to='{"x":"6", "y":"4"}'
-            ></canvas>
-          </div>
-          <button
-            class="bg-primary text-black rounded p-1.5"
-            onclick='PathfindingFX.init(document.querySelectorAll("[data-pathfinding]"))'
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-              />
-            </svg>
-          </button>
-        </div>
-        <div>
-          <h1 class="text-xl text-primary uppercase">Autoloading</h1>
-          <p>
-            Use <code>data-pathfinding</code> for inline path drawing
-            autoloading
-          </p>
-          <pre><code class="text-code">&lt;canvas style="width:225px; height:225px;" 
-    <span class="text-code-important">data-pathfinding="[
-        [0,0,0,0,0,0,0,0,0],
-        [0,1,1,1,1,1,1,1,0],
-        [0,1,1,1,1,1,1,1,0],
-        [0,1,1,1,0,1,1,1,0],
-        [0,1,1,1,0,1,1,1,0],
-        [0,1,1,1,0,1,1,1,0],
-        [0,1,1,1,1,1,1,1,0],
-        [0,1,1,1,1,1,1,1,0],
-        [0,0,0,0,0,0,0,0,0]
-    ]"
-    data-from='{"x":"2", "y":"4"}'
-    data-to='{"x":"6", "y":"4"}'</span>
-&gt;&lt;/canvas&gt;</code></pre>
-        </div>
-      </div>-->
-
-    <!-- PFX :: drawMap() -->
+    <!-- PFX :: initialization() -->
     <div
-      class="grid grid-cols-3 divide-x-2 gap-4 p-8 container mx-auto"
+      class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-8 container mx-auto"
       x-data="initialization()"
     >
       <div class="w-[300px] justify-center flex flex-col gap-4">
@@ -222,24 +155,40 @@
       </div>
       <div class="flex items-center pl-4">
         <pre>
-          <code class="text-xs">
+        <code class="text-xs">
 const PFX = new PathfindingFX(
   document.getElementById("pfx-initialization"),
   { 
-      map: [
-          <span x-html='"["+map.join("],\n          [")+"]"'></span>
+    map:
+      [
+        <span x-html='"["+map.join("],\n        [")+"]"'></span>
       ], 
   }
 );
-        </code>
-      </pre>
+      </code>
+    </pre>
       </div>
     </div>
 
     <!-- PFX :: addNode() -->
-    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="addNode()">
-      <div>
-        <div class="bg-blue-200">
+    <div
+      class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-8 container mx-auto"
+      x-data="addNode()"
+    >
+      <div class="w-[300px] justify-center flex flex-col gap-4">
+        <h1 class="text-xl font-serif">PFX :: addNode()</h1>
+        <p>
+          Initialize PathfindingFX by instantiating a new PathfindingFX Object
+          and pass in the element where the canvas should be drawn into.
+        </p>
+        <p>
+          As a second parameter pass in your settings, the most basic one is
+          passing a map settings with a two-dimensional array giving information
+          about what is a wall and what not.
+        </p>
+      </div>
+      <div class="flex items-center justify-center">
+        <div>
           <div id="addNode" style="width: 225px; height: 225px"></div>
           <script>
             const addNode = () => ({
@@ -276,172 +225,40 @@ const PFX = new PathfindingFX(
           </script>
         </div>
       </div>
-      <div>
-        <h1 class="text-xl text-primary">PFX :: addNode()</h1>
+      <div class="flex items-center pl-4">
         <pre>
-            <code>
+          <code class="text-xs">
+
+const PFX = new PathfindingFX([...]);
+
 const nodeA = <span x-html="JSON.stringify(nodeA)"></span>;
 const nodeB = <span x-html="JSON.stringify(nodeB)"></span>;
 
 PFX.addNode(nodeA);
 PFX.addNode(nodeB);
 
-          </code>
-        </pre>
+        </code>
+      </pre>
       </div>
     </div>
-
-    <!-- PFX :: addPath() -->
-    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="addPath()">
-      <div>
-        <div class="bg-blue-200">
-          <div id="addPath" style="width: 225px; height: 225px"></div>
-          <script>
-            const addPath = () => ({
-              PFXObj: null,
-              map: [
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-              ],
-              from: { pos: { x: 2, y: 2 } },
-              to: { pos: { x: 6, y: 3 } },
-              run() {
-                const PFX = new PathfindingFX(
-                  document.getElementById("addPath"),
-                  { map: this.map }
-                ).drawMap();
-              },
-              init() {
-                this.run();
-              },
-            });
-          </script>
-        </div>
-      </div>
-      <div>
-        <h1 class="text-xl text-primary">PFX :: addPath()</h1>
-
-        <pre>
-            <code>
-const from = <span x-html="JSON.stringify(from)"></span>;
-const to = <span x-html="JSON.stringify(to)"></span>;
-
-PFX.addPath({from:from, to:to});
-
-          </code>
-        </pre>
-      </div>
-    </div>
-
-    <!-- PFX :: drawNodes with max() -->
-    <!-- <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawNodesWithSteps()">
-        <div>
-          <div class="bg-blue-200">
-            <div id="drawNodesWithSteps" style="width:225px; height:225px;"></div>
-            <script>
-              const drawNodesWithSteps = () => ({
-                PFXObj: null,
-                map: [
-                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                ],
-                fromNode: { x: 2, y: 3 },
-                toNode: { x: 6, y: 3 },
-                step: null,
-                sliderValueMax: null,
-                run() {
-                  const PFX = new PathfindingFX(
-                    document.getElementById("drawNodesWithSteps"),
-                    { map: this.map }
-                  );
-                  this.PFXObj = PFX;
-
-                  PFX.drawMap();
-
-                  const path = PFX.addPath(this.fromNode, this.toNode);
-                  this.sliderValueMax = path.length;
-                  if (this.step === null) {
-                    this.step = Math.round(this.sliderValueMax / 2);
-                  }
-
-                  PFX.drawNodes(path.filter((p) => p.g <= this.step));
-
-                  PFX.addNode(this.fromNode, { color: "red" });
-                  PFX.addNode(this.toNode, { color: "green" });
-
-                  PFX.onNodesListUpdate = (nodesList) => {
-                    nodesList.forEach((node) => {
-                      if (node.config.color == "red") {
-                        this.fromNode.pos.x = node.pos.x;
-                        this.fromNode.pos.y = node.pos.y;
-                      }
-                      if (node.config.color == "green") {
-                        this.toNode.pos.x = node.pos.x;
-                        this.toNode.pos.y = node.pos.y;
-                      }
-                      const PFX = this.PFXObj;
-                      PFX.clearAllPaths();
-
-                      const path = PFX.addPath(this.fromNode, this.toNode);
-                      this.sliderValueMax = path.length;
-                      this.step = Math.round(this.sliderValueMax / 2);
-
-                      PFX.drawNodes(path.filter((p) => p.g <= this.step));
-                    });
-                  };
-                },
-                init() {
-                  this.run();
-                  this.$watch("step", (value) => this.run());
-                },
-              });
-            </script>
-          </div>
-        </div>
-        <div>
-          <h1 class="text-xl text-primary">PFX :: drawNodes with steps()</h1>
-          <input
-            id="default-range"
-            type="range"
-            x-model="step"
-            min="0"
-            :max="sliderValueMax"
-            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-          />
-          <pre>
-            <code>
-const fromNode = { x: 2, y: 3 };
-const toNode = { x: 6, y: 3 };
-
-PFX.addStartNode(fromNode);
-PFX.addEndNode(toNode);
-
-const path = PFX.findPath(fromNode, toNode);
-
-PFX.drawNodes(path);
-          </code>
-        </pre>
-        </div>
-      </div>-->
 
     <!-- PFX :: drawFlood() -->
-    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="flood()">
-      <div>
-        <div class="bg-blue-200">
+    <div class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-8 container mx-auto" x-data="flood()">
+
+      <div class="w-[300px] justify-center flex flex-col gap-4">
+        <h1 class="text-xl font-serif">PFX :: positions()</h1>
+        <p>
+          Initialize PathfindingFX by instantiating a new PathfindingFX Object
+          and pass in the element where the canvas should be drawn into.
+        </p>
+        <p>
+          As a second parameter pass in your settings, the most basic one is
+          passing a map settings with a two-dimensional array giving information
+          about what is a wall and what not.
+        </p>
+      </div>
+      <div class="flex items-center justify-center">
+        <div>
           <div id="flood" style="width: 225px; height: 225px"></div>
           <script>
             const flood = () => ({
@@ -500,8 +317,13 @@ PFX.drawNodes(path);
           </script>
         </div>
       </div>
-      <div>
-        <h1 class="text-xl text-primary">Flooding</h1>
+      <div class="flex items-center pl-4">
+        <pre>
+            <code>
+              
+          </code>
+        </pre>
+
         <input
           id="default-range"
           type="range"
@@ -510,155 +332,26 @@ PFX.drawNodes(path);
           :max="sliderValueMax"
           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
         />
-        <input type="checkbox" x-model="greedy" />
-        <pre>
-            <code>
-              
-          </code>
-        </pre>
-      </div>
-    </div>
-
-    <!-- PFX :: sequence() -->
-    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="sequence()">
-      <div>
-        <div class="bg-blue-200">
-          <div id="sequence" style="width: 225px; height: 225px"></div>
-          <script>
-            const sequence = () => ({
-              map: [
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-              ],
-              step: null,
-              sliderValueMax: null,
-              greedy: true,
-              run() {
-                if (document.querySelector("#sequence > canvas"))
-                  document.querySelector("#sequence > canvas").remove();
-
-                const PFX = new PathfindingFX(
-                  document.getElementById("sequence"),
-                  { map: this.map }
-                );
-
-                PFX.drawMap();
-
-                const node = { pos: { x: 2, y: 3 } };
-
-                PFX.addNode(node);
-                const aP = PFX.positions(node.pos);
-                this.sliderValueMax = aP.length;
-
-                if (this.step === null)
-                  this.step = Math.round(this.sliderValueMax / 2);
-
-                PFX.positions(node.pos)
-                  .filter((n, k) => k < this.step)
-                  .map((n) => {
-                    PFX.addNode({ ...n, ...{ style: { color: "red" } } });
-                  });
-
-                /*const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
-                  greedy: this.greedy,
-                }); */
-              },
-              init() {
-                this.run();
-                this.$watch("step", (value) => this.run());
-                this.$watch("greedy", (value) => this.run());
-              },
-            });
-          </script>
-        </div>
-      </div>
-      <div>
-        <h1 class="text-xl text-primary">Sequencing</h1>
-        <input
-          id="default-range"
-          type="range"
-          x-model="step"
-          min="0"
-          :max="sliderValueMax"
-          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-        />
-        <input type="checkbox" x-model="greedy" />
-        <pre>
-            <code>
-              
-          </code>
-        </pre>
-      </div>
-    </div>
-
-    <!-- PFX :: Walker() -->
-    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="walker()">
-      <div>
-        <div class="bg-blue-200">
-          <div id="walker" style="width: 225px; height: 225px"></div>
-          <script>
-            const walker = () => ({
-              PFXObj: null,
-              map: [
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-              ],
-              fromNode: { pos: { x: 2, y: 2 } },
-              toNode: { pos: { x: 6, y: 5 } },
-              run() {
-                const PFX = new PathfindingFX(
-                  document.getElementById("walker"),
-                  { map: this.map }
-                );
-
-                // PFX.drawMap();
-                PFX.addNode({ ...this.fromNode, ...{ to: this.toNode } });
-                PFX.render();
-              },
-              init() {
-                this.run();
-              },
-            });
-          </script>
-        </div>
-      </div>
-      <div>
-        <h1 class="text-xl text-primary">PFX :: Walker</h1>
-
-        <pre>
-            <code>
-const fromNode = <span x-html="JSON.stringify(fromNode, ['x','y'])"></span>;
-const toNode = <span x-html="JSON.stringify(toNode, ['x','y'])"></span>;
-
-PFX.addStartNode(fromNode);
-PFX.addEndNode(toNode);
-
-const path = PFX.findPath(fromNode, toNode);
-
-PFX.drawNodes(path);
-          </code>
-        </pre>
       </div>
     </div>
 
     <!-- PFX :: Weighted Map -->
-    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="weighted()">
-      <div>
-        <div class="bg-blue-200">
+    <div class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-8 container mx-auto" x-data="weighted()">
+      
+      <div class="w-[300px] justify-center flex flex-col gap-4">
+        <h1 class="text-xl font-serif">PFX :: map weights</h1>
+        <p>
+          Initialize PathfindingFX by instantiating a new PathfindingFX Object
+          and pass in the element where the canvas should be drawn into.
+        </p>
+        <p>
+          As a second parameter pass in your settings, the most basic one is
+          passing a map settings with a two-dimensional array giving information
+          about what is a wall and what not.
+        </p>
+      </div>
+      <div class="flex items-center justify-center">
+        <div>
           <div id="weighted" style="width: 225px; height: 225px"></div>
           <script>
             const weighted = () => ({
@@ -692,23 +385,6 @@ PFX.drawNodes(path);
             });
           </script>
         </div>
-      </div>
-      <div>
-        <h1 class="text-xl text-primary">PFX :: Weighted Map</h1>
-
-        <pre>
-            <code>
-const fromNode = <span x-html="JSON.stringify(fromNode, ['x','y'])"></span>;
-const toNode = <span x-html="JSON.stringify(toNode, ['x','y'])"></span>;
-
-PFX.addStartNode(fromNode);
-PFX.addEndNode(toNode);
-
-const path = PFX.findPath(fromNode, toNode);
-
-PFX.drawNodes(path);
-          </code>
-        </pre>
       </div>
     </div>
 
@@ -751,6 +427,5 @@ PFX.drawNodes(path);
     </div>
 
     <script src="./script.js"></script>
-    <script>hljs.highlightAll();</script>
   </body>
 </html>

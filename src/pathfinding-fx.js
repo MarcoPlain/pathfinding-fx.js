@@ -31,6 +31,7 @@ var PathfindingFX = (function () {
     constructor(element, settings = {}) {
       this.map = settings.map || [];
 
+
       this.highestWeight = Math.max(...this.map.flat());
 
       // START PATHFINDING
@@ -52,14 +53,21 @@ var PathfindingFX = (function () {
           " is not a Node."
         );
       }
+
+      const tileOffset = element.offsetWidth % this.map.length;
+      
+      element.style.width = element.offsetWidth - tileOffset + 'px';
+      element.style.height = element.style.width;
+
       this.width = element.offsetWidth;
-      this.height = element.offsetHeight;
+      this.height = element.offsetWidth;
 
       this.canvas = document.createElement("canvas");
 
       this.canvas.width = this.width;
       this.canvas.height = this.height;
       element.appendChild(this.canvas);
+      
 
       this.ctx = this.canvas.getContext("2d");
 
@@ -586,6 +594,12 @@ var PathfindingFX = (function () {
     // START : ADDING DATA TO PFX
 
     addNode(node) {
+
+      /*node.x = node.pos.x * this.tileSize.w
+      node.y = node.pos.y * this.tileSize.h
+      node.pfx = this
+      node.interactive =  typeof node.interactive != "undefined" ? node.interactive : true,*/
+
       node = {
         ...node,
         ...{
