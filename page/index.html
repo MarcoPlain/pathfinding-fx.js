@@ -42,50 +42,60 @@
         <div class="flex flex-col lg:flex-row gap-4">
           <div
             id="demo-examples"
-            style="max-width: 500px;"
+            style="max-width: 500px"
             class="flex-none w-full mx-auto"
           ></div>
           <div class="flex flex-col gap-4">
-            <div class="flex flex-none flex-wrap justify-center lg:justify-start gap-2 items-center text-sm">
+            <div
+              class="flex flex-none flex-wrap justify-center lg:justify-start gap-2 items-center text-sm"
+            >
               <a
                 onclick="loadExamplePathfinding()"
                 data-demo="ExamplePathfinding"
                 class="text-white bg-primary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
-                >Pathfinding</a
               >
+                Pathfinding
+              </a>
               <a
                 onclick="loadExampleDataFlow()"
                 data-demo="ExampleDataFlow"
                 class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
-                >Data Flow</a
               >
+                Data Flow
+              </a>
               <a
                 onclick="loadExampleMazeRunners()"
                 data-demo="ExampleMazeRunners"
                 class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
-                >Maze Runners</a
               >
+                Maze Runners
+              </a>
               <a
                 onclick="loadExampleFlooding()"
                 data-demo="ExampleFlooding"
                 class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
-                >Flooding</a
               >
+                Flooding
+              </a>
               <a
                 onclick="loadExampleMountainClimber()"
                 data-demo="ExampleMountainClimber"
                 class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
-                >Mountain Climber</a
               >
+                Mountain Climber
+              </a>
               <a
                 onclick="loadExampleLightSource()"
                 data-demo="ExampleLightSource"
                 class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
-                >Lightbulb</a
               >
+                Lightbulb
+              </a>
               <!--<a onclick="clearDemo()">Clear</a>-->
             </div>
-            <div class="flex-1 flex flex-col gap-2 justify-between py-12 px-4 lg:px-0">
+            <div
+              class="flex-1 flex flex-col gap-2 justify-between py-12 px-4 lg:px-0"
+            >
               <div class="flex flex-col gap-4">
                 <h2 id="example-title" class="text-3xl font-serif"></h2>
                 <p
@@ -102,60 +112,84 @@
       </div>
     </div>
 
-    <!-- PFX :: initialization() -->
-    <div
-      class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-8 container mx-auto"
-      x-data="initialization()"
-    >
-      <div class="w-[300px] justify-center flex flex-col gap-4">
-        <h1 class="text-xl font-serif">PFX :: initialization()</h1>
-        <p>
-          Initialize PathfindingFX by instantiating a new PathfindingFX Object
-          and pass in the element where the canvas should be drawn into.
-        </p>
-        <p>
-          As a second parameter pass in your settings, the most basic one is
-          passing a map settings with a two-dimensional array giving information
-          about what is a wall and what not.
-        </p>
-      </div>
-      <div class="flex items-center justify-center">
-        <div>
-          <div id="initialization" style="width: 225px; height: 225px"></div>
-          <script>
-            const initialization = () => ({
-              map: [
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-              ],
-              run() {
-                const PFX = new PathfindingFX(
-                  document.getElementById("initialization"),
-                  { map: this.map }
-                );
-
-                //PFX.drawMap();
-                PFX.onUpdateMap = (map) => {
-                  this.map = map;
-                };
-              },
-              init() {
-                this.run();
-              },
-            });
-          </script>
+    <div class="flex flex-col gap-8">
+      <!-- PFX :: initialization() -->
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto"
+        x-data="initialization()"
+      >
+        <div class="w-[300px] justify-center flex flex-col gap-4">
+          <h1 class="text-xl font-serif">PFX :: initialization()</h1>
+          <p class="text-justify">
+            Initialize PathfindingFX by instantiating a new PathfindingFX Object
+            and pass in the element where the canvas should be drawn into.
+          </p>
+          <p class="text-justify">
+            As a second parameter pass in your settings, the most basic one is
+            passing a map settings with a two-dimensional array giving
+            information about what is a wall and what not.
+          </p>
         </div>
-      </div>
-      <div class="flex items-center pl-4">
-        <pre>
-        <code class="text-xs">
+        <div class="flex items-center justify-center">
+          <div>
+            <div id="initialization" style="width: 225px; height: 225px"></div>
+            <script>
+              const initialization = () => ({
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                run() {
+                  const PFX = new PathfindingFX(
+                    document.getElementById("initialization"),
+                    { map: this.map }
+                  );
+
+                  //PFX.drawMap();
+                  PFX.onUpdateMap = (map) => {
+                    this.map = map;
+                  };
+                },
+                init() {
+                  this.run();
+                },
+              });
+            </script>
+          </div>
+        </div>
+        <div class="text-center lg:text-left lg:pl-4">
+          <a
+            onclick="this.nextElementSibling.classList.toggle('hidden')"
+            data-demo="ExampleDataFlow"
+            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 inline"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+              />
+            </svg>
+            Toggle Code
+          </a>
+
+          <div class="hidden lg:block text-left">
+            <pre>
+              <code class="text-xs">
 const PFX = new PathfindingFX(
   document.getElementById("pfx-initialization"),
   { 
@@ -165,68 +199,93 @@ const PFX = new PathfindingFX(
       ], 
   }
 );
-      </code>
-    </pre>
-      </div>
-    </div>
-
-    <!-- PFX :: addNode() -->
-    <div
-      class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-8 container mx-auto"
-      x-data="addNode()"
-    >
-      <div class="w-[300px] justify-center flex flex-col gap-4">
-        <h1 class="text-xl font-serif">PFX :: addNode()</h1>
-        <p>
-          Initialize PathfindingFX by instantiating a new PathfindingFX Object
-          and pass in the element where the canvas should be drawn into.
-        </p>
-        <p>
-          As a second parameter pass in your settings, the most basic one is
-          passing a map settings with a two-dimensional array giving information
-          about what is a wall and what not.
-        </p>
-      </div>
-      <div class="flex items-center justify-center">
-        <div>
-          <div id="addNode" style="width: 225px; height: 225px"></div>
-          <script>
-            const addNode = () => ({
-              map: [
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-              ],
-              nodeA: { pos: { x: 2, y: 2 }, style: { color: "#2a9d8f" } },
-              nodeB: {
-                pos: { x: 6, y: 3 },
-                style: { color: "#e76f51" },
-                to: { pos: { x: 6, y: 6 } },
-              },
-              run() {
-                const PFX = new PathfindingFX(
-                  document.getElementById("addNode"),
-                  { map: this.map }
-                )
-                  .drawMap()
-                  .addNode(this.nodeA)
-                  .addNode(this.nodeB);
-              },
-              init() {
-                this.run();
-              },
-            });
-          </script>
+              </code>
+            </pre>
+          </div>
         </div>
       </div>
-      <div class="flex items-center pl-4">
-        <pre>
+
+      <!-- PFX :: addNode() -->
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto"
+        x-data="addNode()"
+      >
+        <div class="w-[300px] justify-center flex flex-col gap-4">
+          <h1 class="text-xl font-serif">PFX :: addNode()</h1>
+          <p class="text-justify">
+            Initialize PathfindingFX by instantiating a new PathfindingFX Object
+            and pass in the element where the canvas should be drawn into.
+          </p>
+          <p class="text-justify">
+            As a second parameter pass in your settings, the most basic one is
+            passing a map settings with a two-dimensional array giving
+            information about what is a wall and what not.
+          </p>
+        </div>
+        <div class="flex items-center justify-center">
+          <div>
+            <div id="addNode" style="width: 225px; height: 225px"></div>
+            <script>
+              const addNode = () => ({
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                nodeA: { pos: { x: 2, y: 2 }, style: { color: "#2a9d8f" } },
+                nodeB: {
+                  pos: { x: 6, y: 3 },
+                  style: { color: "#e76f51" },
+                  to: { pos: { x: 6, y: 6 } },
+                },
+                run() {
+                  const PFX = new PathfindingFX(
+                    document.getElementById("addNode"),
+                    { map: this.map }
+                  )
+                    .drawMap()
+                    .addNode(this.nodeA)
+                    .addNode(this.nodeB);
+                },
+                init() {
+                  this.run();
+                },
+              });
+            </script>
+          </div>
+        </div>
+
+        <div class="text-center lg:text-left lg:pl-4">
+          <a
+            onclick="this.nextElementSibling.classList.toggle('hidden')"
+            data-demo="ExampleDataFlow"
+            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 inline"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+              />
+            </svg>
+            Toggle Code
+          </a>
+
+          <div class="hidden lg:block text-left">
+            <pre>
           <code class="text-xs">
 
 const PFX = new PathfindingFX([...]);
@@ -239,151 +298,157 @@ PFX.addNode(nodeB);
 
         </code>
       </pre>
-      </div>
-    </div>
-
-    <!-- PFX :: drawFlood() -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-8 container mx-auto" x-data="flood()">
-
-      <div class="w-[300px] justify-center flex flex-col gap-4">
-        <h1 class="text-xl font-serif">PFX :: positions()</h1>
-        <p>
-          Initialize PathfindingFX by instantiating a new PathfindingFX Object
-          and pass in the element where the canvas should be drawn into.
-        </p>
-        <p>
-          As a second parameter pass in your settings, the most basic one is
-          passing a map settings with a two-dimensional array giving information
-          about what is a wall and what not.
-        </p>
-      </div>
-      <div class="flex items-center justify-center">
-        <div>
-          <div id="flood" style="width: 225px; height: 225px"></div>
-          <script>
-            const flood = () => ({
-              map: [
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 0, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-              ],
-              step: null,
-              sliderValueMax: null,
-              greedy: true,
-              run() {
-                if (document.querySelector("#flood > canvas"))
-                  document.querySelector("#flood > canvas").remove();
-
-                const PFX = new PathfindingFX(
-                  document.getElementById("flood"),
-                  { map: this.map }
-                );
-
-                PFX.drawMap();
-
-                const node = { pos: { x: 2, y: 3 } };
-
-                PFX.addNode(node);
-                const aP = PFX.positions(node.pos);
-                this.sliderValueMax = Math.ceil(
-                  Math.max(...aP.map((n) => n.g))
-                );
-
-                if (this.step === null)
-                  this.step = Math.round(this.sliderValueMax / 2);
-
-                PFX.positions(node.pos)
-                  .filter((n) => n.g <= this.step)
-                  .map((n) => {
-                    PFX.addNode({ ...n, ...{ style: { color: "red" } } });
-                  });
-
-                /*const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
-                  greedy: this.greedy,
-                }); */
-              },
-              init() {
-                this.run();
-                this.$watch("step", (value) => this.run());
-                this.$watch("greedy", (value) => this.run());
-              },
-            });
-          </script>
+          </div>
         </div>
       </div>
-      <div class="flex items-center pl-4">
-        <pre>
+
+      <!-- PFX :: drawFlood() -->
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto"
+        x-data="flood()"
+      >
+        <div class="w-[300px] justify-center flex flex-col gap-4">
+          <h1 class="text-xl font-serif">PFX :: positions()</h1>
+          <p class="text-justify">
+            Initialize PathfindingFX by instantiating a new PathfindingFX Object
+            and pass in the element where the canvas should be drawn into.
+          </p>
+          <p class="text-justify">
+            As a second parameter pass in your settings, the most basic one is
+            passing a map settings with a two-dimensional array giving
+            information about what is a wall and what not.
+          </p>
+        </div>
+        <div class="flex items-center justify-center">
+          <div>
+            <div id="flood" style="width: 225px; height: 225px"></div>
+            <script>
+              const flood = () => ({
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                step: null,
+                sliderValueMax: null,
+                greedy: true,
+                run() {
+                  if (document.querySelector("#flood > canvas"))
+                    document.querySelector("#flood > canvas").remove();
+
+                  const PFX = new PathfindingFX(
+                    document.getElementById("flood"),
+                    { map: this.map }
+                  );
+
+                  PFX.drawMap();
+
+                  const node = { pos: { x: 2, y: 3 } };
+
+                  PFX.addNode(node);
+                  const aP = PFX.positions(node.pos);
+                  this.sliderValueMax = Math.ceil(
+                    Math.max(...aP.map((n) => n.g))
+                  );
+
+                  if (this.step === null)
+                    this.step = Math.round(this.sliderValueMax / 2);
+
+                  PFX.positions(node.pos)
+                    .filter((n) => n.g <= this.step)
+                    .map((n) => {
+                      PFX.addNode({ ...n, ...{ style: { color: "red" } } });
+                    });
+
+                  /*const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
+                  greedy: this.greedy,
+                }); */
+                },
+                init() {
+                  this.run();
+                  this.$watch("step", (value) => this.run());
+                  this.$watch("greedy", (value) => this.run());
+                },
+              });
+            </script>
+          </div>
+        </div>
+        <div class="lg:pl-4">
+          <pre>
             <code>
               
           </code>
         </pre>
 
-        <input
-          id="default-range"
-          type="range"
-          x-model="step"
-          min="0"
-          :max="sliderValueMax"
-          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-        />
+          <input
+            id="default-range"
+            type="range"
+            x-model="step"
+            min="0"
+            :max="sliderValueMax"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+          />
+        </div>
       </div>
-    </div>
 
-    <!-- PFX :: Weighted Map -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-8 container mx-auto" x-data="weighted()">
-      
-      <div class="w-[300px] justify-center flex flex-col gap-4">
-        <h1 class="text-xl font-serif">PFX :: map weights</h1>
-        <p>
-          Initialize PathfindingFX by instantiating a new PathfindingFX Object
-          and pass in the element where the canvas should be drawn into.
-        </p>
-        <p>
-          As a second parameter pass in your settings, the most basic one is
-          passing a map settings with a two-dimensional array giving information
-          about what is a wall and what not.
-        </p>
-      </div>
-      <div class="flex items-center justify-center">
-        <div>
-          <div id="weighted" style="width: 225px; height: 225px"></div>
-          <script>
-            const weighted = () => ({
-              PFXObj: null,
-              map: [
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 1, 1, 1, 1, 2, 3, 4, 0],
-                [0, 1, 1, 1, 2, 3, 3, 3, 0],
-                [0, 1, 1, 1, 2, 3, 3, 2, 0],
-                [0, 1, 1, 3, 4, 2, 2, 1, 0],
-                [0, 1, 2, 3, 4, 2, 1, 1, 0],
-                [0, 1, 2, 2, 3, 2, 1, 1, 0],
-                [0, 1, 1, 1, 2, 1, 1, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-              ],
-              fromNode: { pos: { x: 2, y: 2 }, style: { color: "purple" } },
-              toNode: { pos: { x: 6, y: 5 } },
-              run() {
-                const PFX = new PathfindingFX(
-                  document.getElementById("weighted"),
-                  { map: this.map }
-                );
+      <!-- PFX :: Weighted Map -->
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto"
+        x-data="weighted()"
+      >
+        <div class="w-[300px] justify-center flex flex-col gap-4">
+          <h1 class="text-xl font-serif">PFX :: map weights</h1>
+          <p class="text-justify">
+            Initialize PathfindingFX by instantiating a new PathfindingFX Object
+            and pass in the element where the canvas should be drawn into.
+          </p>
+          <p class="text-justify">
+            As a second parameter pass in your settings, the most basic one is
+            passing a map settings with a two-dimensional array giving
+            information about what is a wall and what not.
+          </p>
+        </div>
+        <div class="flex items-center justify-center">
+          <div>
+            <div id="weighted" style="width: 225px; height: 225px"></div>
+            <script>
+              const weighted = () => ({
+                PFXObj: null,
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 1, 2, 3, 4, 0],
+                  [0, 1, 1, 1, 2, 3, 3, 3, 0],
+                  [0, 1, 1, 1, 2, 3, 3, 2, 0],
+                  [0, 1, 1, 3, 4, 2, 2, 1, 0],
+                  [0, 1, 2, 3, 4, 2, 1, 1, 0],
+                  [0, 1, 2, 2, 3, 2, 1, 1, 0],
+                  [0, 1, 1, 1, 2, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                fromNode: { pos: { x: 2, y: 2 }, style: { color: "purple" } },
+                toNode: { pos: { x: 6, y: 5 } },
+                run() {
+                  const PFX = new PathfindingFX(
+                    document.getElementById("weighted"),
+                    { map: this.map }
+                  );
 
-                // PFX.drawMap();
-                PFX.addNode({ ...this.fromNode, ...{ to: this.toNode } });
-                PFX.render();
-              },
-              init() {
-                this.run();
-              },
-            });
-          </script>
+                  // PFX.drawMap();
+                  PFX.addNode({ ...this.fromNode, ...{ to: this.toNode } });
+                  PFX.render();
+                },
+                init() {
+                  this.run();
+                },
+              });
+            </script>
+          </div>
         </div>
       </div>
     </div>

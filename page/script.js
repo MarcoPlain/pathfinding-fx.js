@@ -51,9 +51,9 @@ function loadExamplePathfinding() {
   const canvas = document.getElementById("demo-examples");
   let map = [];
 
-  for (let y = 0; y < 20; y++) {
+  for (let y = 0; y <  Math.ceil(canvas.offsetWidth / SIZE); y++) {
     map[y] = [];
-    for (let x = 0; x <20; x++) {
+    for (let x = 0; x < Math.ceil(canvas.offsetWidth / SIZE); x++) {
       map[y][x] = Math.random() > 0.6 ? 0 : 1;
     }
   }
