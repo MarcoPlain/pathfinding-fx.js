@@ -152,6 +152,9 @@ var PathfindingFX = (function () {
         settings.onInteractionWithAWallNode || null;
       this.onInteractionWithANode = settings.onInteractionWithANode || null;
 
+
+      this.render();
+
       return this;
     }
 
@@ -561,9 +564,7 @@ var PathfindingFX = (function () {
         }
       }
       pfx.render();
-      pfx.animationFrameId = requestAnimationFrame(
-        pfx.animation.bind(0, pfx)
-      );
+      pfx.animationFrameId = requestAnimationFrame(pfx.animation.bind(0, pfx));
     }
 
     play() {
@@ -619,40 +620,37 @@ var PathfindingFX = (function () {
         }
       );
 
+      this.nodesList.push(node);
+
       node.positions = () => {
-        if (!node.accessibleNodes) {
-          node.accessibleNodes = this.positions(node.pos);
+        if (!node._positions) {
+          node._positions = this.positions(node.pos);
         }
-        return node.accessibleNodes;
+        return node._positions;
       };
 
       node.jump = (steps) => {
         if (node.path) {
           // Updating internal values because node has reached next path position
-  
+
           node.pos.x = node.path[steps].pos.x;
           node.pos.y = node.path[steps].pos.y;
-  
+
           node.x = node.pos.x * this.tileSize.w;
           node.y = node.pos.y * this.tileSize.h;
-  
+
           if (typeof node.onPosChange === "function")
             node.onPosChange(node, node.pos);
-  
+
           // When mouse is inside canvas we need to check, if by this change the mouse is now hovering over the node
           if (this.pixelPosition)
             this.nodeIsHovered(node, this.getXYFromPoint(this.pixelPosition));
-  
+
           node.findPath();
           if (node.path.length <= 1 && typeof node.onPathEnd === "function") {
             node.onPathEnd(node);
           }
         }
-      };
-
-      node.render = (params) => {
-        // TODO Can be deleted ?
-        this.drawNode(params);
       };
 
       node.findPath = (to = null) => {
@@ -685,14 +683,16 @@ var PathfindingFX = (function () {
         }
 
         if (node.path.length <= 1) {
-          node.accessibleNodes = null;
+          node._positions = null;
           if (typeof node.onNoPath == "function") {
             node.onNoPath(node);
           }
         }
       };
 
-      this.nodesList.push(node);
+      node.delete = () => {
+        this.nodesList.splice(this.nodesList.findIndex(n=>n==node), 1)
+      }
 
       this.drawNode(node);
 
@@ -881,10 +881,8 @@ var PathfindingFX = (function () {
         let next = node.path[key + 1];
         if (!next) return;
 
-        var drawX =
-          typeof n.x != "undefined" ? n.x : n.pos.x * this.tileSize.w;
-        var drawY =
-          typeof n.y != "undefined" ? n.y : n.pos.y * this.tileSize.h;
+        var drawX = typeof n.x != "undefined" ? n.x : n.pos.x * this.tileSize.w;
+        var drawY = typeof n.y != "undefined" ? n.y : n.pos.y * this.tileSize.h;
 
         this.ctx.strokeStyle =
           node.path.color ||
@@ -892,47 +890,27 @@ var PathfindingFX = (function () {
             typeof node.style.color != "undefined")
             ? node.style.color
             : this.settings.pathNodeColor;
-        this.ctx.beginPath(); // Start a new path
+        this.ctx.beginPath();
         this.ctx.moveTo(
           drawX + this.tileSize.w / 2,
           drawY + this.tileSize.h / 2
-        ); // Move the pen to (30, 50)
+        );
         this.ctx.lineTo(
           next.pos.x * this.tileSize.w + this.tileSize.w / 2,
           next.pos.y * this.tileSize.h + this.tileSize.h / 2
-        ); // Move the pen to (30, 50)
-        this.ctx.stroke(); // Render the path
+        );
+        this.ctx.stroke();
       });
     }
 
-    drawContext(node, config = {}) {
-      //this.ctx.save();
-      //this.ctx.globalAlpha = 0.3;
-
+    drawContext(node) {
       node.style = {
         color: this.settings.wallNodeColor,
         mode: "stroke",
         shape: "roundRect",
       };
-      // config.size = node.size;
 
-      /*if (node.type == "empty" || !config.color) {
-        config.color = this.settings.wallNodeColor;
-      }
-      if (node.type == "empty" || !config.draw) {
-        config.draw = {mode:"stroke", type:"rect"}
-      }
-
-      if (node.type == "wall" || !config.color) {
-        config.color = this.settings.emptyNodeColor;
-      }
-      if (node.type == "wall" || !config.draw) {
-        config.draw = {mode:"stroke", type:"rect"}
-      }*/
-
-      this.drawNode(node, config);
-
-      //this.ctx.restore();
+      this.drawNode(node);
     }
 
     drawNode(node, config = {}) {
@@ -1144,7 +1122,7 @@ var PathfindingFX = (function () {
               ) {
                 node.pos = pos;
 
-                node.accessibleNodes = null;
+                node._positions = null;
 
                 // Also setting the pixel position of the node, if it exists
                 if (typeof node.x != "undefined")
@@ -1339,11 +1317,10 @@ var PathfindingFX = (function () {
         this.findPathForWalker(walker);
       });
 
-      this.nodesList
-        .forEach((node) => {
-          node.accessibleNodes = null;
-          if (node.to) node.findPath()
-        });
+      this.nodesList.forEach((node) => {
+        node._positions = null;
+        if (node.to) node.findPath();
+      });
 
       this.pathsList.forEach((path) => {
         path.path = this.findPath(path.from.pos, path.to.pos);
@@ -1351,28 +1328,6 @@ var PathfindingFX = (function () {
     }
 
     // END : CALLBACKS
-
-    clearAllPaths() {
-      this.pathsList.length = 0;
-    }
-
-    fromNode(node, config = {}) {
-      this.currentNode = this.addStartNode(node, config);
-      return this;
-    }
-
-    toNode(node, config = {}) {
-      node = this.addEndNode(node, config);
-      if (this.currentNode) {
-        this.pathsList.push({
-          from: this.currentNode,
-          to: node,
-          path: this.findPath(this.currentNode.pos, node.pos),
-        });
-      }
-
-      return this;
-    }
 
     static init(elements, settings) {
       if (elements instanceof Node) {

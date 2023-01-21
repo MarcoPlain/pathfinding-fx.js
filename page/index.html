@@ -24,76 +24,79 @@
       defer
       src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"
     ></script>
+
     <script src="../src/pathfinding-fx.js"></script>
   </head>
-  <body class="bg-gray-100 text-gray-700 overflow-x-hidden">
-    <div class="container mx-auto">
-      <div class="p-8 text-center">
-        <h1 class="text-primary text-4xl">pathfinding-fx.js</h1>
-        <p>
-          A visualization library experiment for interactive website effects
-          based on pathfinding algorithms
-        </p>
+  <body class="overflow-x-hidden bg-gray-50">
+    <div class="bg-gray-100 text-gray-700 min-h-screen">
+      <div class="container mx-auto">
+        <div class="p-8 text-center">
+          <h1 class="text-primary text-4xl">pathfinding-fx.js</h1>
+          <p>
+            A visualization library experiment for interactive website effects
+            based on pathfinding algorithms
+          </p>
+        </div>
       </div>
-    </div>
 
-    <div class="container mx-auto my-2 flex flex-col gap-4">
-      <div class="flex gap-4">
-        <div
-          id="demo-examples"
-          style="height: 500px; width: 500px"
-          class="flex-none border border-[#dbdbdb] border-4 bg-[#f8f8f8] rounded box-content"
-        ></div>
-        <div class="flex flex-col gap-4">
-          <div class="flex flex-none gap-2 items-center text-sm">
-            <a
-              onclick="loadExamplePathfinding()"
-              data-demo="ExamplePathfinding"
-              class="text-white bg-primary px-3 py-2 rounded-lg cursor-pointer"
-              >Pathfinding</a
-            >
-            <a
-              onclick="loadExampleDataFlow()"
-              data-demo="ExampleDataFlow"
-              class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
-              >Data Flow</a
-            >
-            <a
-              onclick="loadExampleMazeRunners()"
-              data-demo="ExampleMazeRunners"
-              class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
-              >Maze Runners</a
-            >
-            <a
-              onclick="loadExampleFlooding()"
-              data-demo="ExampleFlooding"
-              class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
-              >Flooding</a
-            >
-            <a
-              onclick="loadExampleMountainClimber()"
-              data-demo="ExampleMountainClimber"
-              class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
-              >Mountain Climber</a
-            >
-            <a
-              onclick="loadExampleLightSource()"
-              data-demo="ExampleLightSource"
-              class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
-              >Lightbulb</a
-            >
-            <!--<a onclick="clearDemo()">Clear</a>-->
-          </div>
-          <div class="flex-1 flex flex-col gap-2 justify-between py-12">
-            <div class="flex flex-col gap-4">
-              <h2 id="example-title" class="text-3xl font-serif"></h2>
-              <p
-                id="example-description"
-                class="text-lg font-sans max-w-[500px] inline-block text-justify"
-              ></p>
+      <div class="container mx-auto my-2 flex flex-col gap-4">
+        <div class="flex gap-4">
+          <div
+            id="demo-examples"
+            style="height: 500px; width: 500px"
+            class="flex-none border border-[#dbdbdb] border-4 bg-[#f8f8f8] rounded box-content"
+          ></div>
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-none gap-2 items-center text-sm">
+              <a
+                onclick="loadExamplePathfinding()"
+                data-demo="ExamplePathfinding"
+                class="text-white bg-primary px-3 py-2 rounded-lg cursor-pointer"
+                >Pathfinding</a
+              >
+              <a
+                onclick="loadExampleDataFlow()"
+                data-demo="ExampleDataFlow"
+                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+                >Data Flow</a
+              >
+              <a
+                onclick="loadExampleMazeRunners()"
+                data-demo="ExampleMazeRunners"
+                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+                >Maze Runners</a
+              >
+              <a
+                onclick="loadExampleFlooding()"
+                data-demo="ExampleFlooding"
+                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+                >Flooding</a
+              >
+              <a
+                onclick="loadExampleMountainClimber()"
+                data-demo="ExampleMountainClimber"
+                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+                >Mountain Climber</a
+              >
+              <a
+                onclick="loadExampleLightSource()"
+                data-demo="ExampleLightSource"
+                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer"
+                >Lightbulb</a
+              >
+              <!--<a onclick="clearDemo()">Clear</a>-->
             </div>
-            <div>
-              <p id="example-instructions" class="text-md font-mono"></p>
+            <div class="flex-1 flex flex-col gap-2 justify-between py-12">
+              <div class="flex flex-col gap-4">
+                <h2 id="example-title" class="text-3xl font-serif"></h2>
+                <p
+                  id="example-description"
+                  class="text-lg font-sans max-w-[500px] inline-block text-justify"
+                ></p>
+              </div>
+              <div>
+                <p id="example-instructions" class="text-md font-mono"></p>
+              </div>
             </div>
           </div>
         </div>
@@ -167,12 +170,27 @@
       </div>-->
 
     <!-- PFX :: drawMap() -->
-    <div class="bg-gray-500 my-8 flex gap-4 p-8" x-data="drawMap()">
-      <div>
-        <div class="bg-blue-200">
-          <div id="drawMap" style="width: 225px; height: 225px"></div>
+    <div
+      class="grid grid-cols-3 divide-x-2 gap-4 p-8 container mx-auto"
+      x-data="initialization()"
+    >
+      <div class="w-[300px] justify-center flex flex-col gap-4">
+        <h1 class="text-xl font-serif">PFX :: initialization()</h1>
+        <p>
+          Initialize PathfindingFX by instantiating a new PathfindingFX Object
+          and pass in the element where the canvas should be drawn into.
+        </p>
+        <p>
+          As a second parameter pass in your settings, the most basic one is
+          passing a map settings with a two-dimensional array giving information
+          about what is a wall and what not.
+        </p>
+      </div>
+      <div class="flex items-center justify-center">
+        <div>
+          <div id="initialization" style="width: 225px; height: 225px"></div>
           <script>
-            const drawMap = () => ({
+            const initialization = () => ({
               map: [
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 1, 1, 1, 1, 1, 1, 1, 0],
@@ -186,11 +204,11 @@
               ],
               run() {
                 const PFX = new PathfindingFX(
-                  document.getElementById("drawMap"),
+                  document.getElementById("initialization"),
                   { map: this.map }
                 );
 
-                PFX.drawMap();
+                //PFX.drawMap();
                 PFX.onUpdateMap = (map) => {
                   this.map = map;
                 };
@@ -202,23 +220,19 @@
           </script>
         </div>
       </div>
-      <div>
-        <h1 class="text-xl text-primary">PFX :: drawMap()</h1>
+      <div class="flex items-center pl-4">
         <pre>
-            <code>
+          <code class="text-xs">
 const PFX = new PathfindingFX(
-    document.getElementById("drawMap"),
-    { 
-        map: [
-          <span x-html='map.join("\n          ")'></span>
-        ], 
-    }
+  document.getElementById("pfx-initialization"),
+  { 
+      map: [
+          <span x-html='"["+map.join("],\n          [")+"]"'></span>
+      ], 
+  }
 );
-
-PFX.drawMap();
-
-          </code>
-        </pre>
+        </code>
+      </pre>
       </div>
     </div>
 
@@ -302,26 +316,7 @@ PFX.addNode(nodeB);
                 const PFX = new PathfindingFX(
                   document.getElementById("addPath"),
                   { map: this.map }
-                )
-                  .drawMap()
-
-                //PFX.drawNodes(path);
-
-                /*PFX.addNode(this.fromNode, {
-                  color: "red",
-                  onPosChange: (node, pos) => {
-                    this.fromNode.pos.x = pos.pos.x;
-                    this.fromNode.pos.y = pos.pos.y;
-                  },
-                });
-                PFX.addNode(this.toNode, {
-                  color: "green",
-                  onPosChange: (node, pos) => {
-                    this.toNode.pos = pos;
-                  },
-                });*/
-
-                //PFX.render();
+                ).drawMap();
               },
               init() {
                 this.run();
@@ -756,5 +751,6 @@ PFX.drawNodes(path);
     </div>
 
     <script src="./script.js"></script>
+    <script>hljs.highlightAll();</script>
   </body>
 </html>
