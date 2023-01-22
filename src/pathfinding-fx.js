@@ -735,11 +735,11 @@ var PathfindingFX = (function () {
       if (node.to) {
         node.to = new Proxy(
           {
-            ...node.to,
             ...{
               onPosChange: (n, p) => {
                 node.findPath();
               },
+            ...node.to,
             },
           },
           {
@@ -1158,6 +1158,7 @@ var PathfindingFX = (function () {
                 this.map[pos.y][pos.x] &&
                 (node.pos.x != pos.x || node.pos.y != pos.y)
               ) {
+
                 node.pos = pos;
 
                 node._positions = null;
