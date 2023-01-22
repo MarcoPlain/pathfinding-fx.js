@@ -78,13 +78,13 @@ function loadExamplePathfinding() {
           ...findRandomNode(map),
           ...{
             style: {
-              size: { w: 10, h: 10 },
+              size: { w: 0.5, h: 0.5 },
               color: "#0a9396",
               shape: "circle",
             },
           },
         },
-        style: { color: "#0a9396", size: { w: 15, h: 15 }, shape: "circle" },
+        style: { color: "#0a9396", size: { w: 0.75, h: 0.75 }, shape: "circle" },
         speed: 100,
       },
       ...cbs,
@@ -94,9 +94,9 @@ function loadExamplePathfinding() {
       ...{
         to: {
           ...findRandomNode(map),
-          ...{ style: { size: { w: 10, h: 10 }, color: "#9b2226" } },
+          ...{ style: { size: { w: 0.5, h: 0.5 }, color: "#9b2226" } },
         },
-        style: { color: "#9b2226", size: { w: 15, h: 15 } },
+        style: { color: "#9b2226", size: { w: 0.75, h: 0.75 } },
         speed: 50,
       },
       ...cbs,
@@ -106,9 +106,9 @@ function loadExamplePathfinding() {
       ...{
         to: {
           ...findRandomNode(map),
-          ...{ style: { size: { w: 10, h: 10 }, color: "#ee9b00" } },
+          ...{ style: { size: { w: 0.25, h: 0.25 }, color: "#ee9b00" } },
         },
-        style: { color: "#ee9b00", size: { w: 15, h: 15 } },
+        style: { color: "#ee9b00", size: { w: 0.5, h: 0.5 } },
         speed: 200,
       },
       ...cbs,
@@ -173,9 +173,9 @@ function loadExampleDataFlow() {
         start: { pos: { x: 1, y: 6 + Math.floor(Math.random() * 13) } },
         to: {
           pos: { x: 23, y: 6 + Math.floor(Math.random() * 13) },
-          style: { size: { w: 10, h: 10 }, color: color, shape: "circle" },
+          style: { size: { w: 0.5, h: 0.5 }, color: color, shape: "circle" },
         },
-        style: { color: color, size: { w: 15, h: 15 }, shape: "circle" },
+        style: { color: color, size: { w: 0.75, h: 0.75 }, shape: "circle" },
         speed: 80 + Math.random() * 120,
       },
       ...{
@@ -283,7 +283,7 @@ function loadExampleMazeRunners() {
             y: Math.floor(map.length / 2),
           },
         },
-        style: { color: color, size: { w: 15, h: 15 } },
+        style: { color: color, size: { w: 0.75, h: 0.75 } },
         speed: 80 + Math.random() * 120,
       },
       ...{
@@ -364,7 +364,7 @@ function loadExampleFlooding() {
     onRender: (node) => {
       if (node.floodToDraw)
         node.floodToDraw.map((p) => {
-          p.style = { color: node.style.color, size: { w: 20, h: 20 } };
+          p.style = { color: node.style.color, size: { w: 1, h: 1 } };
           node.pfx.drawNode(p);
         });
     },
@@ -487,9 +487,9 @@ function loadExampleMountainClimber() {
     pos: { x: 5, y: 20 },
     to: {
       pos: { x: 20, y: 15 },
-      style: { color: "#6b705c", shape: "circle", size: { w: 10, h: 10 } },
+      style: { color: "#6b705c", shape: "circle", size: { w: 0.5, h: 0.5 } },
     },
-    style: { color: "#6b705c", shape: "circle", size: { w: 15, h: 15 } },
+    style: { color: "#6b705c", shape: "circle", size: { w: 0.75, h: 0.75 } },
     speed: 100,
     onPathEnd: (node) => {
       const accessablePositions = node.positions();
@@ -554,7 +554,7 @@ function loadExampleLightSource() {
         .map((p) => {
           p.style = {
             color: "rgba(255,255,0, " + 1 / (p.g / 1.5) + ")",
-            size: { w: 20, h: 20 },
+            size: { w: 1, h: 1 },
           };
           node.pfx.drawNode(p);
         });
@@ -571,7 +571,7 @@ function loadExampleLightSource() {
   PFX.addNode({
     ...{
       pos: { x: 5, y: 5 },
-      style: { color: "silver", size: { w: 20, h: 20 } },
+      style: { color: "silver", size: { w: 1, h: 1 } },
     },
     ...cbs,
   });

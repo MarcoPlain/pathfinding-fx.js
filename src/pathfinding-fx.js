@@ -31,7 +31,6 @@ var PathfindingFX = (function () {
     constructor(element, settings = {}) {
       this.map = settings.map || [];
 
-
       this.highestWeight = Math.max(...this.map.flat());
 
       // START PATHFINDING
@@ -54,39 +53,26 @@ var PathfindingFX = (function () {
         );
       }
 
-      const tileOffset = element.offsetWidth % this.map.length;
-      
-      element.style.width = element.offsetWidth - tileOffset + 'px';
-      element.style.height = element.style.width;
 
-      this.width = element.offsetWidth;
-      this.height = element.offsetWidth;
+      this.nodesList = [];
+      
+      this.interactionMode = null;
+      this.targetNodeIndex = null;
+      this.targetWalkerIndex = null;
+      this.currentContext = null;
+
+      this.element = element;
 
       this.canvas = document.createElement("canvas");
 
-      this.canvas.width = this.width;
-      this.canvas.height = this.height;
       element.appendChild(this.canvas);
-      
 
       this.ctx = this.canvas.getContext("2d");
-
-      this.tileSize = {
-        h: Math.floor(this.height / this.map.length),
-        w: Math.floor(this.width / this.map[0].length),
-      };
 
       this.ctx.mozImageSmoothingEnabled = false;
       this.ctx.webkitImageSmoothingEnabled = false;
       this.ctx.msImageSmoothingEnabled = false;
       this.ctx.imageSmoothingEnabled = false;
-
-      const rect = this.canvas.getBoundingClientRect();
-
-      this.canvas.width = rect.width * window.devicePixelRatio;
-      this.canvas.height = rect.height * window.devicePixelRatio;
-
-      this.ctx.scale(devicePixelRatio, devicePixelRatio);
 
       this.mouseIsDown = false;
 
@@ -100,16 +86,6 @@ var PathfindingFX = (function () {
       this.canvas.addEventListener("mouseleave", this._mouseLeaveHandler);
       this.canvas.addEventListener("mousemove", this._mouseMoveHandler);
 
-      this.canvas.style.width = rect.width + "px";
-      this.canvas.style.height = rect.height + "px";
-
-      this.nodesList = [];
-      this.blockedPositions = [];
-      this.pathsList = [];
-      this.interactionMode = null;
-      this.targetNodeIndex = null;
-      this.targetWalkerIndex = null;
-      this.currentContext = null;
 
       // Settings
       this.settings = {};
@@ -160,10 +136,53 @@ var PathfindingFX = (function () {
         settings.onInteractionWithAWallNode || null;
       this.onInteractionWithANode = settings.onInteractionWithANode || null;
 
+      this._initSizingAndDimensions();
+      window.addEventListener("resize", () => this._initSizingAndDimensions());
 
       this.render();
 
       return this;
+    }
+
+    _initSizingAndDimensions() {
+      this.element.style.removeProperty("width");
+      this.element.style.removeProperty("height");
+      this.canvas.style.removeProperty("width");
+      this.canvas.style.removeProperty("height");
+
+      const tileOffset = this.element.offsetWidth % this.map.length;
+
+      this.element.style.width = this.element.offsetWidth - tileOffset + "px";
+      this.element.style.height = this.element.style.width;
+
+      this.width = this.element.offsetWidth;
+      this.height = this.element.offsetWidth;
+
+      this.canvas.width = this.width;
+      this.canvas.height = this.height;
+
+      this.tileSize = {
+        h: Math.floor(this.height / this.map.length),
+        w: Math.floor(this.width / this.map[0].length),
+      };
+
+      this.ctx.scale(1, 1);
+      const rect = this.canvas.getBoundingClientRect();
+
+      this.canvas.width = rect.width * devicePixelRatio;
+      this.canvas.height = rect.height * devicePixelRatio;
+
+      this.ctx.scale(devicePixelRatio, devicePixelRatio);
+
+      this.canvas.style.width = rect.width + "px";
+      this.canvas.style.height = rect.height + "px";
+
+      this.nodesList.forEach((node) => {
+        node.x = node.pos.x * this.tileSize.w;
+        node.y = node.pos.y * this.tileSize.h;
+      });
+
+      this.render();
     }
 
     /**
@@ -594,7 +613,6 @@ var PathfindingFX = (function () {
     // START : ADDING DATA TO PFX
 
     addNode(node) {
-
       /*node.x = node.pos.x * this.tileSize.w
       node.y = node.pos.y * this.tileSize.h
       node.pfx = this
@@ -705,8 +723,11 @@ var PathfindingFX = (function () {
       };
 
       node.delete = () => {
-        this.nodesList.splice(this.nodesList.findIndex(n=>n==node), 1)
-      }
+        this.nodesList.splice(
+          this.nodesList.findIndex((n) => n == node),
+          1
+        );
+      };
 
       this.drawNode(node);
 
@@ -766,9 +787,9 @@ var PathfindingFX = (function () {
       //console.log('PFX::render()');
       //this.clearCanvas();
       this.drawMap();
-      this.pathsList.forEach((path) => {
+      /*this.pathsList.forEach((path) => {
         this.drawPath(path);
-      });
+      });*/
       this.nodesList.forEach((node) => {
         if (typeof node.onRender === "function") node.onRender(node);
 
@@ -937,24 +958,24 @@ var PathfindingFX = (function () {
         (node.x || node.pos.x * this.tileSize.w) +
         (typeof node.style != "undefined" &&
         typeof node.style.size != "undefined"
-          ? (this.tileSize.w - node.style.size.w) / 2
+          ? (this.tileSize.w - (this.tileSize.w * node.style.size.w)) / 2
           : 0);
       var drawY =
         (node.y || node.pos.y * this.tileSize.h) +
         (typeof node.style != "undefined" &&
         typeof node.style.size != "undefined"
-          ? (this.tileSize.h - node.style.size.h) / 2
+          ? (this.tileSize.h - (this.tileSize.h * node.style.size.h)) / 2
           : 0);
 
       var sizeX =
         typeof node.style != "undefined" &&
         typeof node.style.size != "undefined"
-          ? node.style.size.w
+          ? node.style.size.w * this.tileSize.w
           : this.tileSize.w;
       var sizeY =
         typeof node.style != "undefined" &&
         typeof node.style.size != "undefined"
-          ? node.style.size.h
+          ? node.style.size.h * this.tileSize.h
           : this.tileSize.h;
 
       switch (mode) {
@@ -1336,9 +1357,9 @@ var PathfindingFX = (function () {
         if (node.to) node.findPath();
       });
 
-      this.pathsList.forEach((path) => {
+      /*this.pathsList.forEach((path) => {
         path.path = this.findPath(path.from.pos, path.to.pos);
-      });
+      });*/
     }
 
     // END : CALLBACKS
