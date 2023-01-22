@@ -121,7 +121,7 @@
         class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
         x-data="initialization()"
       >
-        <div class="w-[300px] justify-center flex flex-col gap-4">
+        <div class="lg:w-[300px] justify-center flex flex-col gap-4">
           <h1 class="text-xl font-serif">PFX :: Initialization</h1>
           <p class="text-justify">
             Initialize PathfindingFX by instantiating a new PathfindingFX Object
@@ -187,7 +187,7 @@
                 d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
               />
             </svg>
-            Toggle Code
+            Toggle code
           </a>
 
           <div class="hidden lg:block text-left">
@@ -208,12 +208,12 @@ const PFX = new PathfindingFX(
         </div>
       </div>
 
-      <!-- PFX :: addNode() -->
+      <!-- PFX :: adding_nodes() -->
       <div
         class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
-        x-data="addNode()"
+        x-data="adding_nodes()"
       >
-        <div class="w-[300px] justify-center flex flex-col gap-4">
+        <div class="lg:w-[300px] justify-center flex flex-col gap-4">
           <h1 class="text-xl font-serif">PFX :: Adding nodes</h1>
           <p class="text-justify">
             Adds nodes to the canvas. The addNode method accepts an object of
@@ -228,9 +228,9 @@ const PFX = new PathfindingFX(
         </div>
         <div class="flex items-center justify-center">
           <div>
-            <div id="addNode" style="max-width: 225px"></div>
+            <div id="adding_nodes" style="max-width: 225px"></div>
             <script>
-              const addNode = () => ({
+              const adding_nodes = () => ({
                 map: [
                   [0, 0, 0, 0, 0, 0, 0, 0, 0],
                   [0, 1, 1, 1, 0, 1, 1, 1, 0],
@@ -258,7 +258,7 @@ const PFX = new PathfindingFX(
                   };
 
                   const PFX = new PathfindingFX(
-                    document.getElementById("addNode"),
+                    document.getElementById("adding_nodes"),
                     { map: this.map }
                   )
                     .drawMap()
@@ -294,7 +294,7 @@ const PFX = new PathfindingFX(
                 d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
               />
             </svg>
-            Toggle Code
+            Toggle code
           </a>
 
           <div class="hidden lg:block text-left">
@@ -315,12 +315,12 @@ PFX.addNode(nodeB);
         </div>
       </div>
 
-      <!-- PFX :: findPath() -->
+      <!-- PFX :: finding_the_path -->
       <div
         class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
-        x-data="findPath()"
+        x-data="finding_the_path()"
       >
-        <div class="w-[300px] justify-center flex flex-col gap-4">
+        <div class="lg:w-[300px] justify-center flex flex-col gap-4">
           <h1 class="text-xl font-serif">PFX :: Finding the path</h1>
           <p class="text-justify">
             Every added node can have its path calculated by giving it a <i>"to"</i>
@@ -331,15 +331,15 @@ PFX.addNode(nodeB);
             Like a node itself, the <i>"to"</i> property can have more settings like,
             again, a style property
           </p>
-          <div>
-          <input type="checkbox" x-model="toStyle" /> <span class="font-mono text-xs">Toggle Style</span>
+          <div class="text-center">
+          <input type="checkbox" x-model="toStyle" /> <span class="font-mono text-xs">Toggle style property</span>
         </div>
         </div>
         <div class="flex items-center justify-center">
           <div>
-            <div id="findPath" style="max-width: 225px"></div>
+            <div id="finding_the_path" style="max-width: 225px"></div>
             <script>
-              const findPath = () => ({
+              const finding_the_path = () => ({
                 pfx: null,
                 map: [
                   [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -365,7 +365,7 @@ PFX.addNode(nodeB);
                   };
 
                   this.pfx = new PathfindingFX(
-                    document.getElementById("findPath"),
+                    document.getElementById("finding_the_path"),
                     { map: this.map }
                   )
                     .drawMap()
@@ -416,7 +416,7 @@ PFX.addNode(nodeB);
                 d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
               />
             </svg>
-            Toggle Code
+            Toggle code
           </a>
 
           <div class="hidden lg:block text-left">
@@ -442,7 +442,7 @@ PFX.addNode(node);
         class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
         x-data="flood()"
       >
-        <div class="w-[300px] justify-center flex flex-col gap-4">
+        <div class="lg:w-[300px] justify-center flex flex-col gap-4">
           <h1 class="text-xl font-serif">PFX :: positions()</h1>
           <p class="text-justify">
             Initialize PathfindingFX by instantiating a new PathfindingFX Object
@@ -537,7 +537,7 @@ PFX.addNode(node);
         class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
         x-data="weighted()"
       >
-        <div class="w-[300px] justify-center flex flex-col gap-4">
+        <div class="lg:w-[300px] justify-center flex flex-col gap-4">
           <h1 class="text-xl font-serif">PFX :: map weights</h1>
           <p class="text-justify">
             Initialize PathfindingFX by instantiating a new PathfindingFX Object

@@ -288,9 +288,9 @@ function loadExampleMazeRunners() {
       },
       ...{
         onPathEnd: (node) => {
-          node.pos = findRandomNode(map).pos;
-          node.x = node.pos.x * SIZE;
-          node.y = node.pos.y * SIZE;
+          const newPos = findRandomNode(map).pos;
+          node.pos.x = newPos.x;
+          node.pos.y = newPos.y;
           node.findPath();
         },
       },
