@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
     <title>Pathfinding</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -45,7 +48,7 @@
             style="max-width: 500px"
             class="flex-none w-full mx-auto"
           ></div>
-          <div class="flex flex-col gap-4">
+          <div class="flex-grow flex flex-col gap-4">
             <div
               class="flex flex-none flex-wrap justify-center lg:justify-start gap-2 items-center text-sm"
             >
@@ -112,10 +115,10 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col gap-0 divide-y-2">
       <!-- PFX :: initialization() -->
       <div
-        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto"
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
         x-data="initialization()"
       >
         <div class="w-[300px] justify-center flex flex-col gap-4">
@@ -132,7 +135,7 @@
         </div>
         <div class="flex items-center justify-center">
           <div>
-            <div id="initialization" style="max-width: 225px;"></div>
+            <div id="initialization" style="max-width: 225px"></div>
             <script>
               const initialization = () => ({
                 map: [
@@ -207,24 +210,25 @@ const PFX = new PathfindingFX(
 
       <!-- PFX :: addNode() -->
       <div
-        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto"
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
         x-data="addNode()"
       >
         <div class="w-[300px] justify-center flex flex-col gap-4">
           <h1 class="text-xl font-serif">PFX :: addNode()</h1>
           <p class="text-justify">
-            Initialize PathfindingFX by instantiating a new PathfindingFX Object
-            and pass in the element where the canvas should be drawn into.
+            Adds nodes to the canvas. The addNode method accepts an object of
+            settings. The most important one is the "pos" setting which includes
+            a x and y position based on the current map (starting from zero in
+            the top left corner)
           </p>
           <p class="text-justify">
-            As a second parameter pass in your settings, the most basic one is
-            passing a map settings with a two-dimensional array giving
-            information about what is a wall and what not.
+            There are more settings, for example the style setting defining the
+            shape and color of the node.
           </p>
         </div>
         <div class="flex items-center justify-center">
           <div>
-            <div id="addNode" style="max-width: 225px;"></div>
+            <div id="addNode" style="max-width: 225px"></div>
             <script>
               const addNode = () => ({
                 map: [
@@ -239,11 +243,7 @@ const PFX = new PathfindingFX(
                   [0, 0, 0, 0, 0, 0, 0, 0, 0],
                 ],
                 nodeA: { pos: { x: 2, y: 2 }, style: { color: "#2a9d8f" } },
-                nodeB: {
-                  pos: { x: 6, y: 3 },
-                  style: { color: "#e76f51" },
-                  to: { pos: { x: 6, y: 6 } },
-                },
+                nodeB: { pos: { x: 6, y: 3 }, style: { color: "#e76f51" } },
                 run() {
                   const PFX = new PathfindingFX(
                     document.getElementById("addNode"),
@@ -302,9 +302,106 @@ PFX.addNode(nodeB);
         </div>
       </div>
 
+      <!-- PFX :: findPath() -->
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
+        x-data="findPath()"
+      >
+        <div class="w-[300px] justify-center flex flex-col gap-4">
+          <h1 class="text-xl font-serif">PFX :: Finding the path</h1>
+          <p class="text-justify">
+            Every added node can have its path calculated by giving it a "to"
+            object containing the "pos" to which x/y point the path should be
+            found.
+          </p>
+          <p class="text-justify">
+            There are more settings, for example the style setting defining the
+            shape and color of the node.
+          </p>
+        </div>
+        <div class="flex items-center justify-center">
+          <div>
+            <div id="findPath" style="max-width: 225px"></div>
+            <script>
+              const findPath = () => ({
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                node: {
+                  pos: { x: 2, y: 2 },
+                  style: { color: "#457b9d" },
+                  to: { pos: { x: 6, y: 3 } },
+                },
+                run() {
+                  const PFX = new PathfindingFX(
+                    document.getElementById("findPath"),
+                    { map: this.map }
+                  )
+                    .drawMap()
+                    .addNode(this.node);
+                },
+                init() {
+                  this.run();
+                },
+              });
+            </script>
+          </div>
+        </div>
+
+        <div class="text-center lg:text-left lg:pl-4">
+          <a
+            onclick="this.nextElementSibling.classList.toggle('hidden')"
+            data-demo="ExampleDataFlow"
+            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 inline"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+              />
+            </svg>
+            Toggle Code
+          </a>
+
+          <div class="hidden lg:block text-left">
+            <pre>
+          <code class="text-xs">
+
+const PFX = new PathfindingFX([...]);
+
+const node = {[...],
+  to: {
+    <span x-html="JSON.stringify(node.to)"></span>
+  }
+};
+
+PFX.addNode(node);
+
+        </code>
+      </pre>
+          </div>
+        </div>
+      </div>
+
       <!-- PFX :: drawFlood() -->
       <div
-        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto"
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
         x-data="flood()"
       >
         <div class="w-[300px] justify-center flex flex-col gap-4">
@@ -321,7 +418,7 @@ PFX.addNode(nodeB);
         </div>
         <div class="flex items-center justify-center">
           <div>
-            <div id="flood" style="max-width: 225px;"></div>
+            <div id="flood" style="max-width: 225px"></div>
             <script>
               const flood = () => ({
                 map: [
@@ -399,7 +496,7 @@ PFX.addNode(nodeB);
 
       <!-- PFX :: Weighted Map -->
       <div
-        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto"
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
         x-data="weighted()"
       >
         <div class="w-[300px] justify-center flex flex-col gap-4">
@@ -416,7 +513,7 @@ PFX.addNode(nodeB);
         </div>
         <div class="flex items-center justify-center">
           <div>
-            <div id="weighted" style="max-width: 225px;"></div>
+            <div id="weighted" style="max-width: 225px"></div>
             <script>
               const weighted = () => ({
                 PFXObj: null,
@@ -454,7 +551,7 @@ PFX.addNode(nodeB);
     </div>
 
     <div class="text-center mt-5 bg-secondary">
-      <div class="container mx-auto p-8">
+      <div class="container mx-auto p-8 text-white">
         Made with
         <svg
           xmlns="http://www.w3.org/2000/svg"

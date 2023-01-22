@@ -137,7 +137,8 @@ var PathfindingFX = (function () {
       this.onInteractionWithANode = settings.onInteractionWithANode || null;
 
       this._initSizingAndDimensions();
-      window.addEventListener("resize", () => this._initSizingAndDimensions());
+      this._resizeHandler = () => this._initSizingAndDimensions();
+      window.addEventListener("resize", () => this._resizeHandler);
 
       this.render();
 
@@ -776,6 +777,8 @@ var PathfindingFX = (function () {
       this.mouseLeave();
       this.clearCanvas();
 
+      window.removeEventListener("resize", () => this._resizeHandler);
+
       this.canvas.remove();
     }
 
@@ -1345,21 +1348,11 @@ var PathfindingFX = (function () {
       if (typeof this.onUpdateMap === "function") this.onUpdateMap(map);
       this.map = map;
       this.initMatrix();
-
       this.highestWeight = Math.max(...this.map.flat());
-
-      this.walkers.forEach((walker) => {
-        this.findPathForWalker(walker);
-      });
-
       this.nodesList.forEach((node) => {
         node._positions = null;
         if (node.to) node.findPath();
       });
-
-      /*this.pathsList.forEach((path) => {
-        path.path = this.findPath(path.from.pos, path.to.pos);
-      });*/
     }
 
     // END : CALLBACKS
