@@ -531,7 +531,9 @@ var PathfindingFX = (function () {
           if (!node.to) return;
           if (node.isHovered) return;
 
-          var speed = node.speed || 10;
+          var speed = node.speed;
+          if(!speed)
+            return;
 
           if (node.path.length > 1) {
             var dX = node.path[1].pos.x * this.tileSize.w - node.x;
@@ -600,6 +602,7 @@ var PathfindingFX = (function () {
       this.animationFrameId = requestAnimationFrame(
         this.animation.bind(0, this)
       );
+      return this;
     }
 
     stop() {
@@ -609,6 +612,7 @@ var PathfindingFX = (function () {
       }
       this.lastFrameTimeMs = null;
       this.delta = 0;
+      return this;
     }
 
     // START : ADDING DATA TO PFX
@@ -952,6 +956,7 @@ var PathfindingFX = (function () {
     }
 
     drawNode(node, config = {}) {
+
       if (!node) return;
 
       const shape = node.style && node.style.shape ? node.style.shape : "rect";

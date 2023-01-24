@@ -219,7 +219,7 @@ const PFX = new PathfindingFX(
             Adds nodes to the canvas. The addNode method accepts an object of
             settings. The most important one is the <i>"pos"</i> property which
             includes a x and y position based on the current map (starting from
-            zero in the top left corner)
+            zero in the top left corner).
           </p>
           <p class="text-justify">
             There are more settings, for example the style property defining the
@@ -323,17 +323,18 @@ PFX.addNode(nodeB);
         <div class="lg:w-[300px] justify-center flex flex-col gap-4">
           <h1 class="text-xl font-serif">PFX :: Finding the path</h1>
           <p class="text-justify">
-            Every added node can have its path calculated by giving it a <i>"to"</i>
-            property containing the <i>"pos"</i> to which x/y point the path should be
-            found.
+            Every added node can have its path calculated by giving it a
+            <i>"to"</i> property containing the <i>"pos"</i> to which x/y point
+            the path should be found.
           </p>
           <p class="text-justify">
-            Like a node itself, the <i>"to"</i> property can have more settings like,
-            again, a style property
+            Like a node itself, the <i>"to"</i> property can have more settings
+            like, again, a style property.
           </p>
           <div class="text-center">
-          <input type="checkbox" x-model="toStyle" /> <span class="font-mono text-xs">Toggle style property</span>
-        </div>
+            <input type="checkbox" x-model="toStyle" />
+            <span class="font-mono text-xs">Toggle style property</span>
+          </div>
         </div>
         <div class="flex items-center justify-center">
           <div>
@@ -437,28 +438,171 @@ PFX.addNode(node);
         </div>
       </div>
 
-      <!-- PFX :: drawFlood() -->
+      <!-- PFX :: auto_play -->
       <div
         class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
-        x-data="flood()"
+        x-data="auto_play()"
       >
         <div class="lg:w-[300px] justify-center flex flex-col gap-4">
-          <h1 class="text-xl font-serif">PFX :: positions()</h1>
+          <h1 class="text-xl font-serif">PFX :: Auto Play</h1>
           <p class="text-justify">
-            Initialize PathfindingFX by instantiating a new PathfindingFX Object
-            and pass in the element where the canvas should be drawn into.
+            Give a node a <i>"to"</i> and <i>"speed"</i> property and call the <i>"play()"</i> method on the PFX object to start the auto play.
           </p>
           <p class="text-justify">
-            As a second parameter pass in your settings, the most basic one is
-            passing a map settings with a two-dimensional array giving
-            information about what is a wall and what not.
+            
           </p>
+
+          <div class="text-center">
+            <button
+              @click="pfx.nodesList[0].to.pos = pfx.nodesList[0].positions()[Math.floor(Math.random() * pfx.nodesList[0].positions().length)].pos"
+              class="bg-secondary text-white px-3 py-2 text-xs font-mono rounded-lg"
+            >
+              New <i>"to"</i> position
+            </button>
+          </div>
         </div>
         <div class="flex items-center justify-center">
           <div>
-            <div id="flood" style="max-width: 225px"></div>
+            <div id="auto_play" style="max-width: 225px"></div>
             <script>
-              const flood = () => ({
+              const auto_play = () => ({
+                pfx: null,
+                map: [
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 0, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ],
+                node: {
+                  speed: 50,
+                  pos: { x: 2, y: 2 },
+                  style: { color: "#7B2869" },
+                  to: {
+                    pos: { x: 6, y: 3 },
+                    style: {
+                      shape: "circle",
+                      size: { w: 0.5, h: 0.5 },
+                      color: "#7B2869",
+                    },
+                  },
+                },
+                newTo: function (asd) {
+                  console.log(this.$data);
+                  console.log(asd);
+                  /*this.pfx.nodesList[0].to.pos.x = 2;
+                  this.pfx.nodesList[0].to.pos.y = 2;*/
+                },
+                run() {
+                  /*this.node.to.onPosChange = (node, pos) => {
+                    this.node.to.pos.x = node.pos.x;
+                    this.node.to.pos.y = node.pos.y;
+                  };*/
+
+                  this.pfx = new PathfindingFX(
+                    document.getElementById("auto_play"),
+                    { map: this.map }
+                  )
+                    .drawMap()
+                    .addNode(this.node)
+                    .play();
+
+                  Alpine.store("playNode", this.pfx.nodesList[0]);
+                },
+                init() {
+                  this.run();
+                },
+              });
+            </script>
+          </div>
+        </div>
+
+        <div class="text-center lg:text-left lg:pl-4">
+          <a
+            onclick="this.nextElementSibling.classList.toggle('hidden')"
+            data-demo="ExampleDataFlow"
+            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 inline"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+              />
+            </svg>
+            Toggle code
+          </a>
+
+          <div class="hidden lg:block text-left">
+            <pre>
+          <code class="text-xs">
+
+const PFX = new PathfindingFX([...]);
+
+const node = {[...],
+  to: [...],
+  speed: 25,
+};
+
+PFX.addNode(node);
+PFX.play();
+
+        </code>
+      </pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- PFX :: positions -->
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
+        x-data="positions()"
+      >
+        <div class="lg:w-[300px] justify-center flex flex-col gap-4">
+          <h1 class="text-xl font-serif">PFX :: Positions</h1>
+          <p class="text-justify">
+            Every nodes <i>"positions()"</i> method returns an array of
+            accessible positions for that node. These positions contain
+            different values about how far that position is away.
+          </p>
+          <p class="text-justify">
+            With the help of callbacks like <i>onRender</i> we can modify the
+            drawn canvas by creative ways.
+          </p>
+          <div class="text-center lg:text-left">
+            <div class="flex gap-4 items-center">
+              <div class="flex-grow">
+                <input
+                  id="default-range"
+                  type="range"
+                  x-model="step"
+                  min="0"
+                  :max="sliderValueMax"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                />
+              </div>
+              <div class="flex-none">
+                <span class="font-mono text-xs">Toggle distance</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-center">
+          <div>
+            <div id="positions" style="max-width: 225px"></div>
+            <script>
+              const positions = () => ({
                 map: [
                   [0, 0, 0, 0, 0, 0, 0, 0, 0],
                   [0, 1, 1, 1, 0, 1, 1, 1, 0],
@@ -472,63 +616,97 @@ PFX.addNode(node);
                 ],
                 step: null,
                 sliderValueMax: null,
-                greedy: true,
-                run() {
-                  if (document.querySelector("#flood > canvas"))
-                    document.querySelector("#flood > canvas").remove();
+                node: {
+                  pos: { x: 2, y: 3 },
+                  style: { color: "#579BB1" },
+                  onRender: (node) => {
+                    const aP = node.positions();
+                    node._alpine.sliderValueMax = Math.ceil(
+                      Math.max(...aP.map((n) => n.g))
+                    );
+                    if (node._alpine.step === null)
+                      node._alpine.step = Math.round(
+                        node._alpine.sliderValueMax / 2
+                      );
 
-                  const PFX = new PathfindingFX(
-                    document.getElementById("flood"),
+                    node
+                      .positions()
+                      .filter((n) => n.g <= node._alpine.step)
+                      .map((n) => {
+                        node.pfx.drawNode({
+                          ...n,
+                          ...{ style: { color: "#E1D7C6" } },
+                        });
+                      });
+                  },
+                },
+
+                run() {
+                  this.node._alpine = this;
+
+                  this.pfx = new PathfindingFX(
+                    document.getElementById("positions"),
                     { map: this.map }
                   );
 
-                  PFX.drawMap();
-
-                  const node = { pos: { x: 2, y: 3 } };
-
-                  PFX.addNode(node);
-                  const aP = PFX.positions(node.pos);
-                  this.sliderValueMax = Math.ceil(
-                    Math.max(...aP.map((n) => n.g))
-                  );
-
-                  if (this.step === null)
-                    this.step = Math.round(this.sliderValueMax / 2);
-
-                  PFX.positions(node.pos)
-                    .filter((n) => n.g <= this.step)
-                    .map((n) => {
-                      PFX.addNode({ ...n, ...{ style: { color: "red" } } });
-                    });
-
-                  /*const flood = PFX.findFlood(fromNode.pos, toNode.pos, {
-                  greedy: this.greedy,
-                }); */
+                  this.pfx.addNode(this.node);
                 },
                 init() {
                   this.run();
-                  this.$watch("step", (value) => this.run());
-                  this.$watch("greedy", (value) => this.run());
+                  this.$watch("step", (value) => this.pfx.render());
                 },
               });
             </script>
           </div>
         </div>
-        <div class="lg:pl-4">
-          <pre>
-            <code>
-              
-          </code>
-        </pre>
+        <div class="text-center lg:text-left lg:pl-4">
+          <a
+            onclick="this.nextElementSibling.classList.toggle('hidden')"
+            data-demo="ExampleDataFlow"
+            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 inline"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+              />
+            </svg>
+            Toggle code
+          </a>
 
-          <input
-            id="default-range"
-            type="range"
-            x-model="step"
-            min="0"
-            :max="sliderValueMax"
-            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-          />
+          <div class="hidden lg:block text-left">
+            <pre>
+          <code class="text-xs">
+
+const PFX = new PathfindingFX([...]);
+
+const node = {[...],
+  onRender: (node) => {
+    node
+      .positions()
+      .filter((n) => n.g <= <span x-html="step"></span>)
+      .map((n) => {
+        PFX.drawNode({
+          pos: n.pos
+          style: { color: "#E1D7C6" },
+        });
+      });
+  },
+};
+
+PFX.addNode(node);
+
+        </code>
+      </pre>
+          </div>
         </div>
       </div>
 
