@@ -1,3 +1,3 @@
 # pathfinding-fx.js
 
-A smooth pathfinding visualizer for websites
+A visualization library experiment for interactive website effects based on pathfinding algorithms
