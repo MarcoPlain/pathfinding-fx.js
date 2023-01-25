@@ -18,12 +18,15 @@ const COLORS_MAZERUNNERS = [
   "#1982c4",
   "#6a4c93",
 ];
+
 var PFX = null;
+
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 function findRandomNode(map) {
   while (true) {
     let checkY = getRandomInt(0, map.length - 1);
@@ -34,6 +37,7 @@ function findRandomNode(map) {
     }
   }
 }
+
 function loadExamplePathfinding() {
   document.querySelector("#example-title").innerHTML = "Basic Pathfinding";
   document.querySelector("#example-description").innerHTML =
@@ -116,6 +120,7 @@ function loadExamplePathfinding() {
 
   PFX.play();
 }
+
 function loadExampleDataFlow() {
   document.querySelector("#example-title").innerHTML = "Data Flow";
   document.querySelector("#example-description").innerHTML =
@@ -199,6 +204,7 @@ function loadExampleDataFlow() {
 
   PFX.play();
 }
+
 function loadExampleMazeRunners() {
   document.querySelector("#example-title").innerHTML = "Maze Runners";
   document.querySelector("#example-description").innerHTML =
@@ -299,6 +305,7 @@ function loadExampleMazeRunners() {
 
   PFX.play();
 }
+
 function loadExampleFlooding() {
   document.querySelector("#example-title").innerHTML = "Flooding";
   document.querySelector("#example-description").innerHTML =
@@ -428,6 +435,7 @@ function loadExampleFlooding() {
 
   PFX.play();
 }
+
 function loadExampleMountainClimber() {
   document.querySelector("#example-title").innerHTML = "Mountain Climber";
   document.querySelector("#example-description").innerHTML =
@@ -451,12 +459,12 @@ function loadExampleMountainClimber() {
     [4, 4, 4, 5, 5, 5, 5, 4, 4, 4, 4, 4, 3, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1],
     [3, 4, 4, 4, 5, 5, 5, 5, 4, 3, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1],
     [3, 3, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 3, 2, 2, 2, 2, 1, 1, 1, 1],
-    [3, 4, 3, 4, 4, 4, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 1, 1],
-    [3, 3, 3, 3, 4, 4, 4, 3, 3, 2, 3, 2, 2, 2, 2, 1, 1, 1, 1, 2, 3, 4, 2, 1, 1],
-    [3, 3, 4, 4, 4, 3, 3, 3, 3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 5, 2, 1, 1],
-    [3, 4, 4, 4, 4, 3, 3, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1],
-    [3, 3, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [3, 4, 4, 3, 3, 3, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [3, 4, 3, 4, 4, 4, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 1, 1, 1],
+    [3, 3, 3, 3, 4, 4, 4, 3, 3, 2, 3, 2, 2, 2, 2, 1, 0, 0, 0, 0, 3, 4, 2, 1, 1],
+    [3, 3, 4, 4, 4, 3, 3, 3, 3, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 4, 5, 2, 1, 1],
+    [3, 4, 4, 4, 4, 3, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1],
+    [3, 3, 4, 4, 4, 3, 3, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [3, 4, 4, 3, 3, 3, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1],
     [3, 4, 3, 3, 3, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1],
     [3, 3, 3, 3, 2, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1],
     [3, 3, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 2, 1, 1, 1, 1, 1],
@@ -476,8 +484,8 @@ function loadExampleMountainClimber() {
     map: map,
     onInteractionWithAFreeNode: (node, pos, pfx) => {
       if (pfx.free(pos)) {
-        if (pfx.map[pos.y][pos.x] == 5) pfx.map[pos.y][pos.x] = 1;
         pfx.map[pos.y][pos.x]++;
+        if (pfx.map[pos.y][pos.x] == 6) pfx.map[pos.y][pos.x] = 0;
         pfx.updateMap(pfx.map);
       }
     },
@@ -503,6 +511,7 @@ function loadExampleMountainClimber() {
 
   PFX.play();
 }
+
 function loadExampleLightSource() {
   document.querySelector("#example-title").innerHTML = "Light Bulb";
   document.querySelector("#example-description").innerHTML =
@@ -578,6 +587,7 @@ function loadExampleLightSource() {
 
   //PFX.play();
 }
+
 function clearDemo() {
   document.querySelectorAll("[data-demo]").forEach((btn) => {
     btn.classList.remove("bg-primary");

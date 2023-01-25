@@ -18,13 +18,14 @@ var PathfindingFX = (function () {
 
     highlightEdges: true,
 
-    weightColors: [
-      { w: 1, color: "#6c584c" },
-      { w: 0.75, color: "#a98467" },
-      { w: 0.5, color: "#adc178" },
-      { w: 0.25, color: "#dde5b6" },
-      { w: 0, color: "#f0ead2" },
-    ],
+    weightNodeColors: {
+      5: { w: 5, color: "#6c584c" },
+      4: { w: 4, color: "#a98467" },
+      3: { w: 3, color: "#adc178" },
+      2: { w: 2, color: "#dde5b6" },
+      1: { w: 1, color: "#f0ead2" },
+      0: { w: 0, color: "#0088bb", edgeColor: "#c2b280" },
+    },
   };
 
   class PathfindingFX {
@@ -53,9 +54,8 @@ var PathfindingFX = (function () {
         );
       }
 
-
       this.nodesList = [];
-      
+
       this.interactionMode = null;
       this.targetNodeIndex = null;
       this.targetWalkerIndex = null;
@@ -86,7 +86,6 @@ var PathfindingFX = (function () {
       this.canvas.addEventListener("mouseleave", this._mouseLeaveHandler);
       this.canvas.addEventListener("mousemove", this._mouseMoveHandler);
 
-
       // Settings
       this.settings = {};
       this.settings.wallNodeColor =
@@ -95,12 +94,8 @@ var PathfindingFX = (function () {
         settings.emptyNodeColor || defaults.emptyNodeColor;
       this.settings.pathNodeColor =
         settings.pathNodeColor || defaults.pathNodeColor;
-      this.settings.floodNodeColor =
-        settings.floodNodeColor || defaults.floodNodeColor;
-      this.settings.startNodeColor =
-        settings.startNodeColor || defaults.startNodeColor;
-      this.settings.endNodeColor =
-        settings.endNodeColor || defaults.endNodeColor;
+      this.settings.weightNodeColors =
+        settings.weightNodeColors || defaults.weightNodeColors;
 
       this.settings.highlightEdges =
         typeof settings.highlightEdges != "undefined"
@@ -113,7 +108,7 @@ var PathfindingFX = (function () {
 
       this.sqrt2 = Math.sqrt(2);
 
-      this.initMatrix();
+      this._initMatrix();
 
       this.clearCanvas();
 
@@ -191,26 +186,20 @@ var PathfindingFX = (function () {
      * the current state of the map in order to
      * find a path.
      */
-    initMatrix() {
+    _initMatrix() {
       let nodeMatrix = [];
       for (let y = 0; y < this.map.length; y++) {
         nodeMatrix[y] = [];
         for (let x = 0; x < this.map[y].length; x++) {
           const weight = this.map[y][x];
 
+          var weightSettings = null;
           var color = null;
+          var edgeColor = null;
           if (this.highestWeight > 1) {
-            if (weight == 0) {
-              color = defaults.weightColors[0];
-              color = color.color;
-            } else {
-              const weightPercentage = weight / this.highestWeight;
-              var color = defaults.weightColors.filter(
-                (color) => weightPercentage >= color.w
-              );
-              color = color.shift();
-              color = color.color;
-            }
+            weightSettings = this.settings.weightNodeColors[weight];
+            color = weightSettings.color;
+            edgeColor = weightSettings.edgeColor || null;
           } else {
             switch (weight) {
               case 1:
@@ -232,6 +221,7 @@ var PathfindingFX = (function () {
             g: 0,
             style: {
               color: color,
+              edgeColor: edgeColor,
             },
           };
         }
@@ -246,7 +236,7 @@ var PathfindingFX = (function () {
      * @returns Array of nodes
      */
     findPath = (from, to) => {
-      this.initMatrix();
+      this._initMatrix();
       to = this.matrix[to.y][to.x];
 
       let open = [this.matrix[from.y][from.x]];
@@ -329,7 +319,7 @@ var PathfindingFX = (function () {
     };
 
     positions = (from) => {
-      this.initMatrix();
+      this._initMatrix();
 
       let open = [this.matrix[from.y][from.x]];
       let closed = [];
@@ -532,8 +522,7 @@ var PathfindingFX = (function () {
           if (node.isHovered) return;
 
           var speed = node.speed;
-          if(!speed)
-            return;
+          if (!speed) return;
 
           if (node.path.length > 1) {
             var dX = node.path[1].pos.x * this.tileSize.w - node.x;
@@ -743,7 +732,7 @@ var PathfindingFX = (function () {
               onPosChange: (n, p) => {
                 node.findPath();
               },
-            ...node.to,
+              ...node.to,
             },
           },
           {
@@ -842,6 +831,15 @@ var PathfindingFX = (function () {
               ? this.settings.emptyNodeColor
               : this.settings.wallNodeColor;
 
+          const edgeColor =
+            this.matrix &&
+            this.matrix[y] &&
+            this.matrix[y][x] &&
+            this.matrix[y][x].style &&
+            this.matrix[y][x].style.edgeColor
+              ? this.matrix[y][x].style.edgeColor
+              : this.settings.wallEdgeColor;
+
           this.drawNode(
             {
               pos: { x: x, y: y },
@@ -854,28 +852,28 @@ var PathfindingFX = (function () {
                   (this.map[y][x] == 0 &&
                     this.map[y - 1] &&
                     this.map[y - 1][x] != 0)
-                    ? { color: this.settings.wallEdgeColor }
+                    ? { color: edgeColor }
                     : null,
                 right:
                   (x == this.map[y].length - 1 && this.map[y][x] != 0) ||
                   (this.map[y][x] == 0 &&
                     typeof this.map[y][x + 1] != "undefined" &&
                     this.map[y][x + 1] != 0)
-                    ? { color: this.settings.wallEdgeColor }
+                    ? { color: edgeColor }
                     : null,
                 bottom:
                   (y == this.map.length - 1 && this.map[y][x] != 0) ||
                   (this.map[y][x] == 0 &&
                     this.map[y + 1] &&
                     this.map[y + 1][x] != 0)
-                    ? { color: this.settings.wallEdgeColor }
+                    ? { color: edgeColor }
                     : null,
                 left:
                   (x == 0 && this.map[y][x] != 0) ||
                   (this.map[y][x] == 0 &&
                     typeof this.map[y][x - 1] != "undefined" &&
                     this.map[y][x - 1] != 0)
-                    ? { color: this.settings.wallEdgeColor }
+                    ? { color: edgeColor }
                     : null,
                 // also corners
                 topLeft:
@@ -884,7 +882,7 @@ var PathfindingFX = (function () {
                   this.map[y - 1][x] == 0 &&
                   this.map[y][x - 1] == 0 &&
                   this.map[y - 1][x - 1] != 0
-                    ? { color: this.settings.wallEdgeColor }
+                    ? { color: edgeColor }
                     : null,
                 topRight:
                   this.map[y][x] == 0 &&
@@ -892,7 +890,7 @@ var PathfindingFX = (function () {
                   this.map[y - 1][x] == 0 &&
                   this.map[y][x + 1] == 0 &&
                   this.map[y - 1][x + 1] != 0
-                    ? { color: this.settings.wallEdgeColor }
+                    ? { color: edgeColor }
                     : null,
                 bottomRight:
                   this.map[y][x] == 0 &&
@@ -900,7 +898,7 @@ var PathfindingFX = (function () {
                   this.map[y + 1][x] == 0 &&
                   this.map[y][x + 1] == 0 &&
                   this.map[y + 1][x + 1] != 0
-                    ? { color: this.settings.wallEdgeColor }
+                    ? { color: edgeColor }
                     : null,
                 bottomLeft:
                   this.map[y][x] == 0 &&
@@ -908,7 +906,7 @@ var PathfindingFX = (function () {
                   this.map[y + 1][x] == 0 &&
                   this.map[y][x - 1] == 0 &&
                   this.map[y + 1][x - 1] != 0
-                    ? { color: this.settings.wallEdgeColor }
+                    ? { color: edgeColor }
                     : null,
               },
             }
@@ -956,7 +954,6 @@ var PathfindingFX = (function () {
     }
 
     drawNode(node, config = {}) {
-
       if (!node) return;
 
       const shape = node.style && node.style.shape ? node.style.shape : "rect";
@@ -966,13 +963,13 @@ var PathfindingFX = (function () {
         (node.x || node.pos.x * this.tileSize.w) +
         (typeof node.style != "undefined" &&
         typeof node.style.size != "undefined"
-          ? (this.tileSize.w - (this.tileSize.w * node.style.size.w)) / 2
+          ? (this.tileSize.w - this.tileSize.w * node.style.size.w) / 2
           : 0);
       var drawY =
         (node.y || node.pos.y * this.tileSize.h) +
         (typeof node.style != "undefined" &&
         typeof node.style.size != "undefined"
-          ? (this.tileSize.h - (this.tileSize.h * node.style.size.h)) / 2
+          ? (this.tileSize.h - this.tileSize.h * node.style.size.h) / 2
           : 0);
 
       var sizeX =
@@ -986,13 +983,18 @@ var PathfindingFX = (function () {
           ? node.style.size.h * this.tileSize.h
           : this.tileSize.h;
 
+      this.ctx.fillStyle =
+        typeof node.style != "undefined"
+          ? node.style.color
+          : config.color || this.settings.pathNodeColor;
+
+      this.ctx.strokeStyle =
+        typeof node.style != "undefined"
+          ? node.style.color
+          : config.color || this.settings.pathNodeColor;
+
       switch (mode) {
         case "fill":
-          this.ctx.fillStyle =
-            typeof node.style != "undefined"
-              ? node.style.color
-              : config.color || this.settings.pathNodeColor;
-
           switch (shape) {
             case "rect":
               this.ctx.fillRect(drawX, drawY, sizeX, sizeY);
@@ -1044,14 +1046,9 @@ var PathfindingFX = (function () {
               this.ctx.fill();
               this.ctx.stroke();
               break;
-              break;
           }
-
           break;
         case "stroke":
-          this.ctx.fillStyle = config.color || this.settings.pathNodeColor;
-          this.ctx.strokeStyle = config.color || this.settings.pathNodeColor;
-
           switch (shape) {
             case "rect":
               this.ctx.strokeRect(drawX - 2, drawY - 2, sizeX + 4, sizeY + 4);
@@ -1074,7 +1071,6 @@ var PathfindingFX = (function () {
               this.ctx.stroke();
               break;
           }
-
           break;
       }
     }
@@ -1163,7 +1159,6 @@ var PathfindingFX = (function () {
                 this.map[pos.y][pos.x] &&
                 (node.pos.x != pos.x || node.pos.y != pos.y)
               ) {
-
                 node.pos = pos;
 
                 node._positions = null;
@@ -1353,7 +1348,7 @@ var PathfindingFX = (function () {
     updateMap(map) {
       if (typeof this.onUpdateMap === "function") this.onUpdateMap(map);
       this.map = map;
-      this.initMatrix();
+      this._initMatrix();
       this.highestWeight = Math.max(...this.map.flat());
       this.nodesList.forEach((node) => {
         node._positions = null;
