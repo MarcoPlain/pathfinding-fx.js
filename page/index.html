@@ -16,8 +16,6 @@
             colors: {
               primary: "#78dcca",
               secondary: "#126764",
-              code: "#dbdbdb",
-              "code-important": "#78dcc0",
             },
           },
         },
@@ -170,7 +168,7 @@
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            data-demo="ExampleDataFlow"
+            
             class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
@@ -277,7 +275,7 @@ const PFX = new PathfindingFX(
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            data-demo="ExampleDataFlow"
+            
             class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
@@ -400,7 +398,7 @@ PFX.addNode(nodeB);
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            data-demo="ExampleDataFlow"
+            
             class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
@@ -512,7 +510,7 @@ PFX.addNode(node);
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            data-demo="ExampleDataFlow"
+            
             class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
@@ -650,7 +648,7 @@ PFX.play();
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            data-demo="ExampleDataFlow"
+            
             class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
@@ -720,7 +718,6 @@ PFX.addNode(node);
             <div id="weighted" style="max-width: 225px"></div>
             <script>
               const weighted = () => ({
-                PFXObj: null,
                 map: [
                   [0, 0, 0, 0, 0, 0, 0, 0, 0],
                   [0, 1, 1, 1, 1, 2, 3, 4, 0],
@@ -750,10 +747,7 @@ PFX.addNode(node);
                       },
                     }
                   );
-
-                  // PFX.drawMap();
                   PFX.addNode({ ...this.fromNode, ...{ to: this.toNode } });
-                  PFX.render();
                 },
                 init() {
                   this.run();
@@ -766,7 +760,7 @@ PFX.addNode(node);
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            data-demo="ExampleDataFlow"
+            
             class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
