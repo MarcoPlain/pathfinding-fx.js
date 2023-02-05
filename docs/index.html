@@ -9,18 +9,6 @@
     />
     <title>Pathfinding</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: "#78dcca",
-              secondary: "#126764",
-            },
-          },
-        },
-      };
-    </script>
     <script
       defer
       src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"
@@ -48,7 +36,7 @@
     <div class="bg-gray-100 text-gray-700 py-2 lg:py-16">
       <div class="container mx-auto">
         <div class="p-8 text-center">
-          <h1 class="text-primary text-4xl">pathfinding-fx.js</h1>
+          <h1 class="text-teal-500 text-4xl">pathfinding-fx.js</h1>
           <p>
             A visualization library experiment for interactive website effects
             based on pathfinding algorithms
@@ -88,42 +76,42 @@
               <a
                 onclick="loadExamplePathfinding()"
                 data-demo="ExamplePathfinding"
-                class="text-white bg-primary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
+                class="text-white bg-teal-500 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
               >
                 Pathfinding
               </a>
               <a
                 onclick="loadExampleDataFlow()"
                 data-demo="ExampleDataFlow"
-                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
+                class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
               >
                 Data Flow
               </a>
               <a
                 onclick="loadExampleMazeRunners()"
                 data-demo="ExampleMazeRunners"
-                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
+                class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
               >
                 Maze Runners
               </a>
               <a
                 onclick="loadExampleFlooding()"
                 data-demo="ExampleFlooding"
-                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
+                class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
               >
                 Flooding
               </a>
               <a
                 onclick="loadExampleMountainClimber()"
                 data-demo="ExampleMountainClimber"
-                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
+                class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
               >
                 Mountain Climber
               </a>
               <a
                 onclick="loadExampleLightSource()"
                 data-demo="ExampleLightSource"
-                class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
+                class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap"
               >
                 Lightbulb
               </a>
@@ -223,7 +211,7 @@
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+            class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -321,7 +309,7 @@
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+            class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -433,7 +421,7 @@ PFX.addNode(nodeB);</code></pre>
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+            class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -482,7 +470,7 @@ PFX.addNode(node);</code></pre>
           <div class="text-center">
             <button
               @click="pfx.nodesList[0].to.pos = pfx.nodesList[0].positions()[Math.floor(Math.random() * pfx.nodesList[0].positions().length)].pos"
-              class="bg-secondary text-white px-3 py-2 text-xs font-mono rounded-lg"
+              class="bg-teal-900 text-white px-3 py-2 text-xs font-mono rounded-lg"
             >
               New <i>"to"</i> position
             </button>
@@ -537,7 +525,7 @@ PFX.addNode(node);</code></pre>
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+            class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -668,7 +656,7 @@ PFX.play();</code></pre>
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+            class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -776,7 +764,7 @@ PFX.addNode(node);</code></pre>
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
-            class="text-white bg-secondary px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
+            class="text-white bg-teal-900 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap lg:hidden"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -898,7 +886,7 @@ PFX.<span class="text-[#DD4A68]">reset()</span>           <span class="text-gray
       </div>
     </div>
 
-    <div class="text-center mt-5 bg-secondary">
+    <div class="text-center mt-5 bg-teal-900">
       <div class="container mx-auto p-8 text-white">
         Made with
         <svg
@@ -916,7 +904,7 @@ PFX.<span class="text-[#DD4A68]">reset()</span>           <span class="text-gray
           />
         </svg>
         by
-        <a href="https://marcoplain.com" target="_blank" class="text-primary">
+        <a href="https://marcoplain.com" target="_blank" class="text-teal-500">
           Marco Plain
         </a>
         <p class="text-sm text-gray-300">
@@ -924,12 +912,12 @@ PFX.<span class="text-[#DD4A68]">reset()</span>           <span class="text-gray
           <a
             href="https://tailwindcss.com/"
             target="_blank"
-            class="text-primary"
+            class="text-teal-500"
             >TailwindCSS</a
           >
           <br />
           Interactions realized with
-          <a href="https://alpinejs.dev/" target="_blank" class="text-primary"
+          <a href="https://alpinejs.dev/" target="_blank" class="text-teal-500"
             >Alpine</a
           >
         </p>

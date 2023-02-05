@@ -48,10 +48,10 @@ function loadExamplePathfinding() {
   if (PFX) clearDemo();
   document
     .querySelector("[data-demo='ExamplePathfinding']")
-    .classList.add("bg-primary");
+    .classList.add("bg-teal-500");
   document
     .querySelector("[data-demo='ExamplePathfinding']")
-    .classList.remove("bg-secondary");
+    .classList.remove("bg-teal-900");
   const canvas = document.getElementById("demo-examples");
   let map = [];
 
@@ -132,10 +132,10 @@ function loadExampleDataFlow() {
   if (PFX) clearDemo();
   document
     .querySelector("[data-demo='ExampleDataFlow']")
-    .classList.add("bg-primary");
+    .classList.add("bg-teal-500");
   document
     .querySelector("[data-demo='ExampleDataFlow']")
-    .classList.remove("bg-secondary");
+    .classList.remove("bg-teal-900");
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -214,10 +214,10 @@ function loadExampleMazeRunners() {
   if (PFX) clearDemo();
   document
     .querySelector("[data-demo='ExampleMazeRunners']")
-    .classList.add("bg-primary");
+    .classList.add("bg-teal-500");
   document
     .querySelector("[data-demo='ExampleMazeRunners']")
-    .classList.remove("bg-secondary");
+    .classList.remove("bg-teal-900");
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -313,10 +313,10 @@ function loadExampleFlooding() {
   if (PFX) clearDemo();
   document
     .querySelector("[data-demo='ExampleFlooding']")
-    .classList.add("bg-primary");
+    .classList.add("bg-teal-500");
   document
     .querySelector("[data-demo='ExampleFlooding']")
-    .classList.remove("bg-secondary");
+    .classList.remove("bg-teal-900");
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -439,10 +439,10 @@ function loadExampleMountainClimber() {
     "Interact with the map to toggle between different 'heights'";
   document
     .querySelector("[data-demo='ExampleMountainClimber']")
-    .classList.add("bg-primary");
+    .classList.add("bg-teal-500");
   document
     .querySelector("[data-demo='ExampleMountainClimber']")
-    .classList.remove("bg-secondary");
+    .classList.remove("bg-teal-900");
 
   if (PFX) clearDemo();
 
@@ -515,10 +515,10 @@ function loadExampleLightSource() {
   if (PFX) clearDemo();
   document
     .querySelector("[data-demo='ExampleLightSource']")
-    .classList.add("bg-primary");
+    .classList.add("bg-teal-500");
   document
     .querySelector("[data-demo='ExampleLightSource']")
-    .classList.remove("bg-secondary");
+    .classList.remove("bg-teal-900");
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
@@ -582,8 +582,8 @@ function loadExampleLightSource() {
 
 function clearDemo() {
   document.querySelectorAll("[data-demo]").forEach((btn) => {
-    btn.classList.remove("bg-primary");
-    btn.classList.add("bg-secondary");
+    btn.classList.remove("bg-teal-500");
+    btn.classList.add("bg-teal-900");
   });
   PFX.reset();
   PFX.stop();
