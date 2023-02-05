@@ -65,15 +65,20 @@ var PathfindingFX = (function () {
 
       this.mouseIsDown = false;
 
-      this._mouseDownHandler = (evt) => this.mouseDown(evt);
-      this._mouseUpHandler = (evt) => this.mouseUp(evt);
-      this._mouseLeaveHandler = (evt) => this.mouseLeave(evt);
-      this._mouseMoveHandler = (evt) => this.mouseMove(evt);
+      this._onDownHandler = (evt) => this.onDown(evt);
+      this._onUpHandler = (evt) => this.onUp(evt);
+      this._onLeaveHandler = (evt) => this.onLeave(evt);
+      this._onMoveHandler = (evt) => this.onMove(evt);
 
-      this.canvas.addEventListener("mousedown", this._mouseDownHandler);
-      this.canvas.addEventListener("mouseup", this._mouseUpHandler);
-      this.canvas.addEventListener("mouseleave", this._mouseLeaveHandler);
-      this.canvas.addEventListener("mousemove", this._mouseMoveHandler);
+      this.canvas.addEventListener("mousedown", this._onDownHandler);
+      this.canvas.addEventListener("mouseup", this._onUpHandler);
+      this.canvas.addEventListener("mouseleave", this._onLeaveHandler);
+      this.canvas.addEventListener("mousemove", this._onMoveHandler);
+
+      this.canvas.addEventListener("touchstart", this._onDownHandler);
+      this.canvas.addEventListener("touchmove", this._onMoveHandler);
+      this.canvas.addEventListener("touchend", this._onLeaveHandler);
+      this.canvas.addEventListener("touchcancel", this._onLeaveHandler);
 
       // SETTINGS
       this.settings = {};
@@ -170,6 +175,9 @@ var PathfindingFX = (function () {
         node.x = node.pos.x * this.tileSize.w;
         node.y = node.pos.y * this.tileSize.h;
       });
+
+      // Prevent touch move from scrolling
+      this.canvas.style.touchAction = "none";
 
       this.render();
     }
@@ -325,7 +333,7 @@ var PathfindingFX = (function () {
     };
 
     /**
-     * Retrieves the neighbors of given node to 
+     * Retrieves the neighbors of given node to
      * proceed with the pathfinding algorithm
      */
     _neighbors = (node) => {
@@ -401,7 +409,7 @@ var PathfindingFX = (function () {
     };
 
     /**
-     * Calculates the distance between two noes 
+     * Calculates the distance between two noes
      * based on the heuristic in the settings
      */
     _distance = (from, to) => {
@@ -437,18 +445,22 @@ var PathfindingFX = (function () {
 
     /**
      * Checks if a given position is not occupied by a node.
-     * @param {*} pos 
-     * @returns 
+     * @param {*} pos
+     * @returns
      */
     free = (pos) => {
       return (
         this.nodesList.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) ==
-        -1
+          -1 &&
+        this.nodesList
+          .filter((n) => n.to)
+          .map((n) => n.to)
+          .findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) == -1
       );
     };
 
     /**
-     * Internal update function for auto play calculations. 
+     * Internal update function for auto play calculations.
      */
     _update(delta) {
       this.nodesList
@@ -494,7 +506,7 @@ var PathfindingFX = (function () {
     }
 
     /**
-     * Internal animation function for auto play calculations
+     * Internal animation function for auto play calculations and renderings.
      */
     _animation(pfx, timestamp) {
       if (pfx.lastFrameTimeMs === null) {
@@ -527,7 +539,7 @@ var PathfindingFX = (function () {
     }
 
     /**
-     * Starts auto play
+     * Starts auto play.
      */
     play() {
       this.lastFrameTimeMs = null;
@@ -538,7 +550,7 @@ var PathfindingFX = (function () {
     }
 
     /**
-     * Stops auto play
+     * Stops auto play.
      */
     stop() {
       if (this.animationFrameId) {
@@ -550,6 +562,9 @@ var PathfindingFX = (function () {
       return this;
     }
 
+    /**
+     * Adds a node to the internal engine for rendering and pathfinding.
+     */
     addNode(node) {
       node = {
         ...node,
@@ -696,15 +711,24 @@ var PathfindingFX = (function () {
       return this;
     }
 
+    /**
+     * Resets PFX und removes all listeners and stuff.
+     */
     reset() {
       this.nodesList.length = 0;
       this.map.length = 0;
 
-      this.canvas.removeEventListener("mousedown", this._mouseDownHandler);
-      this.canvas.removeEventListener("mouseup", this._mouseUpHandler);
-      this.canvas.removeEventListener("mouseleave", this._mouseLeaveHandler);
-      this.canvas.removeEventListener("mousemove", this._mouseMoveHandler);
-      this.mouseLeave();
+      this.canvas.removeEventListener("mousedown", this._onDownHandler);
+      this.canvas.removeEventListener("mouseup", this._onUpHandler);
+      this.canvas.removeEventListener("mouseleave", this._onLeaveHandler);
+      this.canvas.removeEventListener("mousemove", this._onMoveHandler);
+
+      this.canvas.removeEventListener("touchstart", this._onDownHandler);
+      this.canvas.removeEventListener("touchmove", this._onMoveHandler);
+      this.canvas.removeEventListener("touchend", this._onLeaveHandler);
+      this.canvas.removeEventListener("touchcancel", this._onLeaveHandler);
+
+      this.onLeave();
       this.clearCanvas();
 
       window.removeEventListener("resize", () => this._resizeHandler);
@@ -712,6 +736,9 @@ var PathfindingFX = (function () {
       this.canvas.remove();
     }
 
+    /**
+     * Renders the canvas
+     */
     render() {
       //this.clearCanvas();
       this.drawMap();
@@ -738,10 +765,13 @@ var PathfindingFX = (function () {
       return this;
     }
 
+    /**
+     * Clears the canvas
+     */
     clearCanvas() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-
+    
     drawMap() {
       this.clearCanvas();
 
@@ -1005,10 +1035,16 @@ var PathfindingFX = (function () {
     // START : CANVAS INTERACTIONS
 
     normalizePointFromEvent(event) {
-      return {
-        x: event.clientX - this.canvas.offsetLeft + window.scrollX,
-        y: event.clientY - this.canvas.offsetTop + window.scrollY,
-      };
+      if (event.type == "mousedown" || event.type == "mousemove")
+        return {
+          x: event.clientX - this.canvas.offsetLeft + window.scrollX,
+          y: event.clientY - this.canvas.offsetTop + window.scrollY,
+        };
+      if (event.type == "touchstart" || event.type == "touchmove")
+        return {
+          x: event.touches[0].clientX - this.canvas.offsetLeft + window.scrollX,
+          y: event.touches[0].clientY - this.canvas.offsetTop + window.scrollY,
+        };
     }
 
     getXYFromPoint(point) {
@@ -1025,7 +1061,8 @@ var PathfindingFX = (function () {
       return null;
     }
 
-    mouseDown(event) {
+    onDown(event) {
+      console.log(event);
       this.mouseIsDown = true;
       this.pixelPosition = this.normalizePointFromEvent(event);
       this.position = this.getXYFromPoint(this.pixelPosition);
@@ -1040,7 +1077,11 @@ var PathfindingFX = (function () {
             if (typeof this.onInteractionWithAFreeNode === "function") {
               this.onInteractionWithAFreeNode(node, pos, this);
             } else {
-              if (this.free(pos)) {
+              if (
+                this.free(pos) &&
+                typeof this.map[pos.y] != "undefined" &&
+                typeof this.map[pos.y][pos.x] != "undefined"
+              ) {
                 this.map[pos.y][pos.x] = 0;
                 this.updateMap(this.map);
               }
@@ -1052,7 +1093,11 @@ var PathfindingFX = (function () {
             if (typeof this.onInteractionWithAWallNode === "function") {
               this.onInteractionWithAWallNode(node, pos, this);
             } else {
-              if (this.free(pos)) {
+              if (
+                this.free(pos) &&
+                typeof this.map[pos.y] != "undefined" &&
+                typeof this.map[pos.y][pos.x] != "undefined"
+              ) {
                 this.map[pos.y][pos.x] = 1;
                 this.updateMap(this.map);
               }
@@ -1088,30 +1133,34 @@ var PathfindingFX = (function () {
           };
           break;
       }
+      if (setPos !== null) {
+        this.interactionFocus = {
+          pos: { x: -1, y: -1 },
+          node: node,
+          setPos: function (pos) {
+            this.pos = pos;
+            setPos(pos);
+          },
+        };
 
-      this.interactionFocus = {
-        pos: { x: -1, y: -1 },
-        node: node,
-        setPos: function (pos) {
-          this.pos = pos;
-          setPos(pos);
-        },
-      };
+        this.interactionFocus.setPos(this.position);
 
-      this.interactionFocus.setPos(this.position);
-
-      if (this.animationFrameId === null) {
-        this.render();
+        if (this.animationFrameId === null) {
+          this.render();
+        }
       }
     }
 
-    mouseLeave(event) {
+    onLeave(event) {
       this.currentContext = null;
       this.pixelPosition = null;
-      this.mouseUp(event);
+      this.onUp(event);
+      if(typeof event != "undefined" && event.type == 'touchend'){
+        event.preventDefault();
+      }
     }
 
-    mouseUp(event) {
+    onUp(event) {
       this.mouseIsDown = false;
       this.interactionFocus = null;
       this.position = null;
@@ -1208,7 +1257,7 @@ var PathfindingFX = (function () {
       }
     }
 
-    mouseMove(event) {
+    onMove(event) {
       this.pixelPosition = this.normalizePointFromEvent(event);
       this.position = this.getXYFromPoint(this.pixelPosition);
 
