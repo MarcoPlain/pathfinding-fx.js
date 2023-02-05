@@ -767,13 +767,13 @@ var PathfindingFX = (function () {
         this.drawNode(node);
       });
 
-      if(this.settings.interactive){
+      /*if(this.settings.interactive){
         if (this.interactionFocus) {
           this.drawContext(this.interactionFocus);
         } else if (this.position) {
           this.drawContext({ pos: this.position });
         }
-      }
+      }*/
 
       return this;
     }
