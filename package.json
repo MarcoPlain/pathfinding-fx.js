@@ -4,7 +4,7 @@
   "description": "A library to help with the user interface of pathfinding.js",
   "main": "src/pathfinding-ui.js",
   "scripts": {
-    "build:dev": "babel src -d dist --copy-files",
+    "build:dev": "babel src -d dist --copy-files && babel src -d docs --copy-files",
     "build:min": "BABEL_ENV=minify babel src -d dist --out-file-extension .min.js",
     "build": "npm run build:dev && npm run build:min",
     "test": "echo \"Error: no test specified\" && exit 1"
