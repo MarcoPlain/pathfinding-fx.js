@@ -56,13 +56,31 @@
         </div>
       </div>
 
-      <div class="container mx-auto my-2 flex flex-col gap-4">
+      <div class="container max-w-8xl mx-auto my-2 flex flex-col gap-4">
         <div class="flex flex-col lg:flex-row gap-4">
-          <div
-            id="demo-examples"
-            style="max-width: 500px"
-            class="flex-none w-full mx-auto"
-          ></div>
+          <div class="flex-none w-full mx-auto" style="max-width: 500px">
+            <div id="demo-examples" style="max-width: 500px"></div>
+            <a
+              target="_blank"
+              href="https://github.com/MarcoPlain/pathfinding-fx.js/blob/main/docs/examples.js"
+              class="text-gray-500 text-sm items-center gap-2 justify-center my-4 hidden lg:flex hover:text-gray-900"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4 inline"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+                />
+              </svg>
+              <span>See examples on GitHub</span>
+            </a>
+          </div>
           <div class="flex-grow flex flex-col gap-4">
             <div
               class="flex flex-none flex-wrap justify-center lg:justify-start gap-2 items-center text-sm"
@@ -109,7 +127,6 @@
               >
                 Lightbulb
               </a>
-              <!--<a onclick="clearDemo()">Clear</a>-->
             </div>
             <div
               class="flex-1 flex flex-col gap-2 justify-between py-12 px-4 lg:px-0"
@@ -121,8 +138,30 @@
                   class="text-lg font-sans max-w-[500px] inline-block text-justify"
                 ></p>
               </div>
+
               <div>
                 <p id="example-instructions" class="text-md font-mono"></p>
+
+                <a
+                  target="_blank"
+                  href="https://github.com/MarcoPlain/pathfinding-fx.js/blob/main/docs/examples.js"
+                  class="text-gray-500 text-sm items-center gap-2 my-4 flex lg:hidden hover:text-gray-900"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-4 h-4 inline"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+                    />
+                  </svg>
+                  <span>See code on Github</span>
+                </a>
               </div>
             </div>
           </div>
@@ -130,10 +169,10 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-0 divide-y-2">
+    <div class="flex flex-col gap-0 divide-y-2 container max-w-6xl mx-auto ">
       <!-- PFX :: initialization() -->
       <div
-        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 py-8"
         x-data="initialization()"
       >
         <div class="lg:w-[300px] justify-center flex flex-col gap-4">
@@ -150,7 +189,7 @@
         </div>
         <div class="flex items-center justify-center">
           <div>
-            <div id="initialization" style="max-width: 225px"></div>
+            <div id="init" style="max-width: 225px"></div>
             <script>
               const initialization = () => ({
                 map: [
@@ -166,8 +205,8 @@
                 ],
                 run() {
                   const PFX = new PathfindingFX(
-                    document.getElementById("initialization"),
-                    { map: this.map }
+                    document.getElementById("init"),
+                    this.map
                   );
 
                   //PFX.drawMap();
@@ -205,26 +244,19 @@
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre>
-              <code class="text-xs">
-const PFX = new PathfindingFX(
-  document.getElementById("pfx-initialization"),
-  { 
-    map:
-      [
-        <span x-html='"["+map.join("],\n        [")+"]"'></span>
-      ], 
-  }
-);
-              </code>
-            </pre>
+            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX(
+  document.getElementById("pfx-init"),
+  [
+    <span x-html='"["+map.join("],\n    [")+"]"'></span>
+  ], 
+);</code></pre>
           </div>
         </div>
       </div>
 
       <!-- PFX :: adding_nodes() -->
       <div
-        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 py-8"
         x-data="adding_nodes()"
       >
         <div class="lg:w-[300px] justify-center flex flex-col gap-4">
@@ -273,7 +305,7 @@ const PFX = new PathfindingFX(
 
                   const PFX = new PathfindingFX(
                     document.getElementById("adding_nodes"),
-                    { map: this.map }
+                    this.map
                   )
                     .drawMap()
                     .addNode(this.nodeA)
@@ -287,7 +319,6 @@ const PFX = new PathfindingFX(
             </script>
           </div>
         </div>
-
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
@@ -311,26 +342,20 @@ const PFX = new PathfindingFX(
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre>
-          <code class="text-xs">
-
-const PFX = new PathfindingFX([...]);
+            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
 
 const nodeA = <span x-html="JSON.stringify(nodeA, null, 4)"></span>;
 const nodeB = <span x-html="JSON.stringify(nodeB, null, 4)"></span>;
 
 PFX.addNode(nodeA);
-PFX.addNode(nodeB);
-
-        </code>
-      </pre>
+PFX.addNode(nodeB);</code></pre>
           </div>
         </div>
       </div>
 
       <!-- PFX :: finding_the_path -->
       <div
-        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 py-8"
         x-data="finding_the_path()"
       >
         <div class="lg:w-[300px] justify-center flex flex-col gap-4">
@@ -380,7 +405,7 @@ PFX.addNode(nodeB);
 
                   this.pfx = new PathfindingFX(
                     document.getElementById("finding_the_path"),
-                    { map: this.map }
+                    this.map
                   )
                     .drawMap()
                     .addNode(this.node);
@@ -400,16 +425,12 @@ PFX.addNode(nodeB);
                       this.pfx.nodesList[0].to.style = this.node.to.style;
                     }
                     this.pfx.render();
-                    /*this.pfx.reset();
-                    console.log(this.map);
-                    this.run();*/
                   });
                 },
               });
             </script>
           </div>
         </div>
-
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
@@ -433,26 +454,20 @@ PFX.addNode(nodeB);
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre>
-          <code class="text-xs">
-
-const PFX = new PathfindingFX([...]);
+            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
 
 const node = {[...],
   to: <span x-html="JSON.stringify(node.to, null, 4)"></span>
 };
 
-PFX.addNode(node);
-
-        </code>
-      </pre>
+PFX.addNode(node);</code></pre>
           </div>
         </div>
       </div>
 
       <!-- PFX :: auto_play -->
       <div
-        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 py-8"
         x-data="auto_play()"
       >
         <div class="lg:w-[300px] justify-center flex flex-col gap-4">
@@ -492,7 +507,7 @@ PFX.addNode(node);
                   [0, 0, 0, 0, 0, 0, 0, 0, 0],
                 ],
                 node: {
-                  speed: 50,
+                  speed: 100,
                   pos: { x: 2, y: 2 },
                   style: { color: "#7B2869" },
                   to: {
@@ -507,13 +522,11 @@ PFX.addNode(node);
                 run() {
                   this.pfx = new PathfindingFX(
                     document.getElementById("auto_play"),
-                    { map: this.map }
+                    this.map
                   )
                     .drawMap()
                     .addNode(this.node)
                     .play();
-
-                  Alpine.store("playNode", this.pfx.nodesList[0]);
                 },
                 init() {
                   this.run();
@@ -522,7 +535,6 @@ PFX.addNode(node);
             </script>
           </div>
         </div>
-
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
@@ -546,28 +558,22 @@ PFX.addNode(node);
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre>
-          <code class="text-xs">
-
-const PFX = new PathfindingFX([...]);
+            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
 
 const node = {[...],
   to: [...],
-  speed: 25,
+  speed: 100,
 };
 
 PFX.addNode(node);
-PFX.play();
-
-        </code>
-      </pre>
+PFX.play();</code></pre>
           </div>
         </div>
       </div>
 
       <!-- PFX :: positions -->
       <div
-        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 py-8"
         x-data="positions()"
       >
         <div class="lg:w-[300px] justify-center flex flex-col gap-4">
@@ -647,7 +653,7 @@ PFX.play();
 
                   this.pfx = new PathfindingFX(
                     document.getElementById("positions"),
-                    { map: this.map }
+                    this.map
                   );
 
                   this.pfx.addNode(this.node);
@@ -683,10 +689,7 @@ PFX.play();
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre>
-          <code class="text-xs">
-
-const PFX = new PathfindingFX([...]);
+            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
 
 const node = {[...],
   onRender: (node) => {
@@ -702,17 +705,14 @@ const node = {[...],
   },
 };
 
-PFX.addNode(node);
-
-        </code>
-      </pre>
+PFX.addNode(node);</code></pre>
           </div>
         </div>
       </div>
 
       <!-- PFX :: Weighted Map -->
       <div
-        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 container mx-auto py-8"
+        class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 py-8"
         x-data="weighted()"
       >
         <div class="lg:w-[300px] justify-center flex flex-col gap-4">
@@ -743,18 +743,22 @@ PFX.addNode(node);
                   [0, 1, 1, 1, 2, 1, 1, 1, 0],
                   [0, 0, 0, 0, 0, 0, 0, 0, 0],
                 ],
-                fromNode: { pos: { x: 2, y: 2 }, style: { color: "purple" } },
+                fromNode: {
+                  pos: { x: 2, y: 2 },
+                  style: { color: "purple" },
+                  allowDiagonal: false,
+                },
                 toNode: { pos: { x: 6, y: 5 } },
                 run() {
                   const PFX = new PathfindingFX(
                     document.getElementById("weighted"),
+                    this.map,
                     {
-                      map: this.map,
                       wallNodeColor: "#242424",
                       onInteractionWithAFreeNode: (node, pos, pfx) => {
                         if (pfx.free(pos)) {
                           pfx.map[pos.y][pos.x]++;
-                          if (pfx.map[pos.y][pos.x] == 5)
+                          if (pfx.map[pos.y][pos.x] == 6)
                             pfx.map[pos.y][pos.x] = 0;
                           pfx.updateMap(pfx.map);
                         }
@@ -770,7 +774,6 @@ PFX.addNode(node);
             </script>
           </div>
         </div>
-
         <div class="text-center lg:text-left lg:pl-4">
           <a
             onclick="this.nextElementSibling.classList.toggle('hidden')"
@@ -794,24 +797,105 @@ PFX.addNode(node);
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre>
-          <code class="text-xs">
-
-const PFX = new PathfindingFX([...], 
-  { 
-    map:
-      [
-        <span x-html='"["+map.join("],\n        [")+"]"'></span>
-      ], 
-  }
+            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...], 
+  [
+    <span x-html='"["+map.join("],\n    [")+"]"'></span>
+  ]
 );
 
-PFX.addNode([...]);
-
-        </code>
-      </pre>
+PFX.addNode({
+  [...],
+  allowDiagonal: false
+});</code></pre>
           </div>
         </div>
+      </div>
+
+      <div class="p-4 container mx-auto py-8">
+        <h1 class="text-xl font-serif">PFX :: More options with defaults</h1>
+        <h2 class="font-serif py-2">Pathfinding Parameters</h2>
+        <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800"><span class="text-gray-400">const PFX = new PathfindingFX(element,map,</span>
+  {
+    <span class="text-gray-600">// Algorithm</span>
+    heuristics:                 <span class="text-[#690]">"manhattan"</span>,     <span class="text-gray-600">// used heuristics, can be "manhattan" or "euclidean"</span>
+    allowDiagonal:              <span class="text-[#905]">true</span>,            <span class="text-gray-600">// globally set if diagonal movement is allowed</span>
+
+    <span class="text-gray-600">// Colors</span>
+    wallNodeColor:              <span class="text-[#690]">"#dbdbdb"</span>,       <span class="text-gray-600">// color of nodes with value "0" (walls)</span>
+    emptyNodeColor:             <span class="text-[#690]">"#f8f8f8"</span>,       <span class="text-gray-600">// color of nodes with value "1" (walkable)</span>
+    pathNodeColor:              <span class="text-[#690]">"#a8a8a8"</span>,       <span class="text-gray-600">// color of paths that aren't colored otherwise</span>
+    highlightEdges:             <span class="text-[#905]">true</span>,            <span class="text-gray-600">// if walls should have edges</span>
+    wallEdgeColor:              <span class="text-[#690]">"#a8a8a8"</span>,       <span class="text-gray-600">// if above is true, this color is used</span>
+    weightNodeColors:           {                <span class="text-gray-600">// in case of weighted map, these colors are used for different weights</span>
+                                  <span class="text-[#905]">5</span>: { color: <span class="text-[#690]">"#6c584c"</span> },
+                                  <span class="text-[#905]">4</span>: { color: <span class="text-[#690]">"#a98467"</span> },
+                                  <span class="text-[#905]">3</span>: { color: <span class="text-[#690]">"#adc178"</span> },
+                                  <span class="text-[#905]">2</span>: { color: <span class="text-[#690]">"#dde5b6"</span> },
+                                  <span class="text-[#905]">1</span>: { color: <span class="text-[#690]">"#f0ead2"</span> },
+                                  <span class="text-[#905]">0</span>: { color: <span class="text-[#690]">"#0088bb"</span>, edgeColor: <span class="text-[#690]">"#c2b280"</span> },
+                                }        
+
+    <span class="text-gray-600">// Interactivity</span>
+    interactive:                <span class="text-[#905]">true</span>,            <span class="text-gray-600">// defines if the map is interactive with cursor or touch events</span>
+                        
+    <span class="text-gray-600">// Callbacks</span>   
+    onUpdateMap:                <span class="text-[#07a]">function(<span class="text-[#000]">newMap</span>)</span>,                    <span class="text-gray-600">// callback function when the map updates</span>
+    onInteractionWithAFreeNode: <span class="text-[#07a]">function(<span class="text-[#000]">node</span>,<span class="text-[#000]">pos</span>,<span class="text-[#000]">pfx_instance</span>)</span>,     <span class="text-gray-600">// callback function when interacting with free nodes</span>
+    onInteractionWithAWallNode: <span class="text-[#07a]">function(<span class="text-[#000]">node</span>,<span class="text-[#000]">pos</span>,<span class="text-[#000]">pfx_instance</span>)</span>,     <span class="text-gray-600">// callback function when interacting with wall nodes</span>
+  }
+<span class="text-gray-400">)</span></code></pre>
+        <h2 class="font-serif py-2">Node Parameters</h2>
+        <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800"><span class="text-gray-400">PFX.addNode(</span>
+  {
+    <span class="text-gray-600">// Algorithm</span>
+    pos: {                                         <span class="text-gray-600">// initial x and y position (0,0 is in the top left corner)</span>
+      x:                    <span class="text-[#905]">0</span>,
+      y:                    <span class="text-[#905]">0</span>
+    },
+    to: {
+      pos: {                                       <span class="text-gray-600">// position to which the path gets calculated and rendered</span>
+        x:                  <span class="text-[#905]">0</span>,
+        y:                  <span class="text-[#905]">0</span>
+      },
+      style:                <span class="text-[#000] italic">[See below, same as node styling]</span>
+    },
+    allowDiagonal:          <span class="text-[#905]">true</span>,                  <span class="text-gray-600">// allows diagonal movement (this overrides global settings)</span>
+    
+    <span class="text-gray-600">// Colors</span>
+    style: {
+      color:                <span class="text-[#690]">"#000000"</span>,             <span class="text-gray-600">// color of the node</span>
+      shape:                <span class="text-[#690]">"rect"</span>,                <span class="text-gray-600">// shape of the node ("rect", "circle" "roundRect")</span>
+      mode:                 <span class="text-[#690]">"fill"</span>,                <span class="text-gray-600">// drawing mode of the node ("fill", "stroke")</span>
+      size: {
+        w:                  <span class="text-[#905]">1</span>                      <span class="text-gray-600">// width of the node, factored to the tile size. (1 equals 100% of the given tiles space)</span>
+        h:                  <span class="text-[#905]">1</span>                      <span class="text-gray-600">// height of the node, factored to the tile size. (1 equals 100% of the given tiles space)</span>
+      }
+    },
+
+    <span class="text-gray-600">// Interactivity</span>
+    interactive:            <span class="text-[#905]">true</span>,                  <span class="text-gray-600">// defines if a node is interactive with cursor or touch events</span>
+
+    <span class="text-gray-600">// Animation</span>
+    speed:                  <span class="text-[#905]">100</span>,                   <span class="text-gray-600">// when using PFX.play() this number defines how quickly the node follows its path</span>
+    
+    <span class="text-gray-600">// Callbacks</span>   
+    onAdd:                  <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function when a node gets added</span>
+    onRender:               <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function when a node gets rendered in the global render function</span>
+    onUpdate:               <span class="text-[#07a]">function(<span class="text-[#000]">node</span>,<span class="text-[#000]">delta</span>)</span>,  <span class="text-gray-600">// callback function when a nodes gets updated in the global animation update function</span>
+    onPosChange:            <span class="text-[#07a]">function(<span class="text-[#000]">node</span>,<span class="text-[#000]">pos</span>)</span>,    <span class="text-gray-600">// callback function when a nodes position changes</span>
+    onPathEnd:              <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function when the node reaches its goal</span>
+    onNoPath:               <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function a node has no path</span>
+  }
+<span class="text-gray-400">)</span></code></pre>
+<h2 class="font-serif py-2">Animation & miscellaneous</h2>
+<pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800"><span class="text-gray-600">// Animation</span>
+PFX.<span class="text-[#DD4A68]">play()</span>            <span class="text-gray-600">// enables animation and will automatically update nodes positions</span>
+PFX.<span class="text-[#DD4A68]">stop()</span>            <span class="text-gray-600">// disables animation</span>
+
+<span class="text-gray-600">// Miscellaneous</span>
+PFX.<span class="text-[#DD4A68]">reset()</span>           <span class="text-gray-600">// resets everything and removes the canvas from the DOM </span>
+
+</code></pre>
       </div>
     </div>
 
@@ -845,7 +929,7 @@ PFX.addNode([...]);
             >TailwindCSS</a
           >
           <br />
-          Interactions realized by
+          Interactions realized with
           <a href="https://alpinejs.dev/" target="_blank" class="text-primary"
             >Alpine</a
           >
@@ -853,6 +937,6 @@ PFX.addNode([...]);
       </div>
     </div>
 
-    <script src="./script.js"></script>
+    <script src="./examples.js"></script>
   </body>
 </html>

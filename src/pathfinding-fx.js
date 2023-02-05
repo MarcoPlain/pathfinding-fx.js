@@ -8,34 +8,29 @@ var PathfindingFX = (function () {
    */
 
   const defaults = {
+    heuristics: "manhattan",
+    allowDiagonal: true,
+
     wallNodeColor: "#dbdbdb",
     wallEdgeColor: "#a8a8a8",
     emptyNodeColor: "#f8f8f8",
     pathNodeColor: "#a8a8a8",
-    floodNodeColor: "#585858",
-    startNodeColor: "#0088bb",
-    endNodeColor: "#00bb88",
-
     highlightEdges: true,
 
     weightNodeColors: {
-      5: { w: 5, color: "#6c584c" },
-      4: { w: 4, color: "#a98467" },
-      3: { w: 3, color: "#adc178" },
-      2: { w: 2, color: "#dde5b6" },
-      1: { w: 1, color: "#f0ead2" },
-      0: { w: 0, color: "#0088bb", edgeColor: "#c2b280" },
+      5: { color: "#6c584c" },
+      4: { color: "#a98467" },
+      3: { color: "#adc178" },
+      2: { color: "#dde5b6" },
+      1: { color: "#f0ead2" },
+      0: { color: "#0088bb", edgeColor: "#c2b280" },
     },
+
+    interactive: true,
   };
 
   class PathfindingFX {
-    constructor(element, settings = {}) {
-      this.map = settings.map || [];
-      this.highestWeight = Math.max(...this.map.flat());
-
-      this.heuristics = settings.heuristics || "manhattan";
-      this.path = [];
-
+    constructor(element, map = null, settings = {}) {
       if (!(element instanceof Node)) {
         throw (
           "Can't initialize pathfinding-fx because " +
@@ -43,6 +38,15 @@ var PathfindingFX = (function () {
           " is not a Node."
         );
       }
+
+      if (typeof map == null) {
+        throw "Can't initialize pathfinding-fx because map is null.";
+      }
+
+      this.map = map || [];
+      this.highestWeight = Math.max(...this.map.flat());
+
+      this.path = [];
 
       this.nodesList = [];
 
@@ -82,6 +86,10 @@ var PathfindingFX = (function () {
 
       // SETTINGS
       this.settings = {};
+
+      this.settings.heuristics = settings.heuristics || defaults.heuristics ;      
+      this.settings.allowDiagonal = typeof settings.allowDiagonal != 'undefined' ? settings.allowDiagonal : defaults.allowDiagonal ;
+
       this.settings.wallNodeColor =
         settings.wallNodeColor || defaults.wallNodeColor;
       this.settings.emptyNodeColor =
@@ -99,6 +107,9 @@ var PathfindingFX = (function () {
         typeof settings.wallEdgeColor != "undefined"
           ? settings.wallEdgeColor
           : defaults.wallEdgeColor;
+
+      this.settings.interactive = typeof settings.interactive != 'undefined' ? settings.interactive : defaults.interactive ;
+  
 
       this.sqrt2 = Math.sqrt(2);
 
@@ -237,7 +248,7 @@ var PathfindingFX = (function () {
      * @param Object to
      * @returns Array of nodes
      */
-    _find = (from, to = null) => {
+    _find = (from, to = null, _params = {}) => {
       this._initMatrix();
 
       let open = [this.matrix[from.y][from.x]];
@@ -275,7 +286,7 @@ var PathfindingFX = (function () {
         closed.push(currentNode);
         if (to === null) positions.push({ ...currentNode });
 
-        let _neighbors = this._neighbors(currentNode);
+        let _neighbors = this._neighbors(currentNode, _params);
         for (let n = 0; n < _neighbors.length; n++) {
           let neighbor = _neighbors[n];
           let invalid = false;
@@ -336,7 +347,7 @@ var PathfindingFX = (function () {
      * Retrieves the neighbors of given node to
      * proceed with the pathfinding algorithm
      */
-    _neighbors = (node) => {
+    _neighbors = (node, params) => {
       let _neighbors = [];
       if (
         this.matrix[node.pos.y - 1] &&
@@ -362,49 +373,49 @@ var PathfindingFX = (function () {
         this.matrix[node.pos.y][node.pos.x + 1].w
       )
         _neighbors.push(this.matrix[node.pos.y][node.pos.x + 1]);
-
-      // Diagonal _neighbors
-      if (
-        this.matrix[node.pos.y - 1] &&
-        this.matrix[node.pos.y - 1][node.pos.x - 1] &&
-        this.matrix[node.pos.y - 1][node.pos.x - 1].w &&
-        this.matrix[node.pos.y - 1][node.pos.x] &&
-        this.matrix[node.pos.y - 1][node.pos.x].w &&
-        this.matrix[node.pos.y][node.pos.x - 1] &&
-        this.matrix[node.pos.y][node.pos.x - 1].w
-      )
-        _neighbors.push(this.matrix[node.pos.y - 1][node.pos.x - 1]);
-      if (
-        this.matrix[node.pos.y + 1] &&
-        this.matrix[node.pos.y + 1][node.pos.x - 1] &&
-        this.matrix[node.pos.y + 1][node.pos.x - 1].w &&
-        this.matrix[node.pos.y + 1][node.pos.x] &&
-        this.matrix[node.pos.y + 1][node.pos.x].w &&
-        this.matrix[node.pos.y][node.pos.x - 1] &&
-        this.matrix[node.pos.y][node.pos.x - 1].w
-      )
-        _neighbors.push(this.matrix[node.pos.y + 1][node.pos.x - 1]);
-      if (
-        this.matrix[node.pos.y - 1] &&
-        this.matrix[node.pos.y - 1][node.pos.x + 1] &&
-        this.matrix[node.pos.y - 1][node.pos.x + 1].w &&
-        this.matrix[node.pos.y - 1][node.pos.x] &&
-        this.matrix[node.pos.y - 1][node.pos.x].w &&
-        this.matrix[node.pos.y][node.pos.x + 1] &&
-        this.matrix[node.pos.y][node.pos.x + 1].w
-      )
-        _neighbors.push(this.matrix[node.pos.y - 1][node.pos.x + 1]);
-      if (
-        this.matrix[node.pos.y + 1] &&
-        this.matrix[node.pos.y + 1][node.pos.x + 1] &&
-        this.matrix[node.pos.y + 1][node.pos.x + 1].w &&
-        this.matrix[node.pos.y + 1][node.pos.x] &&
-        this.matrix[node.pos.y + 1][node.pos.x].w &&
-        this.matrix[node.pos.y][node.pos.x + 1] &&
-        this.matrix[node.pos.y][node.pos.x + 1].w
-      )
-        _neighbors.push(this.matrix[node.pos.y + 1][node.pos.x + 1]);
-
+      if (typeof params.allowDiagonal == 'undefined' || params.allowDiagonal === true) {
+        // Diagonal _neighbors
+        if (
+          this.matrix[node.pos.y - 1] &&
+          this.matrix[node.pos.y - 1][node.pos.x - 1] &&
+          this.matrix[node.pos.y - 1][node.pos.x - 1].w &&
+          this.matrix[node.pos.y - 1][node.pos.x] &&
+          this.matrix[node.pos.y - 1][node.pos.x].w &&
+          this.matrix[node.pos.y][node.pos.x - 1] &&
+          this.matrix[node.pos.y][node.pos.x - 1].w
+        )
+          _neighbors.push(this.matrix[node.pos.y - 1][node.pos.x - 1]);
+        if (
+          this.matrix[node.pos.y + 1] &&
+          this.matrix[node.pos.y + 1][node.pos.x - 1] &&
+          this.matrix[node.pos.y + 1][node.pos.x - 1].w &&
+          this.matrix[node.pos.y + 1][node.pos.x] &&
+          this.matrix[node.pos.y + 1][node.pos.x].w &&
+          this.matrix[node.pos.y][node.pos.x - 1] &&
+          this.matrix[node.pos.y][node.pos.x - 1].w
+        )
+          _neighbors.push(this.matrix[node.pos.y + 1][node.pos.x - 1]);
+        if (
+          this.matrix[node.pos.y - 1] &&
+          this.matrix[node.pos.y - 1][node.pos.x + 1] &&
+          this.matrix[node.pos.y - 1][node.pos.x + 1].w &&
+          this.matrix[node.pos.y - 1][node.pos.x] &&
+          this.matrix[node.pos.y - 1][node.pos.x].w &&
+          this.matrix[node.pos.y][node.pos.x + 1] &&
+          this.matrix[node.pos.y][node.pos.x + 1].w
+        )
+          _neighbors.push(this.matrix[node.pos.y - 1][node.pos.x + 1]);
+        if (
+          this.matrix[node.pos.y + 1] &&
+          this.matrix[node.pos.y + 1][node.pos.x + 1] &&
+          this.matrix[node.pos.y + 1][node.pos.x + 1].w &&
+          this.matrix[node.pos.y + 1][node.pos.x] &&
+          this.matrix[node.pos.y + 1][node.pos.x].w &&
+          this.matrix[node.pos.y][node.pos.x + 1] &&
+          this.matrix[node.pos.y][node.pos.x + 1].w
+        )
+          _neighbors.push(this.matrix[node.pos.y + 1][node.pos.x + 1]);
+      }
       return _neighbors;
     };
 
@@ -415,7 +426,7 @@ var PathfindingFX = (function () {
     _distance = (from, to) => {
       var dx = Math.abs(from.x - to.x);
       var dy = Math.abs(from.y - to.y);
-      switch (this.heuristics) {
+      switch (this.settings.heuristics) {
         case "euclidean":
           return Math.sqrt(dx * dx + dy * dy);
         case "manhattan":
@@ -430,8 +441,8 @@ var PathfindingFX = (function () {
      * @param Object to
      * @returns Array of nodes
      */
-    findPath = (from, to) => {
-      return this._find(from, to);
+    findPath = (from, to, params = {}) => {
+      return this._find(from, to, params);
     };
 
     /**
@@ -439,8 +450,8 @@ var PathfindingFX = (function () {
      * @param Object from
      * @returns Array of nodes
      */
-    positions = (from) => {
-      return this._find(from);
+    positions = (from, params = {}) => {
+      return this._find(from, null, params);
     };
 
     /**
@@ -470,7 +481,7 @@ var PathfindingFX = (function () {
           if (!node.to) return;
           if (node.isHovered) return;
 
-          var speed = node.speed;
+          var speed = node.speed || 100;
           if (!speed) return;
 
           if (node.path.length > 1) {
@@ -653,7 +664,7 @@ var PathfindingFX = (function () {
         node.to.show = !isTrapped;
 
         if (!isTrapped) {
-          node.path = this.findPath(node.pos, node.to.pos);
+          node.path = this.findPath(node.pos, node.to.pos, {allowDiagonal: typeof node.allowDiagonal != 'undefined' ? node.allowDiagonal : this.settings.allowDiagonal});
         } else {
           node.path = [];
           node.x = node.pos.x * this.tileSize.w;
@@ -756,10 +767,12 @@ var PathfindingFX = (function () {
         this.drawNode(node);
       });
 
-      if (this.interactionFocus) {
-        this.drawContext(this.interactionFocus);
-      } else if (this.position) {
-        this.drawContext({ pos: this.position });
+      if(this.settings.interactive){
+        if (this.interactionFocus) {
+          this.drawContext(this.interactionFocus);
+        } else if (this.position) {
+          this.drawContext({ pos: this.position });
+        }
       }
 
       return this;
@@ -771,7 +784,7 @@ var PathfindingFX = (function () {
     clearCanvas() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-    
+
     drawMap() {
       this.clearCanvas();
 
@@ -1062,7 +1075,6 @@ var PathfindingFX = (function () {
     }
 
     onDown(event) {
-      console.log(event);
       this.mouseIsDown = true;
       this.pixelPosition = this.normalizePointFromEvent(event);
       this.position = this.getXYFromPoint(this.pixelPosition);
@@ -1078,6 +1090,7 @@ var PathfindingFX = (function () {
               this.onInteractionWithAFreeNode(node, pos, this);
             } else {
               if (
+                this.settings.interactive && 
                 this.free(pos) &&
                 typeof this.map[pos.y] != "undefined" &&
                 typeof this.map[pos.y][pos.x] != "undefined"
@@ -1094,6 +1107,7 @@ var PathfindingFX = (function () {
               this.onInteractionWithAWallNode(node, pos, this);
             } else {
               if (
+                this.settings.interactive && 
                 this.free(pos) &&
                 typeof this.map[pos.y] != "undefined" &&
                 typeof this.map[pos.y][pos.x] != "undefined"
@@ -1155,7 +1169,7 @@ var PathfindingFX = (function () {
       this.currentContext = null;
       this.pixelPosition = null;
       this.onUp(event);
-      if(typeof event != "undefined" && event.type == 'touchend'){
+      if (typeof event != "undefined" && event.type == "touchend") {
         event.preventDefault();
       }
     }

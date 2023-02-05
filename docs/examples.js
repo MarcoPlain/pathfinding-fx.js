@@ -55,7 +55,7 @@ function loadExamplePathfinding() {
   const canvas = document.getElementById("demo-examples");
   let map = [];
 
-  for (let y = 0; y <  Math.ceil(canvas.offsetWidth / SIZE); y++) {
+  for (let y = 0; y < Math.ceil(canvas.offsetWidth / SIZE); y++) {
     map[y] = [];
     for (let x = 0; x < Math.ceil(canvas.offsetWidth / SIZE); x++) {
       map[y][x] = Math.random() > 0.6 ? 0 : 1;
@@ -63,7 +63,7 @@ function loadExamplePathfinding() {
   }
 
   const cbs = {
-    onNoPath: (node) => { 
+    onNoPath: (node) => {
       const accessablePositions = node.positions();
       if (accessablePositions.length > 0)
         node.to.pos =
@@ -72,9 +72,7 @@ function loadExamplePathfinding() {
           ].pos;
     },
   };
-  PFX = new PathfindingFX(canvas, {
-    map: map,
-  })
+  PFX = new PathfindingFX(canvas, map)
     .addNode({
       ...findRandomNode(map),
       ...{
@@ -88,7 +86,11 @@ function loadExamplePathfinding() {
             },
           },
         },
-        style: { color: "#0a9396", size: { w: 0.75, h: 0.75 }, shape: "circle" },
+        style: {
+          color: "#0a9396",
+          size: { w: 0.75, h: 0.75 },
+          shape: "circle",
+        },
         speed: 100,
       },
       ...cbs,
@@ -163,13 +165,12 @@ function loadExampleDataFlow() {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
-  PFX = new PathfindingFX(canvas, {
-    map: map,
+  PFX = new PathfindingFX(canvas, map, {
     emptyNodeColor: "#242424",
     wallNodeColor: "#464646",
   });
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 50; i++) {
     let color =
       COLORS_DATAFLOW[Math.floor(Math.random() * COLORS_DATAFLOW.length)];
     PFX.addNode({
@@ -188,13 +189,12 @@ function loadExampleDataFlow() {
           node.jump(Math.floor(Math.random() * node.path.length));
         },
         onPathEnd: (node) => {
-
-          // Reset the nodes position back to the start position 
+          // Reset the nodes position back to the start position
           // which we stored upon creating the node.
           node.pos.x = node.start.pos.x;
           node.pos.y = node.start.pos.y;
 
-          // Node has new position now, the goal is the same, 
+          // Node has new position now, the goal is the same,
           // but we need to find the Path again.
           node.findPath();
         },
@@ -247,13 +247,11 @@ function loadExampleMazeRunners() {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
-  PFX = new PathfindingFX(canvas, {
-    map: map,
-  });
+  PFX = new PathfindingFX(canvas, map);
 
   const sides = ["top", "left", "right", "bottom"];
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 50; i++) {
     let color =
       COLORS_MAZERUNNERS[Math.floor(Math.random() * COLORS_MAZERUNNERS.length)];
 
@@ -347,8 +345,7 @@ function loadExampleFlooding() {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
-  PFX = new PathfindingFX(canvas, {
-    map: map,
+  PFX = new PathfindingFX(canvas, map, {
     wallNodeColor: "rgba(254, 228, 64, 0.5)",
     wallEdgeColor: "rgba(254, 228, 64, 0.5)",
     onUpdateMap: (map) => {
@@ -359,9 +356,7 @@ function loadExampleFlooding() {
   const cbs = {
     onUpdate: (node, delta) => {
       node.currentFloodAmount += node.floodSpeed / delta;
-      const highestF = Math.max(
-        ...node.positions().map((p) => p.f)
-      );
+      const highestF = Math.max(...node.positions().map((p) => p.f));
       if (node.currentFloodAmount > highestF * 1.25)
         node.currentFloodAmount = 0;
       node.floodToDraw = node
@@ -440,7 +435,7 @@ function loadExampleMountainClimber() {
   document.querySelector("#example-title").innerHTML = "Mountain Climber";
   document.querySelector("#example-description").innerHTML =
     "Making use of a weighted map the pathfinding algorithm makes sure to find the easiest path for our old and brave mountain climber.";
-    document.querySelector("#example-instructions").innerHTML =
+  document.querySelector("#example-instructions").innerHTML =
     "Interact with the map to toggle between different 'heights'";
   document
     .querySelector("[data-demo='ExampleMountainClimber']")
@@ -480,8 +475,7 @@ function loadExampleMountainClimber() {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 4, 4],
   ];
 
-  PFX = new PathfindingFX(canvas, {
-    map: map,
+  PFX = new PathfindingFX(canvas, map, {
     onInteractionWithAFreeNode: (node, pos, pfx) => {
       if (pfx.free(pos)) {
         pfx.map[pos.y][pos.x]++;
@@ -516,7 +510,7 @@ function loadExampleLightSource() {
   document.querySelector("#example-title").innerHTML = "Light Bulb";
   document.querySelector("#example-description").innerHTML =
     "By playing around with colors and calculated reachable positions we've got a light bulb effect.";
-    document.querySelector("#example-instructions").innerHTML =
+  document.querySelector("#example-instructions").innerHTML =
     "Drag around the light bulb node to increase its intensity, there is a smiley hidden somewhere!";
   if (PFX) clearDemo();
   document
@@ -570,8 +564,8 @@ function loadExampleLightSource() {
     },
   };
 
-  PFX = new PathfindingFX(canvas, {
-    map: map,
+  PFX = new PathfindingFX(canvas, map, {
+    interactive:false,
     emptyNodeColor: "#242424",
     wallNodeColor: "#262626",
     highlightEdges: false,
@@ -584,8 +578,6 @@ function loadExampleLightSource() {
     },
     ...cbs,
   });
-
-  //PFX.play();
 }
 
 function clearDemo() {
@@ -596,4 +588,6 @@ function clearDemo() {
   PFX.reset();
   PFX.stop();
 }
+
+// Initially load Basic Pathfinding example
 loadExamplePathfinding();
