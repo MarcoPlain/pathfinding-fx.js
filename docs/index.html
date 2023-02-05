@@ -835,43 +835,43 @@ PFX.addNode({
         <pre class="bg-gray-100 p-2 rounded overflow-x-scroll"><code class="text-xs text-gray-800"><span class="text-gray-400">PFX.addNode(</span>
   {
     <span class="text-gray-600">// Algorithm</span>
-    pos: {                                         <span class="text-gray-600">// initial x and y position (0,0 is in the top left corner)</span>
-      x:                    <span class="text-[#905]">0</span>,
-      y:                    <span class="text-[#905]">0</span>
+    pos: {                     <span class="text-gray-600">// initial x and y position (0,0 is in the top left corner)</span>
+      x:            <span class="text-[#905]">0</span>,
+      y:            <span class="text-[#905]">0</span>
     },
     to: {
-      pos: {                                       <span class="text-gray-600">// position to which the path gets calculated and rendered</span>
-        x:                  <span class="text-[#905]">0</span>,
-        y:                  <span class="text-[#905]">0</span>
+      pos: {                   <span class="text-gray-600">// position to which the path gets calculated and rendered</span>
+        x:          <span class="text-[#905]">0</span>,
+        y:          <span class="text-[#905]">0</span>
       },
-      style:                <span class="text-[#000] italic">[See below, same as node styling]</span>
+      style:        <span class="text-[#000] italic">[See below, same as node styling]</span>
     },
-    allowDiagonal:          <span class="text-[#905]">true</span>,                  <span class="text-gray-600">// allows diagonal movement (this overrides global settings)</span>
+    allowDiagonal:  <span class="text-[#905]">true</span>,      <span class="text-gray-600">// allows diagonal movement (this overrides global settings)</span>
     
     <span class="text-gray-600">// Colors</span>
     style: {
-      color:                <span class="text-[#690]">"#000000"</span>,             <span class="text-gray-600">// color of the node</span>
-      shape:                <span class="text-[#690]">"rect"</span>,                <span class="text-gray-600">// shape of the node ("rect", "circle" "roundRect")</span>
-      mode:                 <span class="text-[#690]">"fill"</span>,                <span class="text-gray-600">// drawing mode of the node ("fill", "stroke")</span>
+      color:        <span class="text-[#690]">"#000000"</span>, <span class="text-gray-600">// color of the node</span>
+      shape:        <span class="text-[#690]">"rect"</span>,    <span class="text-gray-600">// shape of the node ("rect", "circle" "roundRect")</span>
+      mode:         <span class="text-[#690]">"fill"</span>,    <span class="text-gray-600">// drawing mode of the node ("fill", "stroke")</span>
       size: {
-        w:                  <span class="text-[#905]">1</span>                      <span class="text-gray-600">// width of the node, factored to the tile size. (1 equals 100% of the given tiles space)</span>
-        h:                  <span class="text-[#905]">1</span>                      <span class="text-gray-600">// height of the node, factored to the tile size. (1 equals 100% of the given tiles space)</span>
+        w:          <span class="text-[#905]">1</span>          <span class="text-gray-600">// width of the node, factored to the tile size. (1 equals 100% of the given tiles space)</span>
+        h:          <span class="text-[#905]">1</span>          <span class="text-gray-600">// height of the node, factored to the tile size. (1 equals 100% of the given tiles space)</span>
       }
     },
 
     <span class="text-gray-600">// Interactivity</span>
-    interactive:            <span class="text-[#905]">true</span>,                  <span class="text-gray-600">// defines if a node is interactive with cursor or touch events</span>
+    interactive:    <span class="text-[#905]">true</span>,      <span class="text-gray-600">// defines if a node is interactive with cursor or touch events</span>
 
     <span class="text-gray-600">// Animation</span>
-    speed:                  <span class="text-[#905]">100</span>,                   <span class="text-gray-600">// when using PFX.play() this number defines how quickly the node follows its path</span>
+    speed:          <span class="text-[#905]">100</span>,       <span class="text-gray-600">// when using PFX.play() this number defines how quickly the node follows its path</span>
     
     <span class="text-gray-600">// Callbacks</span>   
-    onAdd:                  <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function when a node gets added</span>
-    onRender:               <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function when a node gets rendered in the global render function</span>
-    onUpdate:               <span class="text-[#07a]">function(<span class="text-[#000]">node</span>,<span class="text-[#000]">delta</span>)</span>,  <span class="text-gray-600">// callback function when a nodes gets updated in the global animation update function</span>
-    onPosChange:            <span class="text-[#07a]">function(<span class="text-[#000]">node</span>,<span class="text-[#000]">pos</span>)</span>,    <span class="text-gray-600">// callback function when a nodes position changes</span>
-    onPathEnd:              <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function when the node reaches its goal</span>
-    onNoPath:               <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function a node has no path</span>
+    onAdd:          <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function when a node gets added</span>
+    onRender:       <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function when a node gets rendered in the global render function</span>
+    onUpdate:       <span class="text-[#07a]">function(<span class="text-[#000]">node</span>,<span class="text-[#000]">delta</span>)</span>,  <span class="text-gray-600">// callback function when a nodes gets updated in the global animation update function</span>
+    onPosChange:    <span class="text-[#07a]">function(<span class="text-[#000]">node</span>,<span class="text-[#000]">pos</span>)</span>,    <span class="text-gray-600">// callback function when a nodes position changes</span>
+    onPathEnd:      <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function when the node reaches its goal</span>
+    onNoPath:       <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function a node has no path</span>
   }
 <span class="text-gray-400">)</span></code></pre>
 <h2 class="font-serif py-2">Animation & miscellaneous</h2>
