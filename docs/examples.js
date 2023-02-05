@@ -307,7 +307,7 @@ function loadExampleMazeRunners() {
 function loadExampleFlooding() {
   document.querySelector("#example-title").innerHTML = "Flooding";
   document.querySelector("#example-description").innerHTML =
-    "By figuring out how far every position is from a specific node, and then allowing to show more and more, we've got a pretty floor flooding effect of colors!";
+    "By figuring out how far every position is away from a specific node, and then allowing to show more and more, we've got a pretty floor flooding effect of colors!";
   document.querySelector("#example-instructions").innerHTML =
     "Use your mouse or finger to remove or add walls, see how it effects the flooding effect!";
   if (PFX) clearDemo();
@@ -436,7 +436,7 @@ function loadExampleMountainClimber() {
   document.querySelector("#example-description").innerHTML =
     "Making use of a weighted map the pathfinding algorithm makes sure to find the easiest path for our old and brave mountain climber.";
   document.querySelector("#example-instructions").innerHTML =
-    "Interact with the map to toggle between different 'heights'";
+    "Interact with the map to toggle between different 'heights' (blue is water!)";
   document
     .querySelector("[data-demo='ExampleMountainClimber']")
     .classList.add("bg-teal-500");
