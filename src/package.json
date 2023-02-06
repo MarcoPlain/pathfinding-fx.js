@@ -1,0 +1,23 @@
+{
+  "name": "pathfinding-fx.js",
+  "version": "1.0.0",
+  "description": "A visualization library experiment for interactive website effects based on pathfinding algorithms",
+  "main": "pathfinding-fx.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarcoPlain/pathfinding-fx.js.git"
+  },
+  "keywords": [
+    "pathfinding",
+    "astar"
+  ],
+  "author": "Marco Schlichting (MarcoPlain)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MarcoPlain/pathfinding-fx.js/issues"
+  },
+  "homepage": "https://marcoplain.github.io/pathfinding-fx.js/"
+}

@@ -1310,3 +1310,5 @@ var PathfindingFX = (function () {
 
   return PathfindingFX;
 })();
+
+module.exports.PathfindingFX = PathfindingFX
