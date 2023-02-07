@@ -53,6 +53,10 @@ var PathfindingFX = function () {
       this.targetWalkerIndex = null;
       this.currentContext = null;
       this.element = element;
+      this.element.style.mozUserSelect = "none";
+      this.element.style.webkitUserSelect = "none";
+      this.element.style.msUserSelect = "none";
+      this.element.style.userSelect = "none";
       this.canvas = document.createElement("canvas");
       element.appendChild(this.canvas);
       this.ctx = this.canvas.getContext("2d");
@@ -77,14 +81,14 @@ var PathfindingFX = function () {
       // SETTINGS
       this.settings = {};
       this.settings.heuristics = settings.heuristics || defaults.heuristics;
-      this.settings.allowDiagonal = typeof settings.allowDiagonal != 'undefined' ? settings.allowDiagonal : defaults.allowDiagonal;
+      this.settings.allowDiagonal = typeof settings.allowDiagonal != "undefined" ? settings.allowDiagonal : defaults.allowDiagonal;
       this.settings.wallNodeColor = settings.wallNodeColor || defaults.wallNodeColor;
       this.settings.emptyNodeColor = settings.emptyNodeColor || defaults.emptyNodeColor;
       this.settings.pathNodeColor = settings.pathNodeColor || defaults.pathNodeColor;
       this.settings.weightNodeColors = settings.weightNodeColors || defaults.weightNodeColors;
       this.settings.highlightEdges = typeof settings.highlightEdges != "undefined" ? settings.highlightEdges : defaults.highlightEdges;
       this.settings.wallEdgeColor = typeof settings.wallEdgeColor != "undefined" ? settings.wallEdgeColor : defaults.wallEdgeColor;
-      this.settings.interactive = typeof settings.interactive != 'undefined' ? settings.interactive : defaults.interactive;
+      this.settings.interactive = typeof settings.interactive != "undefined" ? settings.interactive : defaults.interactive;
       this.sqrt2 = Math.sqrt(2);
       this._initMatrix();
       this.clearCanvas();
@@ -277,7 +281,7 @@ var PathfindingFX = function () {
       if (this.matrix[node.pos.y + 1] && this.matrix[node.pos.y + 1][node.pos.x] && this.matrix[node.pos.y + 1][node.pos.x].w) _neighbors.push(this.matrix[node.pos.y + 1][node.pos.x]);
       if (this.matrix[node.pos.y] && this.matrix[node.pos.y][node.pos.x - 1] && this.matrix[node.pos.y][node.pos.x - 1].w) _neighbors.push(this.matrix[node.pos.y][node.pos.x - 1]);
       if (this.matrix[node.pos.y] && this.matrix[node.pos.y][node.pos.x + 1] && this.matrix[node.pos.y][node.pos.x + 1].w) _neighbors.push(this.matrix[node.pos.y][node.pos.x + 1]);
-      if (typeof params.allowDiagonal == 'undefined' || params.allowDiagonal === true) {
+      if (typeof params.allowDiagonal == "undefined" || params.allowDiagonal === true) {
         // Diagonal _neighbors
         if (this.matrix[node.pos.y - 1] && this.matrix[node.pos.y - 1][node.pos.x - 1] && this.matrix[node.pos.y - 1][node.pos.x - 1].w && this.matrix[node.pos.y - 1][node.pos.x] && this.matrix[node.pos.y - 1][node.pos.x].w && this.matrix[node.pos.y][node.pos.x - 1] && this.matrix[node.pos.y][node.pos.x - 1].w) _neighbors.push(this.matrix[node.pos.y - 1][node.pos.x - 1]);
         if (this.matrix[node.pos.y + 1] && this.matrix[node.pos.y + 1][node.pos.x - 1] && this.matrix[node.pos.y + 1][node.pos.x - 1].w && this.matrix[node.pos.y + 1][node.pos.x] && this.matrix[node.pos.y + 1][node.pos.x].w && this.matrix[node.pos.y][node.pos.x - 1] && this.matrix[node.pos.y][node.pos.x - 1].w) _neighbors.push(this.matrix[node.pos.y + 1][node.pos.x - 1]);
@@ -480,7 +484,7 @@ var PathfindingFX = function () {
         node.to.show = !isTrapped;
         if (!isTrapped) {
           node.path = this.findPath(node.pos, node.to.pos, {
-            allowDiagonal: typeof node.allowDiagonal != 'undefined' ? node.allowDiagonal : this.settings.allowDiagonal
+            allowDiagonal: typeof node.allowDiagonal != "undefined" ? node.allowDiagonal : this.settings.allowDiagonal
           });
         } else {
           node.path = [];
@@ -633,7 +637,7 @@ var PathfindingFX = function () {
         if (!next) return;
         var drawX = typeof n.x != "undefined" ? n.x : n.pos.x * this.tileSize.w;
         var drawY = typeof n.y != "undefined" ? n.y : n.pos.y * this.tileSize.h;
-        this.ctx.strokeStyle = node.path.color || typeof node.style != "undefined" && typeof node.style.color != "undefined" ? node.style.color : this.settings.pathNodeColor;
+        this.ctx.strokeStyle = node.path.color || typeof node.to != "undefined" && typeof node.to.style != "undefined" && typeof node.to.style.color != "undefined" ? node.to.style.color : typeof node.style != "undefined" && typeof node.style.color != "undefined" ? node.style.color : this.settings.pathNodeColor;
         this.ctx.beginPath();
         this.ctx.moveTo(drawX + this.tileSize.w / 2, drawY + this.tileSize.h / 2);
         this.ctx.lineTo(next.pos.x * this.tileSize.w + this.tileSize.w / 2, next.pos.y * this.tileSize.h + this.tileSize.h / 2);
@@ -735,13 +739,14 @@ var PathfindingFX = function () {
     // START : CANVAS INTERACTIONS
 
     normalizePointFromEvent(event) {
+      var rect = event.target.getBoundingClientRect();
       if (event.type == "mousedown" || event.type == "mousemove") return {
-        x: event.clientX - this.canvas.offsetLeft + window.scrollX,
-        y: event.clientY - this.canvas.offsetTop + window.scrollY
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
       };
       if (event.type == "touchstart" || event.type == "touchmove") return {
-        x: event.touches[0].clientX - this.canvas.offsetLeft + window.scrollX,
-        y: event.touches[0].clientY - this.canvas.offsetTop + window.scrollY
+        x: event.touches[0].clientX - rect.left,
+        y: event.touches[0].clientY - rect.top
       };
     }
     getXYFromPoint(point) {
@@ -751,10 +756,6 @@ var PathfindingFX = function () {
         x: x,
         y: y
       };
-      if (typeof this.map[y] != "undefined" && typeof this.map[y][x] != "undefined") {
-        return this.map[y][x];
-      }
-      return null;
     }
     onDown(event) {
       this.mouseIsDown = true;
@@ -952,4 +953,3 @@ var PathfindingFX = function () {
   }
   return PathfindingFX;
 }();
-module.exports.PathfindingFX = PathfindingFX;
