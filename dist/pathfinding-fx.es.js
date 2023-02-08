@@ -1,4 +1,5 @@
-function Constructor(element, map = null, settings = {}) {
+/*! pathfinding-fx.js v1.0.4 | A visualization library experiment for interactive website effects based on pathfinding algorithms | Copyright 2023 | ISC license */
+function PathfindingFX(element, map = null, settings = {}) {
   if (!(element instanceof Node)) {
     throw (
       "Can't initialize pathfinding-fx because " + element + " is not a Node."
@@ -144,7 +145,7 @@ function Constructor(element, map = null, settings = {}) {
  * Internal initialization of sizes and
  * dimensions.
  * */
-Constructor.prototype._initSizingAndDimensions = function () {
+PathfindingFX.prototype._initSizingAndDimensions = function () {
   this.element.style.removeProperty("width");
   this.element.style.removeProperty("height");
   this.canvas.style.removeProperty("width");
@@ -193,7 +194,7 @@ Constructor.prototype._initSizingAndDimensions = function () {
  * the current state of the map in order to
  * find a path.
  */
-Constructor.prototype._initMatrix = function () {
+PathfindingFX.prototype._initMatrix = function () {
   let nodeMatrix = [];
   for (let y = 0; y < this.map.length; y++) {
     nodeMatrix[y] = [];
@@ -243,7 +244,7 @@ Constructor.prototype._initMatrix = function () {
  * @param Object to
  * @returns Array of nodes
  */
-Constructor.prototype._find = function (from, to = null, _params = {}) {
+PathfindingFX.prototype._find = function (from, to = null, _params = {}) {
   this._initMatrix();
 
   let open = [this.matrix[from.y][from.x]];
@@ -333,7 +334,7 @@ Constructor.prototype._find = function (from, to = null, _params = {}) {
  * Retrieves the neighbors of given node to
  * proceed with the pathfinding algorithm
  */
-Constructor.prototype._neighbors = function (node, params) {
+PathfindingFX.prototype._neighbors = function (node, params) {
   let _neighbors = [];
   if (
     this.matrix[node.pos.y - 1] &&
@@ -412,7 +413,7 @@ Constructor.prototype._neighbors = function (node, params) {
  * Calculates the distance between two noes
  * based on the heuristic in the settings
  */
-Constructor.prototype._distance = function (from, to) {
+PathfindingFX.prototype._distance = function (from, to) {
   var dx = Math.abs(from.x - to.x);
   var dy = Math.abs(from.y - to.y);
   switch (this.settings.heuristics) {
@@ -430,7 +431,7 @@ Constructor.prototype._distance = function (from, to) {
  * @param Object to
  * @returns Array of nodes
  */
-Constructor.prototype.findPath = function (from, to, params = {}) {
+PathfindingFX.prototype.findPath = function (from, to, params = {}) {
   return this._find(from, to, params);
 };
 
@@ -439,7 +440,7 @@ Constructor.prototype.findPath = function (from, to, params = {}) {
  * @param Object from
  * @returns Array of nodes
  */
-Constructor.prototype.positions = function (from, params = {}) {
+PathfindingFX.prototype.positions = function (from, params = {}) {
   return this._find(from, null, params);
 };
 
@@ -448,7 +449,7 @@ Constructor.prototype.positions = function (from, params = {}) {
  * @param {*} pos
  * @returns
  */
-Constructor.prototype.free = function (pos) {
+PathfindingFX.prototype.free = function (pos) {
   return (
     this.nodesList.findIndex((n) => n.pos.x == pos.x && n.pos.y == pos.y) ==
       -1 &&
@@ -462,7 +463,7 @@ Constructor.prototype.free = function (pos) {
 /**
  * Internal update function for auto play calculations.
  */
-Constructor.prototype._update = function (delta) {
+PathfindingFX.prototype._update = function (delta) {
   this.nodesList
     //.filter((n) => n.to)
     .forEach((node) => {
@@ -508,7 +509,7 @@ Constructor.prototype._update = function (delta) {
 /**
  * Internal animation function for auto play calculations and renderings.
  */
-Constructor.prototype._animation = function (pfx, timestamp) {
+PathfindingFX.prototype._animation = function (pfx, timestamp) {
   if (pfx.lastFrameTimeMs === null) {
     pfx.lastFrameTimeMs = timestamp;
     pfx.delta = 0;
@@ -539,7 +540,7 @@ Constructor.prototype._animation = function (pfx, timestamp) {
 /**
  * Starts auto play.
  */
-Constructor.prototype.play = function () {
+PathfindingFX.prototype.play = function () {
   this.lastFrameTimeMs = null;
   this.animationFrameId = requestAnimationFrame(this._animation.bind(0, this));
   return this;
@@ -548,7 +549,7 @@ Constructor.prototype.play = function () {
 /**
  * Stops auto play.
  */
-Constructor.prototype.stop = function () {
+PathfindingFX.prototype.stop = function () {
   if (this.animationFrameId) {
     cancelAnimationFrame(this.animationFrameId);
     this.animationFrameId = null;
@@ -561,7 +562,7 @@ Constructor.prototype.stop = function () {
 /**
  * Adds a node to the internal engine for rendering and pathfinding.
  */
-Constructor.prototype.addNode = function (node) {
+PathfindingFX.prototype.addNode = function (node) {
   node = {
     ...node,
     ...{
@@ -715,7 +716,7 @@ Constructor.prototype.addNode = function (node) {
 /**
  * Resets PFX und removes all listeners and stuff.
  */
-Constructor.prototype.reset = function () {
+PathfindingFX.prototype.reset = function () {
   this.nodesList.length = 0;
   this.map.length = 0;
 
@@ -740,7 +741,7 @@ Constructor.prototype.reset = function () {
 /**
  * Renders the canvas
  */
-Constructor.prototype.render = function () {
+PathfindingFX.prototype.render = function () {
   //this.clearCanvas();
   this.drawMap();
   this.nodesList.forEach((node) => {
@@ -771,11 +772,11 @@ Constructor.prototype.render = function () {
 /**
  * Clears the canvas
  */
-Constructor.prototype.clearCanvas = function () {
+PathfindingFX.prototype.clearCanvas = function () {
   this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
 
-Constructor.prototype.drawMap = function () {
+PathfindingFX.prototype.drawMap = function () {
   this.clearCanvas();
 
   for (let y = 0; y < this.map.length; y++) {
@@ -876,7 +877,7 @@ Constructor.prototype.drawMap = function () {
   return this;
 };
 
-Constructor.prototype.drawPath = function (node) {
+PathfindingFX.prototype.drawPath = function (node) {
   node.path.forEach((n, key) => {
     let next = node.path[key + 1];
     if (!next) return;
@@ -904,7 +905,7 @@ Constructor.prototype.drawPath = function (node) {
   });
 };
 
-Constructor.prototype.drawContext = function (node) {
+PathfindingFX.prototype.drawContext = function (node) {
   node.style = {
     color: this.settings.wallNodeColor,
     mode: "stroke",
@@ -914,7 +915,7 @@ Constructor.prototype.drawContext = function (node) {
   this.drawNode(node);
 };
 
-Constructor.prototype.drawNode = function (node, config = {}) {
+PathfindingFX.prototype.drawNode = function (node, config = {}) {
   if (!node) return;
 
   const shape = node.style && node.style.shape ? node.style.shape : "rect";
@@ -1034,7 +1035,7 @@ Constructor.prototype.drawNode = function (node, config = {}) {
 
 // START : CANVAS INTERACTIONS
 
-Constructor.prototype.normalizePointFromEvent = function (event) {
+PathfindingFX.prototype.normalizePointFromEvent = function (event) {
   var rect = event.target.getBoundingClientRect();
 
   if (event.type == "mousedown" || event.type == "mousemove")
@@ -1049,13 +1050,13 @@ Constructor.prototype.normalizePointFromEvent = function (event) {
     };
 };
 
-Constructor.prototype.getXYFromPoint = function (point) {
+PathfindingFX.prototype.getXYFromPoint = function (point) {
   const x = Math.round((point.x - this.tileSize.w / 2) / this.tileSize.w);
   const y = Math.round((point.y - this.tileSize.h / 2) / this.tileSize.h);
   return { x: x, y: y };
 };
 
-Constructor.prototype.onDown = function (event) {
+PathfindingFX.prototype.onDown = function (event) {
   this.mouseIsDown = true;
   this.pixelPosition = this.normalizePointFromEvent(event);
   this.position = this.getXYFromPoint(this.pixelPosition);
@@ -1144,7 +1145,7 @@ Constructor.prototype.onDown = function (event) {
   }
 };
 
-Constructor.prototype.onLeave = function (event) {
+PathfindingFX.prototype.onLeave = function (event) {
   this.currentContext = null;
   this.pixelPosition = null;
   this.onUp(event);
@@ -1153,17 +1154,17 @@ Constructor.prototype.onLeave = function (event) {
   }
 };
 
-Constructor.prototype.onUp = function (event) {
+PathfindingFX.prototype.onUp = function (event) {
   this.mouseIsDown = false;
   this.interactionFocus = null;
   this.position = null;
   if (typeof event != "undefined" && event.type == "touchend") {
-    this.nodesList.forEach(n=>{n.isHovered = false})
+    this.nodesList.forEach(n=>{n.isHovered = false;});
   }
   this.render();
 };
 
-Constructor.prototype.nodeIsHovered = function (node, c, pos) {
+PathfindingFX.prototype.nodeIsHovered = function (node, c, pos) {
   node.isHovered =
     (!this.interactionFocus || this.interactionFocus.node == node) &&
     node.pos.x == c.x &&
@@ -1190,7 +1191,7 @@ Constructor.prototype.nodeIsHovered = function (node, c, pos) {
       */
 };
 
-Constructor.prototype.detectContext = function (pos, event) {
+PathfindingFX.prototype.detectContext = function (pos, event) {
   if (!pos) return;
 
   /*const walkerIndex = this.walkers.findIndex((n) =>
@@ -1253,7 +1254,7 @@ Constructor.prototype.detectContext = function (pos, event) {
   }
 };
 
-Constructor.prototype.onMove = function (event) {
+PathfindingFX.prototype.onMove = function (event) {
   this.pixelPosition = this.normalizePointFromEvent(event);
   this.position = this.getXYFromPoint(this.pixelPosition);
 
@@ -1262,6 +1263,7 @@ Constructor.prototype.onMove = function (event) {
       this.interactionFocus.pos.x !== this.position.x ||
       this.interactionFocus.pos.y !== this.position.y
     ) {
+      console.log("setting pos");
       this.interactionFocus.setPos(this.position);
     }
   } else {
@@ -1273,7 +1275,7 @@ Constructor.prototype.onMove = function (event) {
   }
 };
 
-Constructor.prototype.updateMap = function (map) {
+PathfindingFX.prototype.updateMap = function (map) {
   if (typeof this.onUpdateMap === "function") this.onUpdateMap(map);
   this.map = map;
   this._initMatrix();
@@ -1284,4 +1286,4 @@ Constructor.prototype.updateMap = function (map) {
   });
 };
 
-export default Constructor;
+export { PathfindingFX as default };
