@@ -13,7 +13,7 @@
       defer
       src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"
     ></script>
-    <script src="https://unpkg.com/pathfinding-fx.js@1.0.6/dist/pathfinding-fx.js"/>
+    <script src="https://unpkg.com/pathfinding-fx.js@1.0.6/dist/pathfinding-fx.js" />
     <script>
       var _paq = (window._paq = window._paq || []);
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
@@ -117,7 +117,7 @@
               </a>
             </div>
             <div
-              class="flex-1 flex flex-col gap-2 justify-between py-12 px-4 lg:px-0"
+              class="flex-1 flex flex-col gap-2 justify-between py-4 lg:py-12 px-4 lg:px-0"
             >
               <div class="flex flex-col gap-4">
                 <h2 id="example-title" class="text-3xl font-serif"></h2>
@@ -150,14 +150,51 @@
                   </svg>
                   <span>See code on Github</span>
                 </a>
+                <div
+                  class="flex flex-col lg:flex-row items-center text-center gap-2 lg:gap-8 pt-2 lg:pt-0 mt-4 border-t border-gray-300 lg:border-none"
+                >
+                  <div>
+                    <a
+                      href="https://unpkg.com/pathfinding-fx.js@latest/dist/pathfinding-fx.js"
+                      class="text-white bg-teal-900 hover:bg-teal-500 lg:text-xl uppercase px-4 py-3 my-1 inline-block rounded-lg transition duration-300"
+                      >Download</a
+                    >
+                    <p class="text-xs text-gray-500">
+                      Right click
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-4 h-4 inline"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
+                        />
+                      </svg>
+                      Save as
+                    </p>
+                  </div>
+                  <div>
+                    <p class="mt-2 text-gray-700">Also available on npm:</p>
+                    <p>
+                      <code
+                        class="bg-gray-900 text-gray-50 px-2 py-1 inline-block rounded-lg"
+                        >npm i pathfinding-fx.js</code
+                      >
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="flex flex-col gap-0 divide-y-2 container max-w-6xl mx-auto ">
+    <div class="flex flex-col gap-0 divide-y-2 container max-w-6xl mx-auto">
       <!-- PFX :: initialization() -->
       <div
         class="grid grid-cols-1 lg:grid-cols-3 lg:divide-x-2 gap-4 p-4 py-8"
@@ -170,8 +207,8 @@
             and pass in the element where the canvas should be drawn into.
           </p>
           <p class="text-justify">
-            As a second parameter pass the map with a two-dimensional array giving
-            information about what is a wall and what not.
+            As a second parameter pass the map with a two-dimensional array
+            giving information about what is a wall and what not.
           </p>
         </div>
         <div class="flex items-center justify-center">
@@ -231,7 +268,9 @@
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX(
+            <pre
+              class="bg-gray-100 p-2 rounded"
+            ><code class="text-xs text-gray-800">const PFX = new PathfindingFX(
   document.getElementById("pfx-init"),
   [
     <span x-html='"["+map.join("],\n    [")+"]"'></span>
@@ -329,7 +368,9 @@
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
+            <pre
+              class="bg-gray-100 p-2 rounded"
+            ><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
 
 const nodeA = <span x-html="JSON.stringify(nodeA, null, 4)"></span>;
 const nodeB = <span x-html="JSON.stringify(nodeB, null, 4)"></span>;
@@ -441,7 +482,9 @@ PFX.addNode(nodeB);</code></pre>
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
+            <pre
+              class="bg-gray-100 p-2 rounded"
+            ><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
 
 const node = {[...],
   to: <span x-html="JSON.stringify(node.to, null, 4)"></span>
@@ -545,7 +588,9 @@ PFX.addNode(node);</code></pre>
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
+            <pre
+              class="bg-gray-100 p-2 rounded"
+            ><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
 
 const node = {[...],
   to: [...],
@@ -676,7 +721,9 @@ PFX.play();</code></pre>
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
+            <pre
+              class="bg-gray-100 p-2 rounded"
+            ><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...]);
 
 const node = {[...],
   onRender: (node) => {
@@ -784,7 +831,9 @@ PFX.addNode(node);</code></pre>
           </a>
 
           <div class="hidden lg:block text-left">
-            <pre class="bg-gray-100 p-2 rounded"><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...], 
+            <pre
+              class="bg-gray-100 p-2 rounded"
+            ><code class="text-xs text-gray-800">const PFX = new PathfindingFX([...], 
   [
     <span x-html='"["+map.join("],\n    [")+"]"'></span>
   ]
@@ -801,7 +850,9 @@ PFX.addNode({
       <div class="p-4 container mx-auto py-8">
         <h1 class="text-xl font-serif">PFX :: More options with defaults</h1>
         <h2 class="font-serif py-2">Pathfinding Parameters</h2>
-        <pre class="bg-gray-100 p-2 rounded overflow-x-scroll"><code class="text-xs text-gray-800"><span class="text-gray-400">const PFX = new PathfindingFX(element,map,</span>
+        <pre
+          class="bg-gray-100 p-2 rounded overflow-x-scroll"
+        ><code class="text-xs text-gray-800"><span class="text-gray-400">const PFX = new PathfindingFX(element,map,</span>
   {
     <span class="text-gray-600">// Algorithm</span>
     heuristics:                 <span class="text-[#690]">"manhattan"</span>,     <span class="text-gray-600">// used heuristics, can be "manhattan" or "euclidean"</span>
@@ -832,7 +883,9 @@ PFX.addNode({
   }
 <span class="text-gray-400">)</span></code></pre>
         <h2 class="font-serif py-2">Node Parameters</h2>
-        <pre class="bg-gray-100 p-2 rounded overflow-x-scroll"><code class="text-xs text-gray-800"><span class="text-gray-400">PFX.addNode(</span>
+        <pre
+          class="bg-gray-100 p-2 rounded overflow-x-scroll"
+        ><code class="text-xs text-gray-800"><span class="text-gray-400">PFX.addNode(</span>
   {
     <span class="text-gray-600">// Algorithm</span>
     pos: {                     <span class="text-gray-600">// initial x and y position (0,0 is in the top left corner)</span>
@@ -874,8 +927,10 @@ PFX.addNode({
     onNoPath:       <span class="text-[#07a]">function(<span class="text-[#000]">node</span>)</span>,        <span class="text-gray-600">// callback function a node has no path</span>
   }
 <span class="text-gray-400">)</span></code></pre>
-<h2 class="font-serif py-2">Animation & miscellaneous</h2>
-<pre class="bg-gray-100 p-2 rounded overflow-x-scroll"><code class="text-xs text-gray-800"><span class="text-gray-600">// Animation</span>
+        <h2 class="font-serif py-2">Animation & miscellaneous</h2>
+        <pre
+          class="bg-gray-100 p-2 rounded overflow-x-scroll"
+        ><code class="text-xs text-gray-800"><span class="text-gray-600">// Animation</span>
 PFX.<span class="text-[#DD4A68]">play()</span>            <span class="text-gray-600">// enables animation and will automatically update nodes positions</span>
 PFX.<span class="text-[#DD4A68]">stop()</span>            <span class="text-gray-600">// disables animation</span>
 
@@ -924,6 +979,6 @@ PFX.<span class="text-[#DD4A68]">reset()</span>           <span class="text-gray
       </div>
     </div>
 
-    <script src="./examples.js" type="module"></script>
+    <script src="./examples.js"></script>
   </body>
 </html>
