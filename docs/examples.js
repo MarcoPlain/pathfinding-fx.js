@@ -38,12 +38,15 @@ function findRandomNode(map) {
   }
 }
 
-function loadExamplePathfinding() {
+function loadExamplePathfinding(trackEvent = true) {
   document.querySelector("#example-title").innerHTML = "Basic Pathfinding";
   document.querySelector("#example-description").innerHTML =
     "The most basic example, showing 3 nodes following their way to their goal. Once reached, they simply get a new one.";
   document.querySelector("#example-instructions").innerHTML =
     "Use your mouse or finger to remove walls, add them, or drag the nodes and their goals around!";
+
+  if (trackEvent && window._paq)
+    window._paq.push(["trackEvent", "PFX", "Example", "Basic Pathfinding"]);
 
   if (PFX) clearDemo();
   document
@@ -136,6 +139,10 @@ function loadExampleDataFlow() {
   document
     .querySelector("[data-demo='ExampleDataFlow']")
     .classList.remove("bg-teal-900");
+
+  if (window._paq)
+    window._paq.push(["trackEvent", "PFX", "Example", "Data Flow"]);
+
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -218,6 +225,10 @@ function loadExampleMazeRunners() {
   document
     .querySelector("[data-demo='ExampleMazeRunners']")
     .classList.remove("bg-teal-900");
+
+  if (window._paq)
+    window._paq.push(["trackEvent", "PFX", "Example", "Maze Runners"]);
+
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -317,6 +328,10 @@ function loadExampleFlooding() {
   document
     .querySelector("[data-demo='ExampleFlooding']")
     .classList.remove("bg-teal-900");
+
+  if (window._paq)
+    window._paq.push(["trackEvent", "PFX", "Example", "Flooding"]);
+
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -444,6 +459,9 @@ function loadExampleMountainClimber() {
     .querySelector("[data-demo='ExampleMountainClimber']")
     .classList.remove("bg-teal-900");
 
+  if (window._paq)
+    window._paq.push(["trackEvent", "PFX", "Example", "Mountain Climber"]);
+
   if (PFX) clearDemo();
 
   const canvas = document.getElementById("demo-examples");
@@ -519,6 +537,10 @@ function loadExampleLightSource() {
   document
     .querySelector("[data-demo='ExampleLightSource']")
     .classList.remove("bg-teal-900");
+
+  if (window._paq)
+    window._paq.push(["trackEvent", "PFX", "Example", "Light Source"]);
+
   const canvas = document.getElementById("demo-examples");
   let map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
@@ -565,7 +587,7 @@ function loadExampleLightSource() {
   };
 
   PFX = new PathfindingFX(canvas, map, {
-    interactive:false,
+    interactive: false,
     emptyNodeColor: "#242424",
     wallNodeColor: "#262626",
     highlightEdges: false,
@@ -590,4 +612,4 @@ function clearDemo() {
 }
 
 // Initially load Basic Pathfinding example
-loadExamplePathfinding();
+loadExamplePathfinding(false);

@@ -187,8 +187,15 @@
                     </p>
                   </div>
                   <div>
-                    <iframe src="https://ghbtns.com/github-btn.html?user=MarcoPlain&repo=pathfinding-fx.js&type=star&size=large&text=false" frameborder="0" scrolling="0" width="40" height="30" title="GitHub"></iframe>
-</div>
+                    <iframe
+                      src="https://ghbtns.com/github-btn.html?user=MarcoPlain&repo=pathfinding-fx.js&type=star&size=large&text=false"
+                      frameborder="0"
+                      scrolling="0"
+                      width="40"
+                      height="30"
+                      title="GitHub"
+                    ></iframe>
+                  </div>
                 </div>
               </div>
             </div>
@@ -423,7 +430,7 @@ PFX.addNode(nodeB);</code></pre>
                 ],
                 node: {
                   pos: { x: 2, y: 2 },
-                  style: { color: "#457b9d" },
+                  style: { color: "#ff9f1c", shape:"circle" },
                   to: { pos: { x: 6, y: 3 } },
                 },
                 toStyle: false,
@@ -435,7 +442,9 @@ PFX.addNode(nodeB);</code></pre>
 
                   this.pfx = new PathfindingFX(
                     document.getElementById("finding_the_path"),
-                    this.map
+                    this.map,
+                    { wallNodeColor: "#2ec4b6", wallEdgeColor: "#cbf3f0", emptyNodeColor: "#ffffff"  }
+
                   )
                     .drawMap()
                     .addNode(this.node);
@@ -445,7 +454,7 @@ PFX.addNode(nodeB);</code></pre>
                   this.$watch("toStyle", (value) => {
                     if (value) {
                       this.node.to.style = {
-                        color: "#bb3e03",
+                        color: "#ffbf69",
                         shape: "circle",
                         size: { w: 0.5, h: 0.5 },
                       };
