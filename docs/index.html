@@ -430,7 +430,7 @@ PFX.addNode(nodeB);</code></pre>
                 ],
                 node: {
                   pos: { x: 2, y: 2 },
-                  style: { color: "#ff9f1c", shape:"circle" },
+                  style: { color: "#ff9f1c" },
                   to: { pos: { x: 6, y: 3 } },
                 },
                 toStyle: false,
@@ -442,8 +442,7 @@ PFX.addNode(nodeB);</code></pre>
 
                   this.pfx = new PathfindingFX(
                     document.getElementById("finding_the_path"),
-                    this.map,
-                    { wallNodeColor: "#2ec4b6", wallEdgeColor: "#cbf3f0", emptyNodeColor: "#ffffff"  }
+                    this.map
 
                   )
                     .drawMap()
